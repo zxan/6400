@@ -25,9 +25,9 @@ function CarComponent(props){
 }
 
 function DisplayCar() {
-    // State to hold the list of image URLs
+
     const [cars, setCars] = useState([]);
-    useEffect(() => {
+    useEffect(() => {//will be replaced by whatever is in the backend
       const featchedCars = [
         { model: 'BMW', mileage: '100000' },
         {model:"Benz",mileage:'20000'},

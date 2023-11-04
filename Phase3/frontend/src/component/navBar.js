@@ -54,6 +54,7 @@ const styles = {
     }
 };
 
+//you can reuse this nav bar in all pages, anything reusable should go in the components directory
 export default function NavBar() {
     const [anchorEl, setAnchorEl] = React.useState(null);
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import DisplayCar from './DisplayCar';
+import DisplayCar from './DisplayCar';//this is exported from the Display car file, basically a page
 import Home from './home';
 import {
   BrowserRouter as Router,
@@ -12,19 +12,7 @@ import {
 function App() {
   const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get("/api");
-        setMessage(response.data.message);
-      } catch (error) {
-        console.error("Error fetching the API", error);
-      }
-    }
-
-    fetchData();
-  }, []);
-
+//This file is really just for routing, each path is basically what comes after localhost:3000
   return (
     <div className="App">
 
