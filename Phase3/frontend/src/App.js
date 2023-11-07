@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import DisplayCar from './DisplayCar';//this is exported from the Display car file, basically a page
+import DisplayCar from './DisplayCar';
+import SellerHistory from './SellerHistory';//this is exported from the Display car file, basically a page
+import AverageTime from './AverageTime';
 import Home from './home';
 import {
   BrowserRouter as Router,
@@ -19,8 +21,9 @@ function App() {
 <Router>
         <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/DisplayCar" element={<DisplayCar />} />
-        
+          <Route path="/DisplayCar" element={<DisplayCar />} />
+          <Route path="/SellerHistory" element={<SellerHistory />} />
+          <Route path="/AverageTime" element={<AverageTime />} />
         </Routes>
       </Router>
     </div>
