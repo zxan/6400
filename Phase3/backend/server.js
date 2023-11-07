@@ -8,7 +8,7 @@ const PORT = 8888;
 const carController = require('./controllers/cars.js');
 
 app.get('/api/getCriterias', carController.getCriterias);//this is an API endpoint that point to the getCriterias function in carController
-
+app.get('/api/searchCars',carController.searchCars);
 
 
 app.listen(PORT, () => {
