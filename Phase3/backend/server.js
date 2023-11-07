@@ -6,8 +6,12 @@ const PORT = 8888;
 // MySQL Connection
 //each controller is a file under the controllers file
 const carController = require('./controllers/cars.js');
+const customerController = require('./controllers/customers.js');
 
 app.get('/api/getCriterias', carController.getCriterias);//this is an API endpoint that point to the getCriterias function in carController
+app.post('/api/addIndividualCustomer', customerController.addIndividualCustomer);
+app.post('/api/addBusinessCustomer', customerController.addBusinessCustomer);
+
 
 
 
