@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DisplayCar from './DisplayCar';//this is exported from the Display car file, basically a page
+import AddPartsOrder from './AddPartsOrder';
 import Home from './home';
 import {
   BrowserRouter as Router,
@@ -20,6 +21,7 @@ function App() {
         <Routes>
         <Route path="/" element={<Home />} />
           <Route path="/DisplayCar" element={<DisplayCar />} />
+          <Route path="/AddPartsOrder" element={<AddPartsOrder />} />
         </Routes>
       </Router>
     </div>
