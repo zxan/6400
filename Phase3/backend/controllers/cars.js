@@ -49,8 +49,6 @@ exports.getCriterias = (req, res) => {
         });
     });
 };
-<<<<<<< HEAD
-=======
 
 
 exports.searchCars = (req, res) => {
@@ -147,4 +145,3 @@ console.log(params)
         return res.json(results);
     });
 };
->>>>>>> main
