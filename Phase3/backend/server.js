@@ -10,6 +10,7 @@ const reportsController = require('./controllers/reports.js');
 
 app.get('/api/getCriterias', carController.getCriterias);//this is an API endpoint that point to the getCriterias function in carController
 app.get('/api/getSellerReports', reportsController.getSellerReports);
+app.get('/api/getAverageTime', reportsController.getAverageTime);
 
 
 

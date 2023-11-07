@@ -70,3 +70,26 @@ exports.getSellerReports = (req, res) => {
         res.json(formattedResults);
     });
 };
+
+exports.getAverageTime = (req, res) => {
+    const AverageTimeQuery = `
+    SELECT
+        VehicleType.type,
+        IFNULL(CAST(ROUND(AVG(DATEDIFF(Buys_From.transactionDate, Sells_To.purchaseDate)), 2) AS CHAR), 'N/A') AS averageTime
+    FROM VehicleType
+    LEFT JOIN Of_Type ON VehicleType.type = Of_Type.type
+    LEFT JOIN Vehicle ON Vehicle.vin = Of_Type.vin
+    LEFT JOIN Sells_To ON Sells_To.vin = Of_Type.vin
+    LEFT JOIN Buys_From ON Of_Type.vin = Buys_From.vin 
+    GROUP BY VehicleType.type;
+    `;
+  
+    con.query(AverageTimeQuery, (err, results) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        res.status(500).send('Error with the database');
+        return;
+      }
+      res.json(results);
+    });
+  };
