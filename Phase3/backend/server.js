@@ -9,13 +9,9 @@ const carController = require('./controllers/cars.js');
 const reportsController = require('./controllers/reports.js');
 
 app.get('/api/getCriterias', carController.getCriterias);//this is an API endpoint that point to the getCriterias function in carController
-<<<<<<< HEAD
 app.get('/api/getSellerReports', reportsController.getSellerReports);
 app.get('/api/getAverageTime', reportsController.getAverageTime);
-
-=======
 app.get('/api/searchCars',carController.searchCars);
->>>>>>> main
 
 
 app.listen(PORT, () => {
