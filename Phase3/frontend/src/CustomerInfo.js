@@ -75,7 +75,7 @@ function CustomerInfo() {
                       Tax ID: {customerInfo.taxID}
                     </Typography>
                     <Typography variant="body1" color="textSecondary">
-                      Business name: {customerInfo.business}
+                      Business name: {customerInfo.businessName}
                     </Typography>
                     <Typography variant="body1" color="textSecondary">
                       Contact person name: {customerInfo.name}
