@@ -36,3 +36,42 @@ exports.getSearchVendors = (req, res) => {
     res.json(vendorData);
   });
 };
+
+exports.addVendor = (req, res) => {
+  const { name, phoneNumber, street, city, state, postalCode } = req.body;
+  console.log('Request body:', req.body);
+  if (!name || !phoneNumber || !street || !city || !state || !postalCode) {
+    res.status(400).send('All fields are required');
+    return;
+  }
+
+  const insertQuery = `
+    INSERT INTO Vendor (name, phoneNumber, street, city, state, postalCode)
+    SELECT ?, ?, ?, ?, ?, ?
+    FROM dual
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM Vendor
+        WHERE name = ?
+    );
+  `;
+
+  con.query(
+    insertQuery,
+    [name, phoneNumber, street, city, state, postalCode, name],
+    (err, results) => {
+      if (err) {
+        console.error('Error adding a vendor:', err);
+        res.status(500).send('Error with the database');
+        return;
+      }
+
+      const message =
+        results.affectedRows > 0
+          ? 'Vendor added successfully'
+          : 'Vendor already exists and cannot be added';
+
+      res.json({ message });
+    }
+  );
+};

@@ -15,20 +15,56 @@ function AddPartsOrder() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showTable, setShowTable] = useState(false);
+  const [newVendor, setNewVendor] = useState({
+    name: '',
+    phoneNumber: '',
+    street: '',
+    city: '',
+    state: '',
+    postalCode: '',
+  });
 
   const handleSearch = () => {
     // Make an HTTP request to search for vendors based on the searchText
-    axios.get(`/api/getSearchVendors?searchstring=${searchText}`) // Replace with your search API endpoint
+    axios.get(`/api/getSearchVendors?searchstring=${searchText}`)
       .then((response) => {
         console.log('Search results:', response.data);
         setSearchResults(response.data);
-        setShowTable(true); // Show the table after getting results
+        setShowTable(true);
       })
       .catch((error) => {
-        // Handle any errors
         console.error('Error searching for vendors:', error);
       });
   };
+
+  const handleAddVendor = () => {
+    // Define headers with 'Content-Type' set to 'application/json'
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+  
+    // Make an HTTP request to add a new vendor with the specified headers
+    axios.post('/api/addVendor', newVendor, { headers })
+      .then((response) => {
+        console.log('Vendor added:', response.data);
+        // Optionally, you can clear the form or update the results table
+        // Clear the form:
+        setNewVendor({
+          name: '',
+          phoneNumber: '',
+          street: '',
+          city: '',
+          state: '',
+          postalCode: '',
+        });
+        // Refresh the results:
+        handleSearch();
+      })
+      .catch((error) => {
+        console.error('Error adding a vendor:', error);
+      });
+  };
+  
 
   return (
     <div>
@@ -72,6 +108,48 @@ function AddPartsOrder() {
             </Table>
           </TableContainer>
         )}
+        <h1>Add New Vendor</h1>
+        <div>
+          <TextField
+            label="Name"
+            variant="outlined"
+            value={newVendor.name}
+            onChange={(e) => setNewVendor({ ...newVendor, name: e.target.value })}
+          />
+          <TextField
+            label="Phone Number"
+            variant="outlined"
+            value={newVendor.phoneNumber}
+            onChange={(e) => setNewVendor({ ...newVendor, phoneNumber: e.target.value })}
+          />
+          <TextField
+            label="Street"
+            variant="outlined"
+            value={newVendor.street}
+            onChange={(e) => setNewVendor({ ...newVendor, street: e.target.value })}
+          />
+          <TextField
+            label="City"
+            variant="outlined"
+            value={newVendor.city}
+            onChange={(e) => setNewVendor({ ...newVendor, city: e.target.value })}
+          />
+          <TextField
+            label="State"
+            variant="outlined"
+            value={newVendor.state}
+            onChange={(e) => setNewVendor({ ...newVendor, state: e.target.value })}
+          />
+          <TextField
+            label="Postal Code"
+            variant="outlined"
+            value={newVendor.postalCode}
+            onChange={(e) => setNewVendor({ ...newVendor, postalCode: e.target.value })}
+          />
+          <Button variant="contained" color="primary" onClick={handleAddVendor}>
+            Add Vendor
+          </Button>
+        </div>
       </div>
     </div>
   );
