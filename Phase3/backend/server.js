@@ -12,6 +12,7 @@ app.use(express.json());
 const carController = require('./controllers/cars.js');
 const vendorController = require('./controllers/vendors.js');
 const reportsController = require('./controllers/reports.js');
+const customerController=require('./controllers/customers.js');
 
 // cars API
 app.get('/api/getCriterias', carController.getCriterias);//this is an API endpoint that point to the getCriterias function in carController
