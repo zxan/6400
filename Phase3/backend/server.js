@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql');
 const app = express();
+app.use(express.json());
 const PORT = 8888;
 
 // MySQL Connection
@@ -8,11 +9,19 @@ const PORT = 8888;
 const carController = require('./controllers/cars.js');
 const customerController = require('./controllers/customers.js');
 
+// cars API
 app.get('/api/getCriterias', carController.getCriterias);//this is an API endpoint that point to the getCriterias function in carController
+app.get('/api/searchCars',carController.searchCars);
+
+// customer API
 app.post('/api/addIndividualCustomer', customerController.addIndividualCustomer);
 app.post('/api/addBusinessCustomer', customerController.addBusinessCustomer);
 
+// part API
 
+// report API
+
+// user API
 
 
 app.listen(PORT, () => {
