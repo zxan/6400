@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { AppBar, Button, Box, Container, Toolbar, Typography, IconButton, Menu, MenuItem } from '@mui/material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import { Link } from 'react-router-dom';
-
+import { Link ,useNavigate} from 'react-router-dom';
+import Axios from "axios";
 const navItems = [{name:'Seller History',path:'/sellerHistory'},{name:'Average Time in Inventory Report',path:'/averageTime'},{name:'Price Per Condition Report',path:'/priceReport'},{name:'Parts Statistics Report',path:'/partsReport'},{name:'Monthly Sales Report',path:'/monthlySalesReport'}];
 
 const styles = {
@@ -56,7 +56,35 @@ const styles = {
 
 //you can reuse this nav bar in all pages, anything reusable should go in the components directory
 export default function NavBar() {
+
+    function LogOut(){
+        setLoggedInUser(null);
+        sessionStorage.clear();
+    }
+    const [loggedInUser,setLoggedInUser]=React.useState(null);
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [isManagerOrOwner,setIsManagerorOwner]=React.useState(false);
+    const [isInventoryOrOwner,setIsInventoryOrOwner]=React.useState(false);
+    const navigate = useNavigate();
+    React.useEffect(() => {
+        const storedUser = sessionStorage.getItem('user');
+    if (storedUser) {
+        setLoggedInUser(storedUser);
+        Axios.get("/api/isManagerOrOwner",{ params: { 'username': storedUser } }).then((response) => {
+            if (response.data == false) {
+                setIsManagerorOwner(false);
+                setIsInventoryOrOwner(false);
+            }
+            else{
+                setIsManagerorOwner(true);
+                setIsInventoryOrOwner(true);
+            }
+            ;
+        }).catch((error) => {
+           console.log(error);
+        });
+    }
+      }, []); 
 
     return (
         <Box sx={{ width: '60%', padding: 'auto', margin: '0 auto' }}>
@@ -78,6 +106,8 @@ export default function NavBar() {
                         </Button>
 
                         {/* Report Dropdown */}
+                        {isManagerOrOwner==true &&
+                        <div>
                         <Button
                             aria-controls="report-menu"
                             aria-haspopup="true"
@@ -102,8 +132,13 @@ export default function NavBar() {
                                 </MenuItem>
                             ))}
                         </Menu>
+                        </div>
+                        }
                         <Box style={{ flexGrow: 1 }}></Box>
-                        <Button style={styles.loginButton}>Login</Button>
+                        {loggedInUser === null ? 
+                <Button onClick={() => navigate('/Login')} style={styles.loginButton}>Login</Button>: 
+                <Button onClick={LogOut} style={styles.loginButton}>Log Out</Button>
+            }
                     </Toolbar>
                 </Container>
             </AppBar>

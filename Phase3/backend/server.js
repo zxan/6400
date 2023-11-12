@@ -13,7 +13,7 @@ const carController = require('./controllers/cars.js');
 const vendorController = require('./controllers/vendors.js');
 const reportsController = require('./controllers/reports.js');
 const customerController=require('./controllers/customers.js');
-
+const userController=require('./controllers/user.js');
 // cars API
 app.get('/api/getCriterias', carController.getCriterias);//this is an API endpoint that point to the getCriterias function in carController
 app.get('/api/getSearchVendors', vendorController.getSearchVendors);
@@ -31,7 +31,9 @@ app.post('/api/addBusinessCustomer', customerController.addBusinessCustomer);
 // report API
 
 // user API
-
+app.get('/api/login',userController.getPassword);
+app.get('/api/isManagerOrOwner',userController.isManagerOrOwner);
+app.get('/api/isInventoryOrOwner',userController.isInventoryOrOwner);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);//listening in port 8888, frontend will point to this to talk to this backend
