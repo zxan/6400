@@ -68,6 +68,7 @@ function DisplayCar() {
       };
       axios.get('/api/searchCars',{params})
         .then(response => {
+
           setCars(response.data);
         })
         .catch(error => {
