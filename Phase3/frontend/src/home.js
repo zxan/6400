@@ -31,7 +31,7 @@ function Home() {
     const [price, setPrice] = useState(null);
     const [mileage, setMileage] = useState(null);
     const [keyword, setKeyword] = useState('');
-   
+    const [loggedInUser,setLoggedInUser]=useState(null);
 
 
     const onSubmit = (event) => {
@@ -67,6 +67,10 @@ function Home() {
     }
 
     useEffect(() => {
+        const storedUser = sessionStorage.getItem('user');
+    if (storedUser) {
+        setLoggedInUser(storedUser);
+    }
         //This is important!!!!! Axios is how you communicate with backend
         //if you go to our backend server.js, you will see this get API endpoint
         axios.get('/api/getCriterias')
@@ -84,6 +88,7 @@ function Home() {
             });
     }, []);
     if (manufacturerOptions&& yearOptions && colorOptions && vehicleTypeOptions && fuelTypeOptions) {//only render the page when these variables are not empty
+        console.log(loggedInUser)
         return (
             <div >
             
@@ -93,7 +98,7 @@ function Home() {
 
                     <Grid container spacing={3}>
                         {/* Left Grid for Content */}
-                        <Grid item xs={6}>
+                        <Grid item md={6}>
                             <Typography variant="h1" component="h1" style={styles.header}>
                                 BuzzCar
                             </Typography>
@@ -212,7 +217,7 @@ function Home() {
                           
                         </Grid>
                         {/* Right Grid for Image */}
-                        <Grid item xs={6} style={styles.imgContainer}>
+                        <Grid item md={6} style={styles.imgContainer}>
                             <img
                                 style={styles.img}
                                 src="https://source.unsplash.com/1600x900/?cars"
@@ -236,7 +241,7 @@ function Home() {
 //Following is for styling
 const styles = {
     container: {
-        height: '60rem',
+        height: '50rem',
         display: 'flex',
         background: '#f4f4f4',
         alignItems: 'center',
