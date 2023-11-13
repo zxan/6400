@@ -11,17 +11,13 @@ app.use(express.json());
 //each controller is a file under the controllers file
 const carController = require('./controllers/cars.js');
 const vendorController = require('./controllers/vendors.js');
+const partController = require('./controllers/parts.js');
 const reportsController = require('./controllers/reports.js');
 const customerController=require('./controllers/customers.js');
 const userController=require('./controllers/user.js');
 // cars API
 
 app.get('/api/getCriterias', carController.getCriterias);//this is an API endpoint that point to the getCriterias function in carController
-app.get('/api/getSearchVendors', vendorController.getSearchVendors);
-app.post('/api/addVendor', vendorController.addVendor);
-app.get('/api/getSellerReports', reportsController.getSellerReports);
-app.get('/api/getAverageTime', reportsController.getAverageTime);
-app.get('/api/getPriceReport', reportsController.getPriceReport);
 app.get('/api/searchCars',carController.searchCars);
 
 // customer API
@@ -29,8 +25,14 @@ app.post('/api/addIndividualCustomer', customerController.addIndividualCustomer)
 app.post('/api/addBusinessCustomer', customerController.addBusinessCustomer);
 
 // part API
+app.get('/api/getSearchVendors', vendorController.getSearchVendors);
+app.post('/api/addVendor', vendorController.addVendor);
+app.get('/api/getPartOrder', partController.getPartOrder);
 
 // report API
+app.get('/api/getSellerReports', reportsController.getSellerReports);
+app.get('/api/getAverageTime', reportsController.getAverageTime);
+app.get('/api/getPriceReport', reportsController.getPriceReport);
 
 // user API
 app.get('/api/login',userController.getPassword);

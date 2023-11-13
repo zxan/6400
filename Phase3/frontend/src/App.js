@@ -7,6 +7,7 @@ import AddPartsOrder from './AddPartsOrder';
 import SellerHistory from './SellerHistory';//this is exported from the Display car file, basically a page
 import AverageTime from './AverageTime';
 import PriceReport from './PriceReport';
+import PartOrderStatus from './PartOrderStatus';
 import Home from './home';
 import Login from './Login';
 import {
@@ -33,6 +34,7 @@ function App() {
           <Route path="/SellerHistory" element={<SellerHistory />} />
           <Route path="/AverageTime" element={<AverageTime />} />
           <Route path="/PriceReport" element={<PriceReport />} />
+          <Route path="/PartOrderStatus" element={<PartOrderStatus />} />
           <Route path="/Login" element={<Login/>} />
         </Routes>
       </Router>
