@@ -9,7 +9,8 @@ import TableRow from '@mui/material/TableRow';
 import { Card, CardContent, Typography, TextField, Button, Grid, Tabs, Tab } from '@mui/material';
 import axios from 'axios';
 import NavBar from './component/navBar';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function AddPartsOrder() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -41,14 +42,33 @@ function AddPartsOrder() {
     const phoneNumberRegex = /^\d{3}-\d{3}-\d{4}$/;
     if (!phoneNumberRegex.test(newVendor.phoneNumber)) {
       // Display an error message (you can customize this part based on your UI framework)
-      alert('Invalid phone number format. Please use xxx-xxx-xxxx format.');
+
+      toast.error('Invalid phone number format. Please use xxx-xxx-xxxx format.', {
+        position: "top-center",
+        autoClose: true,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
       return; // Don't proceed with adding the vendor
     }
 
     // Validate postal code format
     const postalCodeRegex = /^\d{5}$/;
     if (!postalCodeRegex.test(newVendor.postalCode)) {
-      alert('Invalid postal code format. Please use a 5-digit code.');
+      toast.error('Invalid postal code format. Please use a 5-digit code.', {
+        position: "top-center",
+        autoClose: true,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
       return; // Don't proceed with adding the vendor
     }
   
@@ -84,6 +104,7 @@ function AddPartsOrder() {
   return (
     <div>
       <NavBar />
+      <ToastContainer />
       <div style={{ textAlign: 'center' }}>
         <h1>Search for Vendors</h1>
         <Grid container justifyContent="center">
