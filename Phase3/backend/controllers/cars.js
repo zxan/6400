@@ -16,7 +16,7 @@ exports.getCriterias = (req, res) => {
             return; 
         }
         criterias["Vehicle Type"] = results.map(result => result.type);
-        console.log('Vehicle Type criteria fetched:', criterias["Vehicle Type"]);
+
 
         const manufacturerQuery = 'SELECT company FROM Manufacturer';
         con.query(manufacturerQuery, (err, results) => {
@@ -25,7 +25,7 @@ exports.getCriterias = (req, res) => {
                 return; 
             }
             criterias["Manufacturer"] = results.map(result => result.company);
-            console.log('Manufacturer criteria fetched:', criterias["Manufacturer"]);
+
 
             const colorQuery = 'SELECT color FROM VehicleColor';
             con.query(colorQuery, (err, results) => {
@@ -34,7 +34,7 @@ exports.getCriterias = (req, res) => {
                     return; 
                 }
                 criterias["Color"] = results.map(result => result.color);
-                console.log('Color criteria fetched:', criterias["Color"]);
+
 
                 let modelYears = [];
                 const currentYear = new Date().getFullYear();
@@ -42,7 +42,7 @@ exports.getCriterias = (req, res) => {
                     modelYears.push(i);
                 }
                 criterias["Model Year"] = modelYears;
-                console.log('Model Year criteria fetched:', criterias["Model Year"]);
+     
 
                 res.json(criterias); // this returns the final results 
             });
@@ -105,14 +105,14 @@ WHERE (v.vin NOT IN ( -- filter out the cars that have not been installed
         OR ? IS NULL)
         AND (v.mileage <= ?
         OR ? IS NULL)
-        AND (1.1 * (SELECT 
+        AND (1.1 * COALESCE((SELECT 
             SUM(P.cost * P.quantity)
         FROM
             PartOrder PO
                 JOIN
             Part P ON P.orderNumber = PO.orderNumber
         WHERE
-            PO.vin = v.vin) + 1.25 * (SELECT 
+            PO.vin = v.vin),0) + 1.25 * (SELECT 
             s.purchasePrice
         FROM
             Sells_To s
