@@ -93,3 +93,50 @@ exports.getAverageTime = (req, res) => {
       res.json(results);
     });
   };
+
+
+  exports.getPriceReport = (req, res) => {
+    const priceReportQuery = `
+    SELECT
+        VT.type AS VehicleType,
+        Conditions.CarCondition,
+        ROUND(AVG(
+            CASE
+                WHEN V.carCondition = Conditions.CarCondition
+                THEN 1.1 * COALESCE(IndividualPartsCost, 0) + 1.25 * COALESCE(ST.purchasePrice, 0)
+                ELSE 0
+            END
+        ), 2) AS AveragePrice
+    FROM VehicleType VT
+    CROSS JOIN (
+        SELECT 'Excellent' AS CarCondition
+        UNION ALL
+        SELECT 'Very Good'
+        UNION ALL
+        SELECT 'Good'
+        UNION ALL
+        SELECT 'Fair'
+    ) Conditions
+    LEFT JOIN Of_Type OT ON VT.type = OT.type
+    LEFT JOIN Vehicle V ON OT.vin = V.vin
+    LEFT JOIN (
+        SELECT 
+            P.vin,
+            COALESCE(SUM(P.cost * COALESCE(P.quantity, 0)), 0) AS IndividualPartsCost
+        FROM Part P
+        GROUP BY P.vin
+    ) Parts ON V.vin = Parts.vin
+    LEFT JOIN Sells_To ST ON V.vin = ST.vin
+    GROUP BY VT.type, Conditions.CarCondition
+    ORDER BY VT.type, FIELD(Conditions.CarCondition, 'Excellent', 'Very Good', 'Good', 'Fair');
+    `;
+
+    con.query(priceReportQuery, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).send('Error with the database');
+            return;
+        }
+        res.json(results);
+    });
+};
