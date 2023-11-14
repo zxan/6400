@@ -167,3 +167,41 @@ exports.getPartsStatistics = (req, res) => {
         res.json(results);
     });
 };
+
+exports.getSummaryReport = (req, res) => {
+    const summaryReportQuery = `
+        SELECT
+            YEAR(BF.transactionDate) AS SaleYear,
+            MONTH(BF.transactionDate) AS SaleMonth,
+            COUNT(DISTINCT BF.vin) AS TotalVehiclesSold,
+            ROUND(SUM(
+                1.1 * COALESCE(PartsCost, 0) + 1.25 * COALESCE(ST.purchasePrice, 0)
+            ), 2) AS TotalSalesIncome,
+            ROUND(SUM(
+                1.1 * COALESCE(PartsCost, 0) + 1.25 * COALESCE(ST.purchasePrice, 0) -
+                COALESCE(ST.purchasePrice, 0) -
+                COALESCE(PartsCost, 0)
+            ), 2) AS TotalNetIncome
+        FROM Sells_To ST
+        JOIN Buys_From BF ON ST.vin = BF.vin
+        LEFT JOIN (
+            SELECT
+                PO.vin,
+                COALESCE(SUM(P.cost * P.quantity), 0) AS PartsCost
+            FROM PartOrder PO
+            JOIN Part P ON P.orderNumber = PO.orderNumber
+            GROUP BY PO.vin
+        ) PartsPrice ON ST.vin = PartsPrice.vin
+        GROUP BY SaleYear, SaleMonth
+        ORDER BY SaleYear DESC, SaleMonth DESC;
+    `;
+
+    con.query(summaryReportQuery, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).send('Error with the database');
+            return;
+        }
+        res.json(results);
+    });
+};

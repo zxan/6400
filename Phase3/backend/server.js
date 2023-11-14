@@ -32,6 +32,7 @@ app.get('/api/getSellerReports', reportsController.getSellerReports);
 app.get('/api/getAverageTime', reportsController.getAverageTime);
 app.get('/api/getPriceReport', reportsController.getPriceReport);
 app.get('/api/getPartsStatistics', reportsController.getPartsStatistics);
+app.get('/api/getSummaryReport', reportsController.getSummaryReport);
 
 
 // user API
