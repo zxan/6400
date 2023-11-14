@@ -140,3 +140,30 @@ exports.getAverageTime = (req, res) => {
         res.json(results);
     });
 };
+
+exports.getPartsStatistics = (req, res) => {
+    const partsStatisticsQuery = `
+    SELECT
+        V.name AS VendorName,
+        COUNT(P.partNumber) AS TotalPartsSupplied,
+        SUM(P.quantity) AS TotalPartsQuantity,
+        SUM(P.quantity * P.cost) AS TotalDollarAmount
+    FROM
+        Part P
+    JOIN
+        PartOrder PO ON P.vin = PO.vin AND P.orderNumber = PO.orderNumber
+    JOIN
+        Vendor V ON PO.vendorName = V.name
+    GROUP BY
+        VendorName;
+    `;
+
+    con.query(partsStatisticsQuery, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).send('Error with the database');
+            return;
+        }
+        res.json(results);
+    });
+};
