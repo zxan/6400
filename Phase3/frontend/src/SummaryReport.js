@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import NavBar from './component/navBar'; // Make sure to adjust the path if needed
+import NavBar from './component/navBar';
 import axios from 'axios';
 
 function SummaryReport() {
   const [summaryData, setSummaryData] = useState([]);
 
   useEffect(() => {
-    // You may need to adjust the endpoint based on your backend
+    // Adjust the endpoint based on your backend
     axios.get('/api/getSummaryReport')
       .then(response => {
         setSummaryData(response.data);
@@ -29,11 +29,20 @@ function SummaryReport() {
       border: '1px solid #000',
       padding: '8px',
       textAlign: 'left',
+      fontWeight: 'bold',
+    },
+    cell: {
+      border: '1px solid #000',
+      padding: '8px',
+      textAlign: 'right', // Align numbers to the right
     },
     title: {
       textAlign: 'center',
       marginTop: '5%',
       marginBottom: '20px',
+    },
+    evenRow: {
+      backgroundColor: '#f9f9f9',
     },
   };
 
@@ -52,19 +61,33 @@ function SummaryReport() {
           </tr>
         </thead>
         <tbody>
-          {summaryData.map((entry) => (
-            <tr key={`${entry.SaleYear}-${entry.SaleMonth}`}>
-              <td>{entry.SaleYear}</td>
-              <td>{entry.SaleMonth}</td>
-              <td>{entry.TotalVehiclesSold}</td>
-              <td>${entry.TotalSalesIncome}</td>
-              <td>${entry.TotalNetIncome}</td>
+          {summaryData.map((entry, index) => (
+            <tr key={`${entry.SaleYear}-${entry.SaleMonth}`} style={index % 2 === 0 ? styles.evenRow : null}>
+              <td style={styles.cell}>{entry.SaleYear}</td>
+              <td style={styles.cell}>{getMonthName(entry.SaleMonth)}</td>
+              <td style={styles.cell}>{entry.TotalVehiclesSold}</td>
+              <td style={styles.cell}>${formatNumber(entry.TotalSalesIncome)}</td>
+              <td style={styles.cell}>${formatNumber(entry.TotalNetIncome)}</td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
   );
+}
+
+// Helper function to format numbers with commas
+function formatNumber(number) {
+  return number.toLocaleString();
+}
+
+// Helper function to get month name from month number
+function getMonthName(monthNumber) {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  return months[monthNumber - 1] || '';
 }
 
 export default SummaryReport;
