@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
+import NavBar from './component/navBar';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { Card, CardContent, Typography, TextField, Button, Grid, Tabs, Tab } from '@mui/material';
+import { TextField, Button, Grid } from '@mui/material';
 import axios from 'axios';
-import NavBar from './component/navBar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 function AddPartsOrder() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -25,7 +26,6 @@ function AddPartsOrder() {
   });
 
   const handleSearch = () => {
-    // Make an HTTP request to search for vendors based on the searchText
     axios.get(`/api/getSearchVendors?searchstring=${searchText}`)
       .then((response) => {
         console.log('Search results:', response.data);
@@ -38,51 +38,30 @@ function AddPartsOrder() {
   };
 
   const handleAddVendor = () => {
-    // Validate phone number format
-    const phoneNumberRegex = /^\d{3}-\d{3}-\d{4}$/;
-    if (!phoneNumberRegex.test(newVendor.phoneNumber)) {
-      // Display an error message (you can customize this part based on your UI framework)
-
-      toast.error('Invalid phone number format. Please use xxx-xxx-xxxx format.', {
-        position: "top-center",
-        autoClose: true,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+    // Check if any of the fields is empty
+    for (const key in newVendor) {
+      if (newVendor[key].trim() === '') {
+        toast.error(`Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`, {
+          position: "top-center",
+          autoClose: true,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
         });
-      return; // Don't proceed with adding the vendor
+        return; // Don't proceed with adding the vendor
+      }
     }
 
-    // Validate postal code format
-    const postalCodeRegex = /^\d{5}$/;
-    if (!postalCodeRegex.test(newVendor.postalCode)) {
-      toast.error('Invalid postal code format. Please use a 5-digit code.', {
-        position: "top-center",
-        autoClose: true,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        });
-      return; // Don't proceed with adding the vendor
-    }
-  
-    // Define headers with 'Content-Type' set to 'application/json'
     const headers = {
       'Content-Type': 'application/json',
     };
-  
-    // Make an HTTP request to add a new vendor with the specified headers
+
     axios.post('/api/addVendor', newVendor, { headers })
       .then((response) => {
         console.log('Vendor added:', response.data);
-        // Optionally, you can clear the form or update the results table
-        // Clear the form:
         setNewVendor({
           name: '',
           phoneNumber: '',
@@ -91,20 +70,16 @@ function AddPartsOrder() {
           state: '',
           postalCode: '',
         });
-        // Refresh the results:
         handleSearch();
       })
       .catch((error) => {
         console.error('Error adding a vendor:', error);
       });
   };
-  
-  
 
   return (
     <div>
       <NavBar />
-      <ToastContainer />
       <div style={{ textAlign: 'center' }}>
         <h1>Search for Vendors</h1>
         <Grid container justifyContent="center">
@@ -200,6 +175,7 @@ function AddPartsOrder() {
           </Grid>
         </Grid>
       </div>
+      <ToastContainer />
     </div>
   );
 }
