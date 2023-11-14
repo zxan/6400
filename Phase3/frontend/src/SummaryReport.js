@@ -69,16 +69,16 @@ function SummaryReport() {
         <tbody>
           {summaryData.map((entry, index) => (
             <tr key={`${entry.SaleYear}-${entry.SaleMonth}`} style={index % 2 === 0 ? styles.evenRow : null}>
-              <td style={styles.cell}>
-                <Link to={`/SummaryReportDetail/${entry.SaleYear}/${entry.SaleMonth}`} style={styles.link}>
-                  {entry.SaleYear}
+                <td style={styles.cell}>
+                <Link to={`/SummaryReportDetail/${entry.SaleYear}/0`} style={styles.link}>
+                    {entry.SaleYear}
                 </Link>
-              </td>
-              <td style={styles.cell}>
-                <Link to={`/SummaryReportDetail/${entry.SaleYear}/${entry.SaleMonth}`} style={styles.link}>
-                  {getMonthName(entry.SaleMonth)}
-                </Link>
-              </td>
+                </td>
+                <td style={styles.cell}>
+                    <Link to={`/SummaryReportDetail/${entry.SaleYear}/${entry.SaleMonth}`} style={styles.link}>
+                    {getMonthName(entry.SaleMonth)}
+                    </Link>
+                </td>
               <td style={styles.cell}>{entry.TotalVehiclesSold}</td>
               <td style={styles.cell}>${formatNumber(entry.TotalSalesIncome)}</td>
               <td style={styles.cell}>${formatNumber(entry.TotalNetIncome)}</td>
