@@ -8,6 +8,10 @@ import SellerHistory from './SellerHistory';//this is exported from the Display 
 import AverageTime from './AverageTime';
 import PriceReport from './PriceReport';
 import PartOrderStatus from './PartOrderStatus';
+import PartsStatistics from './PartsStatistics';
+import SummaryReport from './SummaryReport';
+import SummaryReportDetail from './SummaryReportDetail';
+
 import Home from './home';
 import Login from './Login';
 import {
@@ -35,6 +39,9 @@ function App() {
           <Route path="/AverageTime" element={<AverageTime />} />
           <Route path="/PriceReport" element={<PriceReport />} />
           <Route path="/PartOrderStatus" element={<PartOrderStatus />} />
+          <Route path="/PartsStatistics" element={<PartsStatistics />} />
+          <Route path="/SummaryReport" element={<SummaryReport />} />
+          <Route path="/SummaryReportDetail/:year/:month" element={<SummaryReportDetail />} />
           <Route path="/Login" element={<Login/>} />
         </Routes>
       </Router>

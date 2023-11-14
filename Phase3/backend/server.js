@@ -33,6 +33,9 @@ app.get('/api/getPartOrder', partController.getPartOrder);
 app.get('/api/getSellerReports', reportsController.getSellerReports);
 app.get('/api/getAverageTime', reportsController.getAverageTime);
 app.get('/api/getPriceReport', reportsController.getPriceReport);
+app.get('/api/getPartsStatistics', reportsController.getPartsStatistics);
+app.get('/api/getSummaryReport', reportsController.getSummaryReport);
+app.get('/api/getSummaryReportDetail/:year/:month', reportsController.getSummaryReportDetail);
 
 // user API
 app.get('/api/login',userController.getPassword);
