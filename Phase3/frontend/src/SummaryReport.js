@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import NavBar from './component/navBar';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 function SummaryReport() {
   const [summaryData, setSummaryData] = useState([]);
@@ -44,6 +45,11 @@ function SummaryReport() {
     evenRow: {
       backgroundColor: '#f9f9f9',
     },
+    link: {
+      textDecoration: 'underline',
+      color: 'blue',
+      cursor: 'pointer',
+    },
   };
 
   return (
@@ -63,8 +69,16 @@ function SummaryReport() {
         <tbody>
           {summaryData.map((entry, index) => (
             <tr key={`${entry.SaleYear}-${entry.SaleMonth}`} style={index % 2 === 0 ? styles.evenRow : null}>
-              <td style={styles.cell}>{entry.SaleYear}</td>
-              <td style={styles.cell}>{getMonthName(entry.SaleMonth)}</td>
+              <td style={styles.cell}>
+                <Link to={`/SummaryReportDetail/${entry.SaleYear}/${entry.SaleMonth}`} style={styles.link}>
+                  {entry.SaleYear}
+                </Link>
+              </td>
+              <td style={styles.cell}>
+                <Link to={`/SummaryReportDetail/${entry.SaleYear}/${entry.SaleMonth}`} style={styles.link}>
+                  {getMonthName(entry.SaleMonth)}
+                </Link>
+              </td>
               <td style={styles.cell}>{entry.TotalVehiclesSold}</td>
               <td style={styles.cell}>${formatNumber(entry.TotalSalesIncome)}</td>
               <td style={styles.cell}>${formatNumber(entry.TotalNetIncome)}</td>
