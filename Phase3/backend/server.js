@@ -11,6 +11,7 @@ app.use(express.json());
 //each controller is a file under the controllers file
 const carController = require('./controllers/cars.js');
 const vendorController = require('./controllers/vendors.js');
+const partController = require('./controllers/parts.js');
 const reportsController = require('./controllers/reports.js');
 const customerController=require('./controllers/customers.js');
 const userController=require('./controllers/user.js');
@@ -26,6 +27,7 @@ app.post('/api/addBusinessCustomer', customerController.addBusinessCustomer);
 // part API
 app.get('/api/getSearchVendors', vendorController.getSearchVendors);
 app.post('/api/addVendor', vendorController.addVendor);
+app.get('/api/getPartOrder', partController.getPartOrder);
 
 // report API
 app.get('/api/getSellerReports', reportsController.getSellerReports);

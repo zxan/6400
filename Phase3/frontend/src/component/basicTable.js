@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 function BasicTable({ columns, data }) {
 const styles = {
   table: {
-    width: '50%', // Adjust the width to your preference
+    width: '100%', // Adjust the width to your preference
     borderCollapse: 'collapse', // Add this property
     border: '1px solid #000',
     margin: 'auto', // Centering the table
