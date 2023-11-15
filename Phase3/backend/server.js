@@ -23,6 +23,7 @@ app.get('/api/getSellerReports', reportsController.getSellerReports);
 app.get('/api/getAverageTime', reportsController.getAverageTime);
 app.get('/api/getPriceReport', reportsController.getPriceReport);
 app.get('/api/searchCars',carController.searchCars);
+app.get('/api/getCar',carController.getCar);
 
 // customer API
 app.post('/api/addIndividualCustomer', customerController.addIndividualCustomer);

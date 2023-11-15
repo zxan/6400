@@ -61,6 +61,7 @@ exports.searchCars = (req, res) => {
     // Setting up the base query
     let query = `
     SELECT 
+    v.vin,
     ot.type,
     modelYear,
     mb.company AS manufacturer,
@@ -145,3 +146,37 @@ console.log(params)
         return res.json(results);
     });
 };
+
+exports.getCar = (req, res) => {
+    const vin = req.query.vin; 
+    const query = `
+      SELECT v.vin, ot.type, v.modelYear, mb.company as manufacturer, v.modelName, fuelType, mileage, 
+             GROUP_CONCAT(DISTINCT vc.color) AS colors, v.description,
+             (1.1 * COALESCE((SELECT SUM(P.cost * P.quantity)
+                              FROM PartOrder PO
+                              JOIN Part P ON P.orderNumber = PO.orderNumber
+                              WHERE PO.vin = v.vin), 0) +
+              1.25 * (SELECT s.purchasePrice
+                      FROM Sells_To s
+                      WHERE s.vin = v.vin)) AS price  
+      FROM Vehicle v 
+      JOIN Of_Type ot ON v.vin = ot.vin
+      JOIN Manufactured_By mb ON v.vin = mb.vin 
+      JOIN Of_Color vc ON v.vin = vc.vin  
+      WHERE v.vin = ? AND 
+            v.vin NOT IN (SELECT p.vin
+                          FROM Part p
+                          WHERE p.status != 'installed')
+      GROUP BY v.vin
+      ORDER BY v.vin ASC;
+    `;
+  
+    con.query(query, vin, (err, results) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).send('Error with the database');
+        }
+        console.log(results[0])
+        return res.json(results[0]);
+    });
+  };

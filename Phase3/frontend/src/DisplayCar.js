@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { ImageList,ImageListItem } from '@mui/material';
-import { Card, CardContent, CardMedia, Typography } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography ,Link} from '@mui/material';
 import { Grid } from '@mui/material';
 import NavBar from './component/navBar';
 import axios from 'axios'; 
 import { useLocation } from 'react-router-dom';
 import CarIcon from '@mui/icons-material/DirectionsCar';
+import { useNavigate } from 'react-router-dom';//This is to navigate to differnt pages
 
 function CarComponent(props){
-    return(
+
+  const navigate = useNavigate();
+  function handleClick(){
+    const queryParams = new URLSearchParams();
+    queryParams.set('vin',props.vin);
+    navigate(`/CarDetail?${queryParams}`);
+  }
+  return(
+   
       <Card style={styles.carComponent}>
+         <button 
+    onClick={handleClick} 
+    style={{ all: 'unset', cursor: 'pointer', padding: 0, margin: 0 }}
+  >
       <CardContent>
         {/* Using CarIcon instead of CardMedia for an image */}
         <CarIcon style={{ fontSize: 140 }} />
@@ -37,7 +50,9 @@ function CarComponent(props){
           Colors: {props.colors}
         </Typography>
       </CardContent>
+      </button>
     </Card>
+
   );
 }
 
@@ -84,7 +99,7 @@ function DisplayCar() {
         <Grid style={styles.carList} container spacing={2} >
         {cars.map((item, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
-                <CarComponent type={item.type} year={item.modelYear} manufacturer={item.manufacturer} fuelType={item.fuelType} price={item.price} colors={item.colors} model={item.modelName} mileage={item.mileage} />
+                <CarComponent vin={item.vin} type={item.type} year={item.modelYear} manufacturer={item.manufacturer} fuelType={item.fuelType} price={item.price} colors={item.colors} model={item.modelName} mileage={item.mileage} />
             </Grid>
         ))}
     </Grid>

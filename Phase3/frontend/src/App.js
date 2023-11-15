@@ -9,6 +9,7 @@ import AverageTime from './AverageTime';
 import PriceReport from './PriceReport';
 import Home from './home';
 import Login from './Login';
+import CarDetail from './CarDetail';
 import {
   BrowserRouter as Router,
   Routes,
@@ -34,6 +35,7 @@ function App() {
           <Route path="/AverageTime" element={<AverageTime />} />
           <Route path="/PriceReport" element={<PriceReport />} />
           <Route path="/Login" element={<Login/>} />
+          <Route path="/CarDetail" element={<CarDetail/>}></Route>
         </Routes>
       </Router>
     </div>
