@@ -3,7 +3,7 @@ import { AppBar, Button, Box, Container, Toolbar, Typography, IconButton, Menu, 
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import { Link, useNavigate } from 'react-router-dom';
 import Axios from "axios";
-const navItems = [{ name: 'Seller History', path: '/sellerHistory' }, { name: 'Average Time in Inventory Report', path: '/averageTime' }, { name: 'Price Per Condition Report', path: '/priceReport' }, { name: 'Parts Statistics Report', path: '/partsReport' }, { name: 'Monthly Sales Report', path: '/monthlySalesReport' }];
+const navItems = [{name:'Seller History',path:'/sellerHistory'},{name:'Average Time in Inventory Report',path:'/averageTime'},{name:'Price Per Condition Report',path:'/priceReport'},{name:'Parts Statistics Report',path:'/partsStatistics'},{name:'Monthly Sales Report',path:'/SummaryReport'}];
 
 const styles = {
 
@@ -60,6 +60,8 @@ export default function NavBar() {
     function LogOut() {
         setLoggedInUser(null);
         sessionStorage.clear();
+        window.location.reload();
+
     }
     const [loggedInUser, setLoggedInUser] = React.useState(null);
     const [anchorEl, setAnchorEl] = React.useState(null);

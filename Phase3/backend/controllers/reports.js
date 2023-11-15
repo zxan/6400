@@ -140,3 +140,109 @@ exports.getAverageTime = (req, res) => {
         res.json(results);
     });
 };
+
+exports.getPartsStatistics = (req, res) => {
+    const partsStatisticsQuery = `
+    SELECT
+        V.name AS VendorName,
+        COUNT(P.partNumber) AS TotalPartsSupplied,
+        SUM(P.quantity) AS TotalPartsQuantity,
+        SUM(P.quantity * P.cost) AS TotalDollarAmount
+    FROM
+        Part P
+    JOIN
+        PartOrder PO ON P.vin = PO.vin AND P.orderNumber = PO.orderNumber
+    JOIN
+        Vendor V ON PO.vendorName = V.name
+    GROUP BY
+        VendorName;
+    `;
+
+    con.query(partsStatisticsQuery, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).send('Error with the database');
+            return;
+        }
+        res.json(results);
+    });
+};
+
+exports.getSummaryReport = (req, res) => {
+    const summaryReportQuery = `
+        SELECT
+            YEAR(BF.transactionDate) AS SaleYear,
+            MONTH(BF.transactionDate) AS SaleMonth,
+            COUNT(DISTINCT BF.vin) AS TotalVehiclesSold,
+            ROUND(SUM(
+                1.1 * COALESCE(PartsCost, 0) + 1.25 * COALESCE(ST.purchasePrice, 0)
+            ), 2) AS TotalSalesIncome,
+            ROUND(SUM(
+                1.1 * COALESCE(PartsCost, 0) + 1.25 * COALESCE(ST.purchasePrice, 0) -
+                COALESCE(ST.purchasePrice, 0) -
+                COALESCE(PartsCost, 0)
+            ), 2) AS TotalNetIncome
+        FROM Sells_To ST
+        JOIN Buys_From BF ON ST.vin = BF.vin
+        LEFT JOIN (
+            SELECT
+                PO.vin,
+                COALESCE(SUM(P.cost * P.quantity), 0) AS PartsCost
+            FROM PartOrder PO
+            JOIN Part P ON P.orderNumber = PO.orderNumber
+            GROUP BY PO.vin
+        ) PartsPrice ON ST.vin = PartsPrice.vin
+        GROUP BY SaleYear, SaleMonth
+        ORDER BY SaleYear DESC, SaleMonth DESC;
+    `;
+
+    con.query(summaryReportQuery, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).send('Error with the database');
+            return;
+        }
+        res.json(results);
+    });
+};
+exports.getSummaryReportDetail = (req, res) => {
+    // Extract year and month from request parameters
+    const { year, month } = req.params;
+
+    const summaryReportDetailQuery = `
+        SELECT
+            U.firstName AS FirstName,
+            U.lastName AS LastName,
+            COUNT(DISTINCT BF.vin) AS TotalVehiclesSold,
+            ROUND(SUM(
+                COALESCE(1.1 * COALESCE(PartsCost, 0) + 1.25 * COALESCE(ST.purchasePrice, 0), 0)
+            ), 2) AS TotalSales
+        FROM Salesperson sp
+        JOIN User U ON sp.username = U.username
+        LEFT JOIN Buys_From BF ON BF.username = sp.username
+        LEFT JOIN Sells_To ST ON ST.vin = BF.vin
+        LEFT JOIN (
+            SELECT PO.vin, SUM(COALESCE(P.cost * P.quantity, 0)) AS PartsCost
+            FROM PartOrder PO
+            LEFT JOIN Part P ON PO.orderNumber = P.orderNumber
+            GROUP BY PO.vin
+        ) Parts ON BF.vin = Parts.vin
+        WHERE YEAR(BF.transactionDate) = ? AND (MONTH(BF.transactionDate) = ? OR ? = 0)
+        GROUP BY U.username
+        ORDER BY TotalVehiclesSold DESC, TotalSales DESC;
+    `;
+
+    console.log('SQL Query:', summaryReportDetailQuery);
+
+    // Pass year and month values as parameters in the array
+    con.query(summaryReportDetailQuery, [year, month, month], (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).send('Error with the database');
+            return;
+        }
+
+        console.log('Query Results:', results);
+        res.json(results);
+    });
+};
