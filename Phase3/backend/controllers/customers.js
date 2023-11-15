@@ -144,4 +144,57 @@ const addBusinessCustomer = (req, res) => {
   );
 };
 
-module.exports = { addIndividualCustomer, addBusinessCustomer };
+const searchIndividualCustomer = (req, res) => {
+    const driverLicense = req.query.driverLicense;
+    const selectQuery = `SELECT C.CustomerID, C.email, C.phoneNumber, C.street, C.city, C.state, C.postalCode, I.driverLicense, I.firstName, I.lastName 
+    FROM Customer AS C JOIN Individual AS I ON C.customerID = I.customerID 
+    WHERE I.driverLicense = ?;`;
+    //console.log('Driver license: ' + driverLicense);
+    //console.log(selectQuery);
+
+    con.query(selectQuery, [driverLicense],(err,selectResult) => {
+        if (err){
+            console.error('Error selecting individual customer:', err);
+            res.status(500).send('Error selecting individual customer');
+        }
+        else if (selectResult.length === 0){
+            console.error('Error selecting individual customer:', err);
+            res.status(500).send('Error selecting individual customer');
+        }
+        else {
+            console.log(selectResult);
+            console.log('Individual customer selected successfully');
+            //return res.json(result);
+            res.status(200).send(selectResult);
+        }
+    })
+}
+
+const searchBusinessCustomer = (req, res) => {
+    const taxID = req.query.taxID;
+    const selectQuery = `SELECT C.CustomerID, C.email, C.phoneNumber, C.street, C.city, C.state, C.postalCode, B.taxID, B.businessName, B.name, B.title 
+    FROM Customer AS C INNER JOIN Business AS B ON C.customerID = B.customerID 
+    WHERE B.taxID = ?;`;
+
+    console.log('taxID: ' + taxID);
+
+                
+    con.query(selectQuery, [taxID],(err,selectResult) => {
+        if (err){
+            console.error('Error selecting business customer:', err);
+            res.status(500).send('Error selecting business customer');
+        }
+        else if (selectResult.length === 0){
+            console.error('Error selecting business customer:', err);
+            res.status(500).send('Error selecting business customer');
+        }
+        else {
+            console.log('Business customer selected successfully');
+            //return res.json(result);
+            res.status(200).send(selectResult);
+        }
+    })
+
+}
+
+module.exports = { addIndividualCustomer, addBusinessCustomer, searchIndividualCustomer, searchBusinessCustomer };

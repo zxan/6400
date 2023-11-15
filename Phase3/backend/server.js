@@ -23,6 +23,8 @@ app.get('/api/searchCars',carController.searchCars);
 // customer API
 app.post('/api/addIndividualCustomer', customerController.addIndividualCustomer);
 app.post('/api/addBusinessCustomer', customerController.addBusinessCustomer);
+app.get('/api/searchIndividualCustomer', customerController.searchIndividualCustomer);
+app.get('/api/searchBusinessCustomer', customerController.searchBusinessCustomer);
 
 // part API
 app.get('/api/getSearchVendors', vendorController.getSearchVendors);

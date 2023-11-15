@@ -9,6 +9,8 @@ import React, { useState } from 'react';
 import { Card, CardContent, Typography, TextField, Button, Grid, Tabs, Tab } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';//This is to navigate to differnt pages
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AddCustomer() {
   const [individualFormData, setIndividualFormData] = useState({
@@ -36,32 +38,6 @@ function AddCustomer() {
     postalCode: '',
   });
 
-  // const [individualFormDataWithCustomerID, setIndividualFormDataWithCustomerID] = useState({
-  //   customerID:'',
-  //   firstName: '',
-  //   lastName: '',
-  //   driverLicense:'',
-  //   email: '',
-  //   phoneNumber: '',
-  //   street: '',
-  //   city: '',
-  //   state: '',
-  //   postalCode: '',
-  // });
-
-  // const [businessFormDataWithCustomerID, setBusinessFormDataWithCustomerID] = useState({
-  //   customerID: '',
-  //   taxID: '',
-  //   businessName: '',
-  //   name: '',
-  //   title: '',
-  //   email: '',
-  //   phoneNumber: '',
-  //   street: '',
-  //   city: '',
-  //   state: '',
-  //   postalCode: '',
-  // });
   const navigate = useNavigate();
 
   const [currentTab, setCurrentTab] = useState(0);
@@ -75,12 +51,129 @@ function AddCustomer() {
     }
   };
 
+  const displayErrorToast = (message) => {
+    toast.error(message, {
+      position: "top-center",
+      autoClose: true,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  };
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const validateIndividualForm = () => {
+    // Validation logic for individual form
+    const { firstName, lastName, driverLicense, email, phoneNumber, street, city, state, postalCode } = individualFormData;
+    if (firstName === '') {
+      displayErrorToast('Please enter the first name');
+      return false;
+    }
+    if (lastName === '') {
+      displayErrorToast('Please enter the last name');
+      return false;
+    }
+    if (driverLicense === '') {
+      displayErrorToast('Please enter the driver license number');
+      return false;
+    }
+    if (email === '') {
+      displayErrorToast('Please enter the email');
+      return false;
+    }
+    if (!emailRegex.test(email)){
+      displayErrorToast('Please enter a valid email');
+      return false;
+    }
+    if (phoneNumber === '') {
+      displayErrorToast('Please enter the phone number');
+      return false;
+    }
+    if (street === '') {
+      displayErrorToast('Please enter the street information');
+      return false;
+    }
+    if (city === '') {
+      displayErrorToast('Please enter the city');
+      return false;
+    }
+    if (state === '') {
+      displayErrorToast('Please enter the state');
+      return false;
+    }
+    if (postalCode === '') {
+      displayErrorToast('Please enter the postal code');
+      return false;
+    }
+    
+    return true;
+  };
+
+  const validateBusinessForm = () => {
+    // Validation logic for business form
+    const { taxID, businessName, name, title, email, phoneNumber, street, city, state, postalCode } = businessFormData;
+    if (taxID === '') {
+      displayErrorToast('Please enter the tax ID');
+      return false;
+    }
+    if (businessName === '') {
+      displayErrorToast('Please enter the business name');
+      return false;
+    }
+    if (name === '') {
+      displayErrorToast('Please enter the name of the contact person');
+      return false;
+    }
+    if (title === '') {
+      displayErrorToast('Please enter the title of the contact person');
+      return false;
+    }
+    if (email === '') {
+      displayErrorToast('Please enter the email');
+      return false;
+    }
+    if (!emailRegex.test(email)){
+      displayErrorToast('Please enter a valid email');
+      return false;
+    }
+    if (phoneNumber === '') {
+      displayErrorToast('Please enter the phone number');
+      return false;
+    }
+    if (street === '') {
+      displayErrorToast('Please enter the street information');
+      return false;
+    }
+    if (city === '') {
+      displayErrorToast('Please enter the city');
+      return false;
+    }
+    if (state === '') {
+      displayErrorToast('Please enter the state');
+      return false;
+    }
+    if (postalCode === '') {
+      displayErrorToast('Please enter the postal code');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault();    
 
     try {
       let response;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (currentTab === 0) {
+        if (!validateIndividualForm()) {
+          return;
+        }
+
         // Send a POST request to add the new individual customer
         console.log(individualFormData);
         response = await axios.post('/api/addIndividualCustomer', individualFormData);
@@ -88,6 +181,11 @@ function AddCustomer() {
         // Handle success for individual customer
         console.log('Individual customer added successfully');
       } else {
+        if (!validateBusinessForm()) {
+          return;
+        }
+
+
         // Send a POST request to add the new business customer
         response = await axios.post('/api/addBusinessCustomer', businessFormData);
         //setBusinessFormDataWithCustomerID(response.data[0]);
@@ -119,6 +217,7 @@ function AddCustomer() {
   return (
     <div>
       <NavBar />
+      <ToastContainer />
       <Grid container justifyContent="center">
         <Grid item xs={12} sm={6}>
           <Card>

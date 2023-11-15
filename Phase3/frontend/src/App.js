@@ -3,8 +3,9 @@ import axios from 'axios';
 import DisplayCar from './DisplayCar';//this is exported from the Display car file, basically a page
 import AddCustomer from './AddCustomer';
 import CustomerInfo from './CustomerInfo';
+import SearchCustomer from './SearchCustomer';
 import AddPartsOrder from './AddPartsOrder';
-import SellerHistory from './SellerHistory';//this is exported from the Display car file, basically a page
+import SellerHistory from './SellerHistory';
 import AverageTime from './AverageTime';
 import PriceReport from './PriceReport';
 import PartOrderStatus from './PartOrderStatus';
@@ -33,6 +34,7 @@ function App() {
         <Route path="/" element={<Home />} />
           <Route path="/DisplayCar" element={<DisplayCar />} />
           <Route path="/AddCustomer" element={<AddCustomer />} />
+          <Route path="/SearchCustomer" element={<SearchCustomer />} />
           <Route path="/CustomerInfo" element={<CustomerInfo />} />
           <Route path="/AddPartsOrder" element={<AddPartsOrder />} />
           <Route path="/SellerHistory" element={<SellerHistory />} />
