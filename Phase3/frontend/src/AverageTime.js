@@ -39,6 +39,7 @@ function AverageTime() {
     <div>
       <NavBar />
       <h1 style={styles.title}>Average Time in Inventory</h1>
+
       <table style={styles.table}>
         <thead>
           <tr>

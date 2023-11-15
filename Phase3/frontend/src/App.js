@@ -14,6 +14,7 @@ import SummaryReportDetail from './SummaryReportDetail';
 
 import Home from './home';
 import Login from './Login';
+import CarDetail from './CarDetail';
 import {
   BrowserRouter as Router,
   Routes,
@@ -43,6 +44,7 @@ function App() {
           <Route path="/SummaryReport" element={<SummaryReport />} />
           <Route path="/SummaryReportDetail/:year/:month" element={<SummaryReportDetail />} />
           <Route path="/Login" element={<Login/>} />
+          <Route path="/CarDetail" element={<CarDetail/>}></Route>
         </Routes>
       </Router>
     </div>

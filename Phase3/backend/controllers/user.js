@@ -66,3 +66,35 @@ exports.isInventoryOrOwner = (req, res) => {
         }
     });
 };
+
+exports.isSalesperson= (req, res) => {
+ 
+    const username = req.query.username;
+    const query = `
+      SELECT username
+      FROM User u
+      WHERE u.username = ?
+        AND u.username NOT IN (
+            SELECT username FROM Owner
+            UNION
+            SELECT username FROM Manager
+            UNION
+            SELECT username FROM InventoryClerk
+        );
+    `;
+ 
+    con.query(query, username, (err, results) => {
+      if (err) {
+        console.error(err.message);
+        return res.status(500).send('Error with the database');
+      }
+      if (results.length > 0){
+        res.json(true);
+
+      }
+      else{
+        res.json(false);
+      }
+     
+    });
+  };
