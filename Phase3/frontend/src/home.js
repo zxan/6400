@@ -34,28 +34,9 @@ function Home() {
     const [loggedInUser,setLoggedInUser]=useState(null);
     const [vin,setVin]=useState('');
    
-    const onSearchVin = (event) => {
-        event.preventDefault();
-        if (!vin) {
-                toast.error('Please enter a valid VIN to search vehicle by VIN.', {
-                    position: "top-center",
-                    autoClose: false,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                    });
-            return; 
-          }
-        const queryParams = new URLSearchParams();
-        queryParams.set('vin', vin);
-        navigate(`/DisplayCar?${queryParams}`);
-    }
     const onSubmit = (event) => {
         event.preventDefault();
-        if (!vehicleType && !manufacturer && !year && !fuelType && color.length === 0 && !keyword && !price && !mileage) {
+        if (!vin&&!vehicleType && !manufacturer && !year && !fuelType && color.length === 0 && !keyword && !price && !mileage) {
 
                 toast.error('Please enter some keywords or choose at least one filtering criteria.', {
                     position: "top-center",
@@ -82,6 +63,7 @@ function Home() {
         if (keyword) queryParams.set('keyword', keyword);
         if (price) queryParams.set('price', price);
         if (mileage) queryParams.set('mileage', mileage);
+        if (vin) queryParams.set('vin', vin);
         navigate(`/DisplayCar?${queryParams}`);
     }
     useEffect(() => {
@@ -122,7 +104,7 @@ function Home() {
                                 BuzzCar
                             </Typography>
                             {loggedInUser&&
-                                <Paper component="form" style={styles.search}>
+                                <Paper style={styles.search}>
                                 <InputBase
                                     style={styles.input}
                                     value={vin}
@@ -130,9 +112,6 @@ function Home() {
                                     inputProps={{ 'aria-label': 'search' }}
                                     onChange={(event) => setVin(event.target.value)}
                                 />
-                                <IconButton onClick={onSearchVin} type="submit" aria-label="search">
-                                    <SearchIcon />
-                                </IconButton>
                             </Paper>
                             }
                            
