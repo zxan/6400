@@ -12,6 +12,8 @@ import PartOrderStatus from './PartOrderStatus';
 import PartsStatistics from './PartsStatistics';
 import SummaryReport from './SummaryReport';
 import SummaryReportDetail from './SummaryReportDetail';
+import SalesOrder from './SalesOrder';
+import SaleConfirmation from './SaleConfirmation';
 
 import Home from './home';
 import Login from './Login';
@@ -47,6 +49,8 @@ function App() {
           <Route path="/SummaryReportDetail/:year/:month" element={<SummaryReportDetail />} />
           <Route path="/Login" element={<Login/>} />
           <Route path="/CarDetail" element={<CarDetail/>}></Route>
+          <Route path="/SalesOrder" element={<SalesOrder/>}></Route>
+          <Route path="/SaleConfirmation" element={<SaleConfirmation/>}></Route>
         </Routes>
       </Router>
     </div>

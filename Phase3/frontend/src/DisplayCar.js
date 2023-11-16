@@ -138,7 +138,7 @@ function DisplayCar() {
               ))
             ) : (
               <div style={{ textAlign: 'center'}}>
-              <Typography variant="h4" style={{ color: 'red', textAlign: 'center', margin: '20px' }}>No cars found.</Typography>
+              <Typography variant="h4" style={{ color: 'red', textAlign: 'center', margin: '20px' }}>Sorry, it looks like we don’t have that in stock!</Typography>
               </div>
             )
           }

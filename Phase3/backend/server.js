@@ -20,6 +20,8 @@ const userController=require('./controllers/user.js');
 app.get('/api/getCriterias', carController.getCriterias);//this is an API endpoint that point to the getCriterias function in carController
 app.get('/api/searchCars',carController.searchCars);
 app.get('/api/getCar',carController.getCar);
+app.get('/api/hasBeenSold',carController.hasBeenSold);
+app.post('/api/sale',carController.sale);
 
 // customer API
 app.post('/api/addIndividualCustomer', customerController.addIndividualCustomer);
@@ -45,6 +47,7 @@ app.get('/api/getSummaryReportDetail/:year/:month', reportsController.getSummary
 app.get('/api/login',userController.getPassword);
 app.get('/api/isManagerOrOwner',userController.isManagerOrOwner);
 app.get('/api/isInventoryOrOwner',userController.isInventoryOrOwner);
+app.get('/api/isSalespersonOrOwner',userController.isSalespersonOrOwner);
 app.get('/api/isAuthorized',userController.isAuthorized);
 
 app.listen(PORT, () => {

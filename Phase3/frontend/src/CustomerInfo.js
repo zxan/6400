@@ -4,15 +4,24 @@ import { Card, CardContent, Button, CardMedia, Typography, Container, Box } from
 import { Grid } from '@mui/material';
 import NavBar from './component/navBar';
 import axios from 'axios'; 
+import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 
 
 function CustomerInfo() {
+  const navigate = useNavigate();
   const location = useLocation();
-  const { customerInfo } = location.state;
+  //const { customerInfo } = location.state;
 
+  const { vehicleInfo, customerInfo } = location.state;
 
-  console.log(customerInfo); 
+  console.log('In CustomerInfo');
+  console.log(vehicleInfo);
+  console.log(customerInfo);
+
+  const handleLinkCustomer = (e) => {
+    navigate('/SalesOrder', { state: { vehicleInfo: vehicleInfo, customerInfo: customerInfo } });
+  };
 
   return (
     <Container maxWidth="xl">
@@ -113,7 +122,7 @@ function CustomerInfo() {
                 type="submit"
                 variant="contained"
                 color="primary"
-                //onClick ={handleSubmit}
+                onClick ={handleLinkCustomer}
                 fullWidth
                 
               >

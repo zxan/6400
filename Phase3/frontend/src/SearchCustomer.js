@@ -11,6 +11,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';//This is to navigate to differnt pages
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useLocation } from 'react-router-dom';
 
 function SearchCustomer() {
   const [searchFormData, setSearchFormData] = useState({
@@ -19,6 +20,9 @@ function SearchCustomer() {
   });
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { vehicleInfo} = location.state;
+  console.log(vehicleInfo);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -58,7 +62,7 @@ function SearchCustomer() {
       // Handle success, navigate to customer info page
       console.log('Search successful:', response.data);
       // Navigate to a customer info page
-      navigate('/CustomerInfo', { state: { customerInfo: response.data[0] } });
+      navigate('/CustomerInfo', { state: { customerInfo: response.data[0], vehicleInfo: vehicleInfo } });
 
     } catch (error) {
       // Handle errors, show an error message

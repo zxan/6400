@@ -62,6 +62,7 @@ export default function NavBar() {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [isManagerOrOwner, setIsManagerorOwner] = React.useState(false);
     const [isInventoryOrOwner, setIsInventoryOrOwner] = React.useState(false);
+    const [isSalespersonOrOwner, setIsSalesPersonOrOwner] = React.useState(false);
     const navigate = useNavigate();
     function LogOut() {
         setLoggedInUser(null);
@@ -74,13 +75,29 @@ export default function NavBar() {
         if (storedUser) {
             setLoggedInUser(storedUser);
             Axios.get("/api/isManagerOrOwner", { params: { 'username': storedUser } }).then((response) => {
-                if (response.data == false) {
-                    setIsManagerorOwner(false);
-                    setIsInventoryOrOwner(false);
-                }
-                else {
+                if (response.data == true) {
                     setIsManagerorOwner(true);
+                    //setIsInventoryOrOwner(false);
+                }
+                // else {
+                //     setIsManagerorOwner(true);
+                //     setIsInventoryOrOwner(true);
+                // }
+                ;
+            }).catch((error) => {
+                console.log(error);
+            });
+            Axios.get("/api/isInventoryOrOwner", { params: { 'username': storedUser } }).then((response) => {
+                if (response.data == true) {
                     setIsInventoryOrOwner(true);
+                }
+                ;
+            }).catch((error) => {
+                console.log(error);
+            });
+            Axios.get("/api/isSalespersonOrOwner", { params: { 'username': storedUser } }).then((response) => {
+                if (response.data == true) {
+                    setIsSalesPersonOrOwner(true);
                 }
                 ;
             }).catch((error) => {

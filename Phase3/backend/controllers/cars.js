@@ -249,3 +249,62 @@ exports.getCar = (req, res) => {
         return res.json(results[0]);
     });
   };
+
+  exports.hasBeenSold = (req, res) => {
+    const vin = req.query.vin; 
+
+    const query = `
+    SELECT CASE 
+        WHEN EXISTS (SELECT 1 FROM Buys_From WHERE vin = ?) THEN 1 ELSE 0 END AS hasBeenSold;
+`;
+    con.query(query, [vin], (err, result) => {
+        if (err) {
+            res.status(500).send('Error in database');
+            return;
+        }
+        if (result[0].hasBeenSold === 0) {
+            console.log(result[0]);
+            res.json(false);
+        } else {
+           console.log(result[0]);
+            res.json(true);
+        }
+    });
+  };
+
+
+  exports.sale = (req, res) => {
+
+    console.log(req.body);
+
+    const customerID = req.body.CustomerID; 
+    const username = req.body.username; 
+    const vin = req.body.vin; 
+    const transactionDate = req.body.transactionDate; 
+
+    console.log(customerID)
+    console.log(username)
+    console.log(vin)
+    console.log(transactionDate)
+
+    const query = `
+        INSERT INTO Buys_from (customerID, username, vin, transactionDate)
+        VALUES (?,?,?,?)`;
+    
+        con.query(query,
+            [customerID, username,vin,transactionDate],
+            (err, result) => {
+                if (err) 
+                {
+                    console.error('Error adding transaction:', err);
+                    res.status(500).send('Error adding sale transaction');
+                } 
+                else 
+                {
+                    console.log('Sale transaction added successfully');
+                }
+            }
+        );
+  };
+
+  
