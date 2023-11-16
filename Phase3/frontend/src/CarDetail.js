@@ -54,8 +54,10 @@ function CarDetail() {
         <CardContent>
           {/* Using CarIcon instead of CardMedia for an image */}
           <CarIcon style={{ fontSize: 140 }} />
-  
-          <Typography variant="h1" component="div">
+          <Typography variant="h2" component="div">
+           {car.vin}
+          </Typography>
+          <Typography variant="h4" component="text.secondary">
            {car.manufacturer} -- {car.modelYear}
           </Typography>
           <Typography variant="h4" color="text.secondary">
