@@ -26,8 +26,10 @@ function CarComponent(props) {
         <CardContent>
           {/* Using CarIcon instead of CardMedia for an image */}
           <CarIcon style={{ fontSize: 140 }} />
-
           <Typography variant="h5" component="div">
+            {props.vin} 
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
             {props.model} -- {props.year}
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -69,9 +71,10 @@ function DisplayCar() {
   const price = queryParams.get('price');
   const mileage = queryParams.get('mileage');
   const color = queryParams.getAll('color');
-  const storedUser = sessionStorage.getItem('user');
-  const isSalesperson = (username) => {
-    return axios.get('/api/isSalesperson', { params: { username } })
+  const vin = queryParams.get('vin');
+
+  const isAuthorized = (username) => {
+    return axios.get('/api/isAuthorized', { params: { username } })
       .then(response => {
         return response.data;
 
@@ -83,44 +86,33 @@ function DisplayCar() {
   }
 
   useEffect(() => {
-    if (queryParams.has('vin')) {
-      const vin = queryParams.get('vin');
-
-      isSalesperson(storedUser).then(isSales => {
-        console.log(isSales);
-        const endpoint = isSales ? '/api/searchByVinSales' : '/api/searchByVinOwner';
-        axios.get(endpoint, { params: { vin } })
-          .then(response => {
-            setCars(response.data);
-          })
-          .catch(error => {
-            console.error("Error fetching cars:", error);
-          });
-      });
+    const storedUser = sessionStorage.getItem('user');
+    async function fetchCar() {
+      try {
+        
+        const isAuthorizedResult = await isAuthorized(storedUser);
+        console.log(isAuthorizedResult);
+        const params = {
+          vin,
+          vehicleType,
+          manufacturer,
+          modelYear,
+          fuelType,
+          color,
+          keyword,
+          price,
+          mileage,
+          isAuthorized: isAuthorizedResult
+        };
+        const response = await axios.get('/api/searchCars', { params });
+        setCars(response.data);
+      } catch (error) {
+        console.error("Error in fetching data:", error);
+      }
     }
-    else {
-      const params = {
-        vehicleType,
-        manufacturer,
-        modelYear,
-        fuelType,
-        color,
-        keyword,
-        price,
-        mileage,
-      };
-      axios.get('/api/searchCars', { params })
-        .then(response => {
-
-          setCars(response.data);
-        })
-        .catch(error => {
-          console.error("Error fetching cars:", error);
-        });
-
-    }
-  }, [location]);
-
+    fetchCar();
+  }, []);
+  
   return (
     <div>
       <NavBar></NavBar>

@@ -67,22 +67,21 @@ exports.isInventoryOrOwner = (req, res) => {
     });
 };
 
-exports.isSalesperson= (req, res) => {
- 
+exports.isAuthorized= (req, res) => {
+    console.log('check authorization')
     const username = req.query.username;
     const query = `
-      SELECT username
-      FROM User u
-      WHERE u.username = ?
-        AND u.username NOT IN (
-            SELECT username FROM Owner
-            UNION
-            SELECT username FROM Manager
-            UNION
-            SELECT username FROM InventoryClerk
-        );
-    `;
- 
+    SELECT u.username
+    FROM User u
+    WHERE u.username = ? AND u.username IN (
+              SELECT username FROM Owner
+              UNION
+              SELECT username FROM Manager
+              UNION
+              SELECT username FROM InventoryClerk
+          );`;
+    if (username){
+        console.log('here')
     con.query(query, username, (err, results) => {
       if (err) {
         console.error(err.message);
@@ -97,4 +96,8 @@ exports.isSalesperson= (req, res) => {
       }
      
     });
+}
+    else{
+        res.json(false);
+    }
   };

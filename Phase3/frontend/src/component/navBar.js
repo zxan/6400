@@ -57,17 +57,18 @@ const styles = {
 //you can reuse this nav bar in all pages, anything reusable should go in the components directory
 export default function NavBar() {
 
-    function LogOut() {
-        setLoggedInUser(null);
-        sessionStorage.clear();
-        window.location.reload();
-
-    }
+   
     const [loggedInUser, setLoggedInUser] = React.useState(null);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [isManagerOrOwner, setIsManagerorOwner] = React.useState(false);
     const [isInventoryOrOwner, setIsInventoryOrOwner] = React.useState(false);
     const navigate = useNavigate();
+    function LogOut() {
+        setLoggedInUser(null);
+        sessionStorage.clear();
+        navigate('/');
+
+    }
     React.useEffect(() => {
         const storedUser = sessionStorage.getItem('user');
         if (storedUser) {
