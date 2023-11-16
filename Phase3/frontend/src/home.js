@@ -32,8 +32,27 @@ function Home() {
     const [mileage, setMileage] = useState(null);
     const [keyword, setKeyword] = useState('');
     const [loggedInUser,setLoggedInUser]=useState(null);
-
-
+    const [vin,setVin]=useState('');
+   
+    const onSearchVin = (event) => {
+        event.preventDefault();
+        if (!vin) {
+                toast.error('Please enter a valid VIN to search vehicle by VIN.', {
+                    position: "top-center",
+                    autoClose: false,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    });
+            return; 
+          }
+        const queryParams = new URLSearchParams();
+        queryParams.set('vin', vin);
+        navigate(`/DisplayCar?${queryParams}`);
+    }
     const onSubmit = (event) => {
         event.preventDefault();
         if (!vehicleType && !manufacturer && !year && !fuelType && color.length === 0 && !keyword && !price && !mileage) {
@@ -65,12 +84,13 @@ function Home() {
         if (mileage) queryParams.set('mileage', mileage);
         navigate(`/DisplayCar?${queryParams}`);
     }
-
     useEffect(() => {
         const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
         setLoggedInUser(storedUser);
     }
+    }, []);
+    useEffect(() => {
         //This is important!!!!! Axios is how you communicate with backend
         //if you go to our backend server.js, you will see this get API endpoint
         axios.get('/api/getCriterias')
@@ -88,7 +108,6 @@ function Home() {
             });
     }, []);
     if (manufacturerOptions&& yearOptions && colorOptions && vehicleTypeOptions && fuelTypeOptions) {//only render the page when these variables are not empty
-        console.log(loggedInUser)
         return (
             <div >
             
@@ -102,6 +121,21 @@ function Home() {
                             <Typography variant="h1" component="h1" style={styles.header}>
                                 BuzzCar
                             </Typography>
+                            {loggedInUser&&
+                                <Paper component="form" style={styles.search}>
+                                <InputBase
+                                    style={styles.input}
+                                    value={vin}
+                                    placeholder="Search By VIN"
+                                    inputProps={{ 'aria-label': 'search' }}
+                                    onChange={(event) => setVin(event.target.value)}
+                                />
+                                <IconButton onClick={onSearchVin} type="submit" aria-label="search">
+                                    <SearchIcon />
+                                </IconButton>
+                            </Paper>
+                            }
+                           
                             <FormControl variant="outlined" style={styles.formControl}>
                                 <InputLabel >Year</InputLabel>
                                 <Select
@@ -241,7 +275,7 @@ function Home() {
 //Following is for styling
 const styles = {
     container: {
-        height: '50rem',
+        height: '55rem',
         display: 'flex',
         background: '#f4f4f4',
         alignItems: 'center',
@@ -255,6 +289,7 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         width: '70%',
+        marginBottom:'3%'
     },
     input: {
         flex: 1,

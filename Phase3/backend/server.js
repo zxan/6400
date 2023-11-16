@@ -19,7 +19,9 @@ const userController=require('./controllers/user.js');
 
 app.get('/api/getCriterias', carController.getCriterias);//this is an API endpoint that point to the getCriterias function in carController
 app.get('/api/searchCars',carController.searchCars);
-
+app.get('/api/getCar',carController.getCar);
+app.get('/api/searchByVinOwner',carController.searchByVinOwner);
+app.get('/api/searchByVinSales',carController.searchByVinSales);
 // customer API
 app.post('/api/addIndividualCustomer', customerController.addIndividualCustomer);
 app.post('/api/addBusinessCustomer', customerController.addBusinessCustomer);
@@ -30,6 +32,7 @@ app.get('/api/searchBusinessCustomer', customerController.searchBusinessCustomer
 app.get('/api/getSearchVendors', vendorController.getSearchVendors);
 app.post('/api/addVendor', vendorController.addVendor);
 app.get('/api/getPartOrder', partController.getPartOrder);
+app.put('/api/updatePartOrderStatus/:orderNumber/:partNumber/:vin', partController.updatePartOrderStatus);
 
 // report API
 app.get('/api/getSellerReports', reportsController.getSellerReports);
@@ -43,6 +46,7 @@ app.get('/api/getSummaryReportDetail/:year/:month', reportsController.getSummary
 app.get('/api/login',userController.getPassword);
 app.get('/api/isManagerOrOwner',userController.isManagerOrOwner);
 app.get('/api/isInventoryOrOwner',userController.isInventoryOrOwner);
+app.get('/api/isSalesperson',userController.isSalesperson);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);//listening in port 8888, frontend will point to this to talk to this backend
