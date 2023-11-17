@@ -178,7 +178,7 @@ function AddCustomer() {
         }
 
         // Send a POST request to add the new individual customer
-        console.log(individualFormData);
+        //console.log(individualFormData);
         response = await axios.post('/api/addIndividualCustomer', individualFormData);
         //setIndividualFormDataWithCustomerID(response.data[0]);
         // Handle success for individual customer
