@@ -1,43 +1,74 @@
+import NavBar from './component/navBar';
+import { Card, CardActions, CardContent, Typography, TextField, Button, Container,Box, Grid, Tabs, Tab, MenuItem,  } from '@mui/material';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';//This is to navigate to differnt pages
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import React, { useState, useEffect } from 'react';
 import { ImageList,ImageListItem } from '@mui/material';
-import { Card, CardContent, Button, CardMedia, Typography, Container, Box } from '@mui/material';
-import { Grid } from '@mui/material';
-import NavBar from './component/navBar';
-import axios from 'axios'; 
-import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 
-
-function CustomerInfo() {
+function SaleConfirmation() {
+  
   const navigate = useNavigate();
   const location = useLocation();
-  //const { customerInfo } = location.state;
+  const { vehicleInfo, customerInfo, transactionDate } = location.state;
 
-  const { vehicleInfo, customerInfo } = location.state;
+  // console.log(vehicleInfo);
+  // console.log(customerInfo);
+  // console.log(transactionDate);
 
-  console.log('In CustomerInfo');
-  console.log(vehicleInfo);
-  console.log(customerInfo);
 
-  const handleLinkCustomer = (e) => {
-    navigate('/SalesOrder', { state: { vehicleInfo: vehicleInfo, customerInfo: customerInfo } });
-  };
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <NavBar />
 
+      {/* Vehicle Information Card */}
+      <Card sx={{ minWidth: 12, width: '60%' }} variant="outlined" style={{ marginTop: '20px' }}>
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Vehicle Information
+          </Typography>
+          <div>
+          <Typography variant="body1" color="textSecondary">
+            <br />
+            Vin: {vehicleInfo.vin}
+            <br />
+            Model year: {vehicleInfo.modelYear}
+            <br />
+            Manufacturer: {vehicleInfo.manufacturer}
+            <br />
+            Vehicle type: {vehicleInfo.type}
+            <br />
+            Mileage: {vehicleInfo.mileage}
+            <br />
+            Fuel type: {vehicleInfo.fueltype}
+            <br />
+            Price: {vehicleInfo.price}
+            <br />
+            Color(s): {vehicleInfo.colors}
+            <br />
+            Description: {vehicleInfo.description}
+            <br />
+            
+            {/* Add more vehicle information here */}
+          </Typography>
+          </div>
+        </CardContent>
+      </Card>
 
-      <Grid container justifyContent="center">
-        <Grid item xs={12} sm={6}>
-          <Card>
-            <CardContent>
-
-              <Box textAlign="center">
-                {customerInfo.driverLicense ? (
+      {/* Customer Information Card */}
+      <Card sx={{ minWidth: 12, width: '60%' }} variant="outlined" style={{ marginTop: '20px' }}>
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Customer Information
+            </Typography>
+            {customerInfo.driverLicense ? (
                   <div>
-                    <Typography gutterBottom variant="h5" component="div">
-                      Individual Customer Details
+                    <Typography gutterBottom variant="h6" component="div" color="textSecondary">
+                    <br />
+                    Individual Customer
                     </Typography>
                     <Typography variant="body1" color="textSecondary">
                       Customer ID: {customerInfo.CustomerID}
@@ -74,8 +105,9 @@ function CustomerInfo() {
                   </div>
                 ) : customerInfo.taxID ? (
                   <div>
-                    <Typography gutterBottom variant="h5" component="div">
-                      Business Customer Details
+                    <Typography gutterBottom variant="h6" component="div" color="textSecondary">
+                      <br />
+                      Business Customer
                     </Typography>
                     <Typography variant="body1" color="textSecondary">
                       Customer ID: {customerInfo.CustomerID}
@@ -116,29 +148,40 @@ function CustomerInfo() {
                     Customer information not available.
                   </Typography>
                 )}
-              </Box>
 
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                onClick ={handleLinkCustomer}
-                fullWidth
-                
-              >
-                Link this customer
-              </Button>
+        </CardContent>
 
-            </CardContent>
+      </Card>
 
+      {/* Sales Information Card */}
+      <Card sx={{ minWidth: 12, width: '60%' }} variant="outlined" style={{ marginTop: '20px' }}>
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Sales Date
+          </Typography>
+          <Typography variant="body1" color="textSecondary" >
+            <br />
+            The sale was completed on {transactionDate}.
+          </Typography>
+          
+        </CardContent>
+      </Card>
 
+      <div style={{ marginTop: '16px', marginBottom: '16px' }}>
+          <Button variant="contained" 
+            color="primary" 
+            onClick={ () =>{ 
+              navigate('/');
+            }}
+            
+            >
+              Back to home
+            </Button>
+          </div>
 
-          </Card>
-        </Grid>
-      </Grid>
     </Container>
   );
 }
 
-export default CustomerInfo;
 
+export default SaleConfirmation;

@@ -37,7 +37,7 @@ exports.isManagerOrOwner = (req, res) => {
 
             res.json(false);
         } else {
-           console.log(result[0]);
+           //console.log(result[0]);
             // Example: Returning only the password, but consider the security implications
             res.json(true);
         }
@@ -57,6 +57,31 @@ exports.isInventoryOrOwner = (req, res) => {
             return;
         }
         if (result[0].isInventoryOrOwner === 0) {
+
+            res.json(false);
+        } else {
+           //console.log(result[0]);
+            // Example: Returning only the password, but consider the security implications
+            res.json(true);
+        }
+    });
+};
+
+exports.isSalespersonOrOwner = (req, res) => {
+    
+    const username = req.query.username; // or req.body.username, depending on your setup
+    //console.log('In the user.isSalespersonOrOwner API. username: ' + username);
+    const query = `
+    SELECT CASE 
+        WHEN EXISTS (SELECT 1 FROM Salesperson WHERE username = ?) THEN 1
+        WHEN EXISTS (SELECT 1 FROM Owner WHERE username = ?) THEN 1 ELSE 0 END AS isSalespersonOrOwner;
+`;
+    con.query(query, [username,username], (err, result) => {
+        if (err) {
+            res.status(500).send('Error in database');
+            return;
+        }
+        if (result[0].isSalespersonOrOwner === 0) {
 
             res.json(false);
         } else {
