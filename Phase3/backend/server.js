@@ -48,6 +48,7 @@ app.get('/api/login',userController.getPassword);
 app.get('/api/isManagerOrOwner',userController.isManagerOrOwner);
 app.get('/api/isInventoryOrOwner',userController.isInventoryOrOwner);
 app.get('/api/isSalespersonOrOwner',userController.isSalespersonOrOwner);
+app.get('/api/isSalesperson',userController.isSalesperson);
 app.get('/api/isAuthorized',userController.isAuthorized);
 
 app.listen(PORT, () => {
