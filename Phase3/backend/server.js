@@ -15,13 +15,17 @@ const partController = require('./controllers/parts.js');
 const reportsController = require('./controllers/reports.js');
 const customerController=require('./controllers/customers.js');
 const userController=require('./controllers/user.js');
-// cars API
 
+// cars API
 app.get('/api/getCriterias', carController.getCriterias);//this is an API endpoint that point to the getCriterias function in carController
 app.get('/api/searchCars',carController.searchCars);
 app.get('/api/getCar',carController.getCar);
+app.get('/api/getCarForInventoryClerk',carController.getCarForInventoryClerk);
+//app.get('/api/getCarForManager',carController.getCarForManager);
 app.get('/api/hasBeenSold',carController.hasBeenSold);
 app.post('/api/sale',carController.sale);
+app.get('/api/countVehicleForPublic',carController.countVehicleForPublic);
+
 
 // customer API
 app.post('/api/addIndividualCustomer', customerController.addIndividualCustomer);
@@ -49,6 +53,7 @@ app.get('/api/isManagerOrOwner',userController.isManagerOrOwner);
 app.get('/api/isInventoryOrOwner',userController.isInventoryOrOwner);
 app.get('/api/isSalespersonOrOwner',userController.isSalespersonOrOwner);
 app.get('/api/isSalesperson',userController.isSalesperson);
+app.get('/api/isInventoryClerk',userController.isInventoryClerk);
 app.get('/api/isAuthorized',userController.isAuthorized);
 
 app.listen(PORT, () => {
