@@ -10,6 +10,9 @@ app.use(express.json());
 // MySQL Connection
 //each controller is a file under the controllers file
 const carController = require('./controllers/cars.js');
+
+const carController1 = require('./controllers/cars1.js');
+
 const vendorController = require('./controllers/vendors.js');
 const reportsController = require('./controllers/reports.js');
 const customerController=require('./controllers/customers.js');
@@ -21,6 +24,8 @@ app.post('/api/addVendor', vendorController.addVendor);
 app.get('/api/getSellerReports', reportsController.getSellerReports);
 app.get('/api/getAverageTime', reportsController.getAverageTime);
 app.get('/api/searchCars',carController.searchCars);
+
+app.post('/api/addCar',carController1.addCar);
 
 // customer API
 app.post('/api/addIndividualCustomer', customerController.addIndividualCustomer);
