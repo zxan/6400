@@ -7,6 +7,8 @@ import SearchCustomer from './SearchCustomer';
 import AddPartsOrder from './AddPartsOrder';
 import SellerHistory from './SellerHistory';
 import AverageTime from './AverageTime';
+import AddCar from './AddCar';
+import CarInfo from './CarInfo';
 import PriceReport from './PriceReport';
 import PartOrderStatus from './PartOrderStatus';
 import PartsStatistics from './PartsStatistics';
@@ -37,11 +39,13 @@ function App() {
         <Route path="/" element={<Home />} />
           <Route path="/DisplayCar" element={<DisplayCar />} />
           <Route path="/AddCustomer" element={<AddCustomer />} />
+          <Route path="/AddCar" element={<AddCar />} />
           <Route path="/SearchCustomer" element={<SearchCustomer />} />
           <Route path="/CustomerInfo" element={<CustomerInfo />} />
           <Route path="/AddPartsOrder" element={<AddPartsOrder />} />
           <Route path="/SellerHistory" element={<SellerHistory />} />
           <Route path="/AverageTime" element={<AverageTime />} />
+          <Route path="/CarInfo" element={<CarInfo />} />
           <Route path="/PriceReport" element={<PriceReport />} />
           <Route path="/PartOrderStatus" element={<PartOrderStatus />} />
           <Route path="/PartsStatistics" element={<PartsStatistics />} />
