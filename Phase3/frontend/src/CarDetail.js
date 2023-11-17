@@ -17,17 +17,17 @@ function CarDetail() {
     const navigate = useNavigate();
 
     // check if the user is eligible to sell a vehicle
-    const [isSalespersonOrOwner, setIsSalesPersonOrOwner] = React.useState(false);
+    const [isSalesperson, setIsSalesPerson] = React.useState(false);
     const storedUser = sessionStorage.getItem('user');
-    axios.get("/api/isSalespersonOrOwner", { params: { 'username': storedUser } }).then((response) => {
+    axios.get("/api/isSalesperson", { params: { 'username': storedUser } }).then((response) => {
       if (response.data == true) {
-          setIsSalesPersonOrOwner(true);
+          setIsSalesPerson(true);
       }
       ;
       }).catch((error) => {
           console.log(error);
       });
-    console.log('Is salesperson or owner?' + isSalespersonOrOwner);
+    //console.log('Is salesPerson?' + isSalesperson);
 
     // check if the vehicle has been sold
     const [hasBeenSold, setHasBeenSold] = React.useState(false);
@@ -39,7 +39,7 @@ function CarDetail() {
       }).catch((error) => {
           console.log(error);
       });
-    console.log('Has the car been sold?' + hasBeenSold);
+    //console.log('Has the car been sold?' + hasBeenSold);
 
     // const location = useLocation();
     // const queryParams = new URLSearchParams(location.search);
@@ -129,7 +129,7 @@ function CarDetail() {
           }
 
 
-          {isSalespersonOrOwner && !hasBeenSold && (
+          {isSalesperson && !hasBeenSold && (
 
           <div style={{ marginTop: '16px' }}>
           <Button variant="contained" 
