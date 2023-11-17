@@ -15,9 +15,9 @@ function CustomerInfo() {
 
   const { vehicleInfo, customerInfo } = location.state;
 
-  console.log('In CustomerInfo');
-  console.log(vehicleInfo);
-  console.log(customerInfo);
+  // console.log('In CustomerInfo');
+  // console.log(vehicleInfo);
+  // console.log(customerInfo);
 
   const handleLinkCustomer = (e) => {
     navigate('/SalesOrder', { state: { vehicleInfo: vehicleInfo, customerInfo: customerInfo } });

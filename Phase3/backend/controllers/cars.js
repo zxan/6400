@@ -248,9 +248,50 @@ exports.getCar = (req, res) => {
         }
         return res.json(results[0]);
     });
-  };
+};
 
-  exports.hasBeenSold = (req, res) => {
+exports.getCarForInventoryClerk = (req, res) => {
+    const vin = req.query.vin; 
+    const query = `
+    SELECT v.vin, ot.type, v.modelYear, mb.company as manufacturer, v.modelName, fuelType, mileage, 
+        GROUP_CONCAT(DISTINCT vc.color) AS colors, v.description,
+        (1.1 * COALESCE((SELECT SUM(P.cost * P.quantity)
+                          FROM PartOrder PO
+                          JOIN Part P ON P.orderNumber = PO.orderNumber
+                          WHERE PO.vin = v.vin), 0) +
+            1.25 * (SELECT s.purchasePrice
+                  FROM Sells_To s
+                  WHERE s.vin = v.vin)) AS price, 
+        (SELECT s.purchasePrice
+          FROM Sells_To s
+          WHERE s.vin = v.vin) AS purchasePrice,
+        COALESCE((SELECT SUM(P.cost * P.quantity)
+                  FROM PartOrder PO
+                  JOIN Part P ON P.orderNumber = PO.orderNumber
+                  WHERE PO.vin = v.vin), 0) AS totalPartsCost
+    FROM Vehicle v 
+    JOIN Of_Type ot ON v.vin = ot.vin
+    JOIN Manufactured_By mb ON v.vin = mb.vin 
+    JOIN Of_Color vc ON v.vin = vc.vin  
+    WHERE v.vin = ? 
+    -- the NOT-IN below might not be needed as those vehicles should not show up in the DisplayCarList page before CarDetial page
+    AND v.vin NOT IN (SELECT bf.vin FROM Buys_From bf)
+    GROUP BY v.vin
+    ORDER BY v.vin ASC;          
+    `;
+  
+    con.query(query, vin, (err, results) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).send('Error with the database');
+        }
+        return res.json(results[0]);
+    });
+};
+
+
+
+exports.hasBeenSold = (req, res) => {
     const vin = req.query.vin; 
 
     const query = `
@@ -270,10 +311,10 @@ exports.getCar = (req, res) => {
             res.json(true);
         }
     });
-  };
+};
 
 
-  exports.sale = (req, res) => {
+exports.sale = (req, res) => {
 
     console.log(req.body);
 
@@ -291,21 +332,53 @@ exports.getCar = (req, res) => {
         INSERT INTO Buys_from (customerID, username, vin, transactionDate)
         VALUES (?,?,?,?)`;
     
-        con.query(query,
-            [customerID, username,vin,transactionDate],
-            (err, result) => {
-                if (err) 
-                {
-                    console.error('Error adding transaction:', err);
-                    res.status(500).send('Error adding sale transaction');
-                } 
-                else 
-                {
-                    res.status(200).send('Sale transaction added successfully');
-                    console.log('Sale transaction added successfully');
-                }
+    con.query(query,
+        [customerID, username,vin,transactionDate],
+        (err, result) => {
+            if (err) 
+            {
+                console.error('Error adding transaction:', err);
+                res.status(500).send('Error adding sale transaction');
+            } 
+            else 
+            {
+                res.status(200).send('Sale transaction added successfully');
+                console.log('Sale transaction added successfully');
             }
-        );
-  };
+        }
+    );
+};
+
+// number of vehicles available for customer's purchase. used after inventory clerks, managers, and owners log in
+exports.countVehicleForPublic = (req, res) => {
+
+    console.log(req.body);
+
+    const query = `
+    SELECT COUNT(v.vin) AS countVehicleForPublic FROM Vehicle v 
+    JOIN Of_Type ot ON v.vin = ot.vin
+    JOIN Manufactured_By mb ON v.vin = mb.vin 
+    JOIN Of_Color vc ON v.vin = vc.vin  
+    WHERE v.vin NOT IN (SELECT bf.vin FROM Buys_From bf) AND 
+          v.vin NOT IN (SELECT p.vin
+                        FROM Part p
+                        WHERE p.status != 'installed')
+    `;
+    
+    con.query(query,
+        (err, result) => {
+            if (err) 
+            {
+                console.error('Error counting the number of vehicles availabel for customer to purchase:', err);
+                res.status(500).send('Error counting the number of vehicles availabel for customer to purchase');
+            } 
+            else 
+            {
+                res.status(200).send(result);
+                console.log('Sale transaction added successfully');
+            }
+        }
+    );
+};
 
   
