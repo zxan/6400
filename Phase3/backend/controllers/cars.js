@@ -253,8 +253,6 @@ exports.getCar = (req, res) => {
 exports.getCarForInventoryClerk = (req, res) => {
     const vin = req.query.vin; 
     const query = `
-    SET @vin = 'VIN123';
-
     SELECT v.vin, ot.type, v.modelYear, mb.company as manufacturer, v.modelName, fuelType, mileage, 
         GROUP_CONCAT(DISTINCT vc.color) AS colors, v.description,
         (1.1 * COALESCE((SELECT SUM(P.cost * P.quantity)
