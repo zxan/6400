@@ -22,7 +22,7 @@ function SearchCustomer() {
   const navigate = useNavigate();
   const location = useLocation();
   const { vehicleInfo} = location.state;
-  console.log(vehicleInfo);
+  //console.log(vehicleInfo);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +51,7 @@ function SearchCustomer() {
       }
 
       // Send a GET request to search for the customer
-      console.log('Search field value: '+ searchFormData.searchValue);
+      //console.log('Search field value: '+ searchFormData.searchValue);
       if (searchFormData.searchType === 'individual') {
         
         response = await axios.get(`/api/searchIndividualCustomer?driverLicense=${searchFormData.searchValue}`);

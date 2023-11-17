@@ -73,7 +73,7 @@ function SalesOrder() {
         response = await axios.post('/api/sale', { 'username': storedUser, 'CustomerID': customerInfo.CustomerID, 'vin': vehicleInfo.vin, 'transactionDate': transactionDate } );
         //setIndividualFormDataWithCustomerID(response.data[0]);
         // Handle success for individual customer
-        console.log(response.status);
+        //console.log(response.status);
         //console.log(response);
         console.log('Sale transaction added successfully');
         navigate('/SaleConfirmation', { state: { vehicleInfo: vehicleInfo, customerInfo: customerInfo, transactionDate: transactionDate } });
@@ -82,7 +82,7 @@ function SalesOrder() {
       }catch(error){
         //console.error('Error inserting the sale:', error);
         if (error.response && error.response.status === 500) {
-          toast.error('Error inserting the sale transaction. The vehicle might have been sold. Please check again.', {
+          toast.error('Error inserting the sale transaction. The vehicle might have been sold or the date is not real. Please check again.', {
             position: 'top-center',
             autoClose: true,
             hideProgressBar: false,
