@@ -1,12 +1,28 @@
 const con = require('../connect');
-
 exports.getSearchVendors = (req, res) => {
   // Retrieve the search string from the query parameters or request body
   const searchstring = req.query.searchstring || req.body.searchstring;
 
-  // Ensure the searchstring is not empty
-  if (!searchstring) {
-    res.status(400).send('Search string is required');
+  // Check if the searchstring is undefined or an empty string
+  if (searchstring === undefined || searchstring === '') {
+    // Provide a default behavior to return all vendors
+    const defaultQuery = `
+      SELECT name, phoneNumber, street, city, state, postalCode
+      FROM Vendor;
+    `;
+
+    con.query(defaultQuery, (err, results) => {
+      if (err) {
+        console.error('Error fetching all vendors:', err);
+        res.status(500).send('Error with the database');
+        return;
+      }
+
+      // Extract vendor data from the results
+      const vendorData = results;
+
+      res.json(vendorData);
+    });
     return;
   }
 
@@ -36,6 +52,7 @@ exports.getSearchVendors = (req, res) => {
     res.json(vendorData);
   });
 };
+
 
 exports.addVendor = (req, res) => {
   const { name, phoneNumber, street, city, state, postalCode } = req.body;

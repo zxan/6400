@@ -31,12 +31,12 @@ function Home() {
     const [price, setPrice] = useState(null);
     const [mileage, setMileage] = useState(null);
     const [keyword, setKeyword] = useState('');
+    const [loggedInUser,setLoggedInUser]=useState(null);
+    const [vin,setVin]=useState('');
    
-
-
     const onSubmit = (event) => {
         event.preventDefault();
-        if (!vehicleType && !manufacturer && !year && !fuelType && color.length === 0 && !keyword && !price && !mileage) {
+        if (!vin&&!vehicleType && !manufacturer && !year && !fuelType && color.length === 0 && !keyword && !price && !mileage) {
 
                 toast.error('Please enter some keywords or choose at least one filtering criteria.', {
                     position: "top-center",
@@ -63,9 +63,15 @@ function Home() {
         if (keyword) queryParams.set('keyword', keyword);
         if (price) queryParams.set('price', price);
         if (mileage) queryParams.set('mileage', mileage);
+        if (vin) queryParams.set('vin', vin);
         navigate(`/DisplayCar?${queryParams}`);
     }
-
+    useEffect(() => {
+        const storedUser = sessionStorage.getItem('user');
+    if (storedUser) {
+        setLoggedInUser(storedUser);
+    }
+    }, []);
     useEffect(() => {
         //This is important!!!!! Axios is how you communicate with backend
         //if you go to our backend server.js, you will see this get API endpoint
@@ -93,10 +99,22 @@ function Home() {
 
                     <Grid container spacing={3}>
                         {/* Left Grid for Content */}
-                        <Grid item xs={6}>
+                        <Grid item md={6}>
                             <Typography variant="h1" component="h1" style={styles.header}>
                                 BuzzCar
                             </Typography>
+                            {loggedInUser&&
+                                <Paper style={styles.search}>
+                                <InputBase
+                                    style={styles.input}
+                                    value={vin}
+                                    placeholder="Search By VIN"
+                                    inputProps={{ 'aria-label': 'search' }}
+                                    onChange={(event) => setVin(event.target.value)}
+                                />
+                            </Paper>
+                            }
+                           
                             <FormControl variant="outlined" style={styles.formControl}>
                                 <InputLabel >Year</InputLabel>
                                 <Select
@@ -212,7 +230,7 @@ function Home() {
                           
                         </Grid>
                         {/* Right Grid for Image */}
-                        <Grid item xs={6} style={styles.imgContainer}>
+                        <Grid item md={6} style={styles.imgContainer}>
                             <img
                                 style={styles.img}
                                 src="https://source.unsplash.com/1600x900/?cars"
@@ -236,7 +254,7 @@ function Home() {
 //Following is for styling
 const styles = {
     container: {
-        height: '60rem',
+        height: '55rem',
         display: 'flex',
         background: '#f4f4f4',
         alignItems: 'center',
@@ -250,6 +268,7 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         width: '70%',
+        marginBottom:'3%'
     },
     input: {
         flex: 1,
