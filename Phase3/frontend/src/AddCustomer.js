@@ -11,6 +11,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';//This is to navigate to differnt pages
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useLocation } from 'react-router-dom';
 
 function AddCustomer() {
   const [individualFormData, setIndividualFormData] = useState({
@@ -39,6 +40,8 @@ function AddCustomer() {
   });
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { vehicleInfo} = location.state;
 
   const [currentTab, setCurrentTab] = useState(0);
 
@@ -193,7 +196,7 @@ function AddCustomer() {
         console.log('Business customer added successfully');
       }
 
-      navigate('/CustomerInfo', { state: { customerInfo: response.data[0] } });
+      navigate('/CustomerInfo', { state: { customerInfo: response.data[0], vehicleInfo: vehicleInfo } });
       
     } catch (error) {
       // Handle errors, show an error message, or redirect as needed

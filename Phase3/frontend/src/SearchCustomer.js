@@ -77,7 +77,7 @@ function SearchCustomer() {
           draggable: true,
           progress: undefined,
           theme: 'light',
-          onClose: () => navigate('/AddCustomer'),
+          onClose: () => navigate('/AddCustomer',{ state: { vehicleInfo: vehicleInfo } }),
         });
         //navigate('/AddCustomer');
 

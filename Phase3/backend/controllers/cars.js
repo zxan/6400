@@ -301,6 +301,7 @@ exports.getCar = (req, res) => {
                 } 
                 else 
                 {
+                    res.status(200).send('Sale transaction added successfully');
                     console.log('Sale transaction added successfully');
                 }
             }

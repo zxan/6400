@@ -14,9 +14,9 @@ function SaleConfirmation() {
   const location = useLocation();
   const { vehicleInfo, customerInfo, transactionDate } = location.state;
 
-  console.log(vehicleInfo);
-  console.log(customerInfo);
-  console.log(transactionDate);
+  // console.log(vehicleInfo);
+  // console.log(customerInfo);
+  // console.log(transactionDate);
 
 
 
@@ -175,7 +175,7 @@ function SaleConfirmation() {
             }}
             
             >
-              Confirm the sale
+              Back to home
             </Button>
           </div>
 

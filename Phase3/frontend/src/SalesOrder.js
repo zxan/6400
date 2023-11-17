@@ -14,8 +14,8 @@ function SalesOrder() {
   const location = useLocation();
   const { vehicleInfo, customerInfo } = location.state;
 
-  console.log(vehicleInfo);
-  console.log(customerInfo);
+  //console.log(vehicleInfo);
+  //console.log(customerInfo);
 
   const storedUser = sessionStorage.getItem('user');
 
@@ -57,39 +57,160 @@ function SalesOrder() {
     });
   };
 
+  let response;
+
   const handleSellVehicle = async (e) => {
+    e.preventDefault();
     transactionDate = salesDate.year + '-' + salesDate.month + '-' + salesDate.day;
-    console.log(transactionDate);
-    console.log(dateRegex.test(transactionDate));
+    //console.log(transactionDate);
+    //console.log(dateRegex.test(transactionDate));
     if(!dateRegex.test(transactionDate)){
-      //console.log('before toast.error');
-      toast.error('Please enter the correct date');
-      displayErrorToast('Please enter the correct date');
-      //console.log('after toast.error');
-      //displayErrorToast('Please enter a correct date using a two-digit number for month, a two-digit number for day, and a four-digit number for year');
+      displayErrorToast('Please enter a correct date using a two-digit number for month, a two-digit number for day, and a four-digit number for year');
     }
     else {
       try{
         // Send a POST request to add the new individual customer
-        await axios.post('/api/sale', { 'username': storedUser, 'CustomerID': customerInfo.CustomerID, 'vin': vehicleInfo.vin, 'transactionDate': transactionDate } );
+        response = await axios.post('/api/sale', { 'username': storedUser, 'CustomerID': customerInfo.CustomerID, 'vin': vehicleInfo.vin, 'transactionDate': transactionDate } );
         //setIndividualFormDataWithCustomerID(response.data[0]);
         // Handle success for individual customer
-        console.log('Individual customer added successfully');
+        console.log(response.status);
+        //console.log(response);
+        console.log('Sale transaction added successfully');
         navigate('/SaleConfirmation', { state: { vehicleInfo: vehicleInfo, customerInfo: customerInfo, transactionDate: transactionDate } });
 
+
       }catch(error){
-        console.error('Error inserting the sale:', error);
-        toast.error('Error inserting the sale transaction. Please check again.');
-      }
+        //console.error('Error inserting the sale:', error);
+        if (error.response && error.response.status === 500) {
+          toast.error('Error inserting the sale transaction. The vehicle might have been sold. Please check again.', {
+            position: 'top-center',
+            autoClose: true,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+          });
+        }
+        else {
+          toast.error('Error inserting the sale transaction. The vehicle might have been sold. Please check again.');
+        }
+        }
+        
 
     }
     //navigate('/SearchCustomer', { state: { vehicleInfo: vehicleInfo } });
   };
 
+  if(customerInfo == null){
+    return (
+      <Container maxWidth="xl" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <NavBar />
+        <ToastContainer />
+  
+        {/* Vehicle Information Card */}
+        <Card sx={{ minWidth: 12, width: '60%' }} variant="outlined" style={{ marginTop: '20px' }}>
+          <CardContent>
+            <Typography variant="h5" component="div">
+              Vehicle Information
+            </Typography>
+            <div>
+            <Typography variant="body1" color="textSecondary">
+              <br />
+              Vin: {vehicleInfo.vin}
+              <br />
+              Model year: {vehicleInfo.modelYear}
+              <br />
+              Manufacturer: {vehicleInfo.manufacturer}
+              <br />
+              Vehicle type: {vehicleInfo.type}
+              <br />
+              Mileage: {vehicleInfo.mileage}
+              <br />
+              Fuel type: {vehicleInfo.fueltype}
+              <br />
+              Price: {vehicleInfo.price}
+              <br />
+              Color(s): {vehicleInfo.colors}
+              <br />
+              Description: {vehicleInfo.description}
+              <br />
+              
+              {/* Add more vehicle information here */}
+            </Typography>
+            </div>
+          </CardContent>
+        </Card>
+  
+        {/* Customer Information Card */}
+        <Card sx={{ minWidth: 12, width: '60%' }} variant="outlined" style={{ marginTop: '20px' }}>
+          <CardContent>
+            <Typography variant="h5" component="div">
+              Customer Information
+            </Typography>
 
-  return (
+  
+          </CardContent>
+          <CardActions>
+            <Button size="small" onClick = {handleSearchCustomer}>Search Customer</Button>
+          </CardActions>
+        </Card>
+  
+        {/* Sales Information Card */}
+        <Card sx={{ minWidth: 12, width: '60%' }} variant="outlined" style={{ marginTop: '20px' }}>
+          <CardContent>
+            <Typography variant="h5" component="div">
+              Sales Date
+            </Typography>
+            <Typography variant="body1" color="textSecondary" >
+              <br />
+              Please enter the sales date:
+            </Typography>
+            <TextField
+              id="month"
+              label="MM"
+              variant="outlined"
+              style={{ marginTop: '16px', marginBottom: '16px' }}
+              value={salesDate.month}
+              onChange={handleMonthChange}
+            />
+            <TextField
+              id="day"
+              label="DD"
+              variant="outlined"
+              style={{ marginTop: '16px', marginBottom: '16px' }}
+              value={salesDate.day}
+              onChange={handleDayChange}
+            />
+            <TextField
+              id="year"
+              label="YYYY"
+              variant="outlined"
+              style={{ marginTop: '16px', marginBottom: '16px' }}
+              value={salesDate.year}
+              onChange={handleYearChange}
+            />
+          </CardContent>
+        </Card>
+  
+        <div style={{ marginTop: '16px', marginBottom: '16px' }}>
+            <Button variant="contained" 
+              color="primary" 
+              onClick={handleSellVehicle}
+              
+              >
+                Confirm the sale
+              </Button>
+            </div>
+  
+      </Container>
+    );
+  }
+  else {return (
     <Container maxWidth="xl" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <NavBar />
+      <ToastContainer />
 
       {/* Vehicle Information Card */}
       <Card sx={{ minWidth: 12, width: '60%' }} variant="outlined" style={{ marginTop: '20px' }}>
@@ -130,7 +251,7 @@ function SalesOrder() {
         <CardContent>
           <Typography variant="h5" component="div">
             Customer Information
-            </Typography>
+          </Typography>
             {customerInfo.driverLicense ? (
                   <div>
                     <Typography gutterBottom variant="h6" component="div" color="textSecondary">
@@ -216,9 +337,6 @@ function SalesOrder() {
                   </Typography>
                 )}
 
-
-          
-          {/* Add more customer information components here */}
         </CardContent>
         <CardActions>
           <Button size="small" onClick = {handleSearchCustomer}>Search Customer</Button>
@@ -273,7 +391,9 @@ function SalesOrder() {
           </div>
 
     </Container>
-  );
+  );}
+
+  
 }
 
 
