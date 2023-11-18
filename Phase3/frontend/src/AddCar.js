@@ -42,7 +42,6 @@ function AddCar() {
     const customerInfo = location.state?.customerInfo || {};
     const vehicleInfo = location.state?.vehicleInfo || {};
 
-
     const handleInputChange = (e) => {
       const { name, value } = e.target;
       setIndividualFormData({ ...individualFormData, [name]: value });
