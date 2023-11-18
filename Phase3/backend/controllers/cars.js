@@ -448,6 +448,7 @@ exports.countVehicleForPublic = (req, res) => {
 };
 
 exports.addCar = (req, res) => {
+    
     //console.log(req.body);
     const {
         customerID,
@@ -466,10 +467,19 @@ exports.addCar = (req, res) => {
         description,
     } = req.body;  
     //Check if required fields are empty 
-
-    // if (!vin || !type || !username || !modelYear || !company ||  !modelName || !fuelType || !color || !carCondition || !mileage || !customerID || !purchaseDate || !purchasePrice) {
-    //     return res.status(500).send("Please provide input in required field.");
-    // }
+    if (!vin || !type || !username || !modelYear || !company ||  !modelName || !fuelType || !color || !carCondition || !mileage || !customerID || !purchaseDate || !purchasePrice) {
+        console.log("Required field Empty.");
+        return res.status(500).send("Please provide input in required field.");
+    }
+     //Check mileage is integer and purchase price is decimal 
+    if (mileage === 'number') {
+        console.log("Required field Empty.");
+        return res.status(500).send("Please provide input in required field.");
+    }
+    if (purchasePrice === 'number') {
+        console.log("Required field Empty.");
+        return res.status(500).send("Please provide input in required field.");
+    }
     //Check if purchase date is a date no later than current date 
     if (Date.parse(purchaseDate) < Date.now()) {
         console.log("Purchase date is in the past");
@@ -497,16 +507,25 @@ exports.addCar = (req, res) => {
         }
        
         const colorSQL = `
-            INSERT INTO Of_Color (vin, color) VALUES (?, ?);`;
+            INSERT INTO Of_Color (vin, color) VALUES ?;`;
+
+        var i ;
+        var color_values = [];
+        for(i=0; i < color.length; i++){
+            color_values.push([vin, color[i]]);
+        }
         con.query(
             colorSQL,
-            [vin, color],
+            [color_values],
+            // [vin, color],
             (err, result) => {
+                console.log(color_values);
             if (err) {
                 console.error('Error adding car(of_color):', err);
                 res.status(500).send('Error adding car(of_color)');
                 return; 
             } else {
+                
                 console.log('Car added successfully(of_color)');
             //res.status(200).send('Customer added successfully');
             }
