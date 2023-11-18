@@ -41,7 +41,14 @@ function AddCustomer() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { vehicleInfo} = location.state;
+
+  const vehicleInfo = location.state?.vehicleInfo || {};
+  const addCar = location.state?.addCar || {};
+
+  // console.log(vehicleInfo);
+  // console.log('AddCustomer.js. addCar: ' + addCar);
+
+  
 
   const [currentTab, setCurrentTab] = useState(0);
 
@@ -196,7 +203,7 @@ function AddCustomer() {
         console.log('Business customer added successfully');
       }
 
-      navigate('/CustomerInfo', { state: { customerInfo: response.data[0], vehicleInfo: vehicleInfo } });
+      navigate('/CustomerInfo', { state: { customerInfo: response.data[0], vehicleInfo: vehicleInfo, addCar: addCar } });
       
     } catch (error) {
       // Handle errors, show an error message, or redirect as needed
