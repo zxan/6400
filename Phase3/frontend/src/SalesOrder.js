@@ -12,7 +12,8 @@ function SalesOrder() {
   
   const navigate = useNavigate();
   const location = useLocation();
-  const { vehicleInfo, customerInfo } = location.state;
+  const customerInfo = location.state?.customerInfo || {};
+  const vehicleInfo = location.state?.vehicleInfo || {};
 
   //console.log(vehicleInfo);
   //console.log(customerInfo);

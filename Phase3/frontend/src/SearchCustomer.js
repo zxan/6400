@@ -21,12 +21,17 @@ function SearchCustomer() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { vehicleInfo} = location.state;
-  //console.log(vehicleInfo);
+
+  const customerInfo = location.state?.customerInfo || {};
+  const vehicleInfo = location.state?.vehicleInfo || {};
+  const addCar = location.state?.addCar || {};
+
+  // console.log(vehicleInfo);
+  // console.log('SearchCustomer.js. addCar: ' + addCar);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setSearchFormData({ ...searchFormData, [name]: value });
+    setSearchFormData({ ...searchFormData, [name]: value});
   };
 
   const handleSearch = async (e) => {
@@ -52,8 +57,7 @@ function SearchCustomer() {
 
       // Send a GET request to search for the customer
       //console.log('Search field value: '+ searchFormData.searchValue);
-      if (searchFormData.searchType === 'individual') {
-        
+      if (searchFormData.searchType === 'individual') {        
         response = await axios.get(`/api/searchIndividualCustomer?driverLicense=${searchFormData.searchValue}`);
       } else {
         response = await axios.get(`/api/searchBusinessCustomer?taxID=${searchFormData.searchValue}`);
@@ -62,7 +66,7 @@ function SearchCustomer() {
       // Handle success, navigate to customer info page
       console.log('Search successful:', response.data);
       // Navigate to a customer info page
-      navigate('/CustomerInfo', { state: { customerInfo: response.data[0], vehicleInfo: vehicleInfo } });
+      navigate('/CustomerInfo', { state: { customerInfo: response.data[0], vehicleInfo: vehicleInfo, addCar:addCar } });
 
     } catch (error) {
       // Handle errors, show an error message
@@ -77,7 +81,7 @@ function SearchCustomer() {
           draggable: true,
           progress: undefined,
           theme: 'light',
-          onClose: () => navigate('/AddCustomer',{ state: { vehicleInfo: vehicleInfo } }),
+          onClose: () => navigate('/AddCustomer',{ state: { vehicleInfo: vehicleInfo, addCar:addCar } }),
         });
         //navigate('/AddCustomer');
 

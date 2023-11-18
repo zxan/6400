@@ -63,6 +63,7 @@ export default function NavBar() {
     const [isManagerOrOwner, setIsManagerorOwner] = React.useState(false);
     const [isInventoryOrOwner, setIsInventoryOrOwner] = React.useState(false);
     const [isSalespersonOrOwner, setIsSalesPersonOrOwner] = React.useState(false);
+    const [isInventoryClerk, setIsInventoryClerk] = React.useState(false);
     const navigate = useNavigate();
     function LogOut() {
         setLoggedInUser(null);
@@ -98,6 +99,14 @@ export default function NavBar() {
             Axios.get("/api/isSalespersonOrOwner", { params: { 'username': storedUser } }).then((response) => {
                 if (response.data == true) {
                     setIsSalesPersonOrOwner(true);
+                }
+                ;
+            }).catch((error) => {
+                console.log(error);
+            });
+            Axios.get("/api/isInventoryClerk", { params: { 'username': storedUser } }).then((response) => {
+                if (response.data == true) {
+                    setIsInventoryClerk(true);
                 }
                 ;
             }).catch((error) => {
@@ -152,6 +161,19 @@ export default function NavBar() {
                                         </MenuItem>
                                     ))}
                                 </Menu>
+                            </div>
+                        }
+                        {/* AddCar Dropdown */}
+                        {isInventoryOrOwner == true &&
+                            <div>
+                                <Button
+                                    aria-controls="addCar-menu"
+                                    aria-haspopup="true"
+                                    onClick={(event) => navigate('/AddCar')}
+                                    style={styles.reportButton}
+                                >
+                                    Add Car
+                                </Button>
                             </div>
                         }
                         <Box style={{ flexGrow: 1 }}></Box>

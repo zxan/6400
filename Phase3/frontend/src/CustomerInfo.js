@@ -12,15 +12,28 @@ function CustomerInfo() {
   const navigate = useNavigate();
   const location = useLocation();
   //const { customerInfo } = location.state;
+  //const { vehicleInfo, customerInfo } = location.state;
 
-  const { vehicleInfo, customerInfo } = location.state;
+  const customerInfo = location.state?.customerInfo || {};
+  const vehicleInfo = location.state?.vehicleInfo || {};
+  const addCar = location.state?.addCar || {};
+
+  // console.log(vehicleInfo);
+  // console.log('CustomerInfo.js. addCar: ' + addCar);
 
   // console.log('In CustomerInfo');
   // console.log(vehicleInfo);
   // console.log(customerInfo);
 
   const handleLinkCustomer = (e) => {
-    navigate('/SalesOrder', { state: { vehicleInfo: vehicleInfo, customerInfo: customerInfo } });
+    //console.log('CustomerInfo.js, vehicleInfo: ' + vehicleInfo);
+    if (addCar === true){
+      //console.log('CustomerInfo.js, customerInfo: ' + customerInfo);
+      navigate('/AddCar', { state: { vehicleInfo: vehicleInfo, customerInfo: customerInfo } });
+    }
+    else {
+      navigate('/SalesOrder', { state: { vehicleInfo: vehicleInfo, customerInfo: customerInfo } });
+    }
   };
 
   return (
