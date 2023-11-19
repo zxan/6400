@@ -83,7 +83,7 @@ function SalesOrder() {
       }catch(error){
         //console.error('Error inserting the sale:', error);
         if (error.response && error.response.status === 500) {
-          toast.error('Error inserting the sale transaction. The vehicle might have been sold or the date is not real. Please check again.', {
+          toast.error('Error inserting the sale transaction. Please check again.', {
             position: 'top-center',
             autoClose: true,
             hideProgressBar: false,
@@ -95,7 +95,7 @@ function SalesOrder() {
           });
         }
         else {
-          toast.error('Error inserting the sale transaction. The vehicle might have been sold. Please check again.');
+          toast.error('Error inserting the sale transaction. Please check again.');
         }
         }
         
@@ -104,7 +104,18 @@ function SalesOrder() {
     //navigate('/SearchCustomer', { state: { vehicleInfo: vehicleInfo } });
   };
 
-  if(customerInfo == null){
+  if(storedUser == null){
+    return (
+      <Container maxWidth="xl" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <NavBar />
+        <Typography variant="h5" component="div">
+          <br />Please log in to view this internal page. 
+        </Typography>
+        
+        </Container>
+    );
+  }
+  else if(customerInfo == null){
     return (
       <Container maxWidth="xl" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <NavBar />
