@@ -300,6 +300,7 @@ function AddCar() {
     );
     }
     else {
+        individualFormData.customerID = customerInfo.CustomerID;
       return (
         <div>
           <NavBar />
@@ -402,8 +403,6 @@ function AddCar() {
                   <CardActions>
             <Button size="small" onClick = {handleSearchCustomer}>Search Customer</Button>
           </CardActions>
-
-                
             </Card>
 
               <Card>
@@ -415,14 +414,17 @@ function AddCar() {
                   
 
                     <form onSubmit={handleSubmit}>
-                      <TextField
+                      {/* <TextField
                         style={styles.formControl}
                         label="Customer ID*"
                         name="customerID"
                         value={individualFormData.customerID}
                         onChange={handleInputChange}
                         fullWidth
-                      />
+                      /> */}
+                      <Typography variant="body1" color="textSecondary">
+                        Customer ID: {individualFormData.customerID}
+                      </Typography>
                       <TextField
                         style={styles.formControl}
                         label="Vin*"
