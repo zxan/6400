@@ -1,167 +1,268 @@
 import React, { useState, useEffect } from 'react';
-import { ImageList,ImageListItem } from '@mui/material';
+import { ImageList, ImageListItem } from '@mui/material';
 import { Card, CardContent, CardMedia, Typography, Button } from '@mui/material';
 import { Grid } from '@mui/material';
 import NavBar from './component/navBar';
-import axios from 'axios'; 
+import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import CarIcon from '@mui/icons-material/DirectionsCar';
 import { useNavigate } from 'react-router-dom';
 
 
 function CarDetail() {
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const vin = queryParams.get('vin');
-    const [car, setCar] = useState({});
-    const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const vin = queryParams.get('vin');
+  const [car, setCar] = useState({});
+  const navigate = useNavigate();
+  const [transactionUser, setTransactionUser] = useState({});//inventory clerk, customer info
+  // check if the user is eligible to sell a vehicle
+  const [isSalesperson, setIsSalesPerson] = React.useState(false);
+  const storedUser = sessionStorage.getItem('user');
+  axios.get("/api/isSalesperson", { params: { 'username': storedUser } }).then((response) => {
+    if (response.data == true) {
+      setIsSalesPerson(true);
+    }
+    ;
+  }).catch((error) => {
+    console.log(error);
+  });
 
-    // check if the user is eligible to sell a vehicle
-    const [isSalesperson, setIsSalesPerson] = React.useState(false);
-    const storedUser = sessionStorage.getItem('user');
-    axios.get("/api/isSalesperson", { params: { 'username': storedUser } }).then((response) => {
-      if (response.data == true) {
-          setIsSalesPerson(true);
-      }
-      ;
-      }).catch((error) => {
-          console.log(error);
+  // check if the vehicle has been sold
+  const [hasBeenSold, setHasBeenSold] = React.useState(false);
+  axios.get("/api/hasBeenSold", { params: { 'vin': vin } }).then((response) => {
+    if (response.data == true) {
+      setHasBeenSold(true);
+    }
+    ;
+  }).catch((error) => {
+    console.log(error);
+  });
+
+  const isUserInventoryClerk = (username) => {
+    return axios.get('/api/isInventoryClerk', { params: { username } })
+      .then(response => {
+        return response.data;
+
+      })
+      .catch(error => {
+        console.error("Error checking user role:", error);
+        return false;
       });
-    //console.log('Is salesPerson?' + isSalesperson);
+  }
+  const isUserManagerOrOwner = (username) => {
+    return axios.get('/api/isManagerOrOwner', { params: { username } })
+      .then(response => {
 
-    // check if the vehicle has been sold
-    const [hasBeenSold, setHasBeenSold] = React.useState(false);
-    axios.get("/api/hasBeenSold", { params: { 'vin': vin } }).then((response) => {
-      if (response.data == true) {
-        setHasBeenSold(true);
-      }
-      ;
-      }).catch((error) => {
-          console.log(error);
+        return response.data;
+
+      })
+      .catch(error => {
+        console.error("Error checking user role:", error);
+        return false;
       });
-    //console.log('Has the car been sold?' + hasBeenSold);
+  }
+  useEffect(() => {
 
-    // const location = useLocation();
-    // const queryParams = new URLSearchParams(location.search);
-    // const vehicleType = queryParams.get('vehicleType');
-    // const manufacturer = queryParams.get('manufacturer');
-    // const modelYear = queryParams.get('modelYear');
-    // const fuelType = queryParams.get('fuelType');
-    // const keyword = queryParams.get('keyword');
-    // const price = queryParams.get('price');
-    // const mileage = queryParams.get('mileage');
-    // const color = queryParams.getAll('color');
+    async function fetchCarDetail() {
+      try {
 
-    useEffect(() => {
-    //   const params = {
-    //     vehicleType, 
-    //     manufacturer,
-    //     modelYear,
-    //     fuelType,
-    //     color,
-    //     keyword,
-    //     price,
-    //     mileage
-    //   };
-  
-
-      axios.get('/api/getCar',{params:{'vin':vin}})
-        .then(response => {
+        const isManagerOrOwner = await isUserManagerOrOwner(storedUser);
+        const isInventoryClerk = await isUserInventoryClerk(storedUser)
+        const params = {
+          vin
+        };
+        if (isManagerOrOwner) {
+          const response = await axios.get('/api/getCarForManager', { params });
+          const response2 = await axios.get('/api/getCustomerAndUserForManager', { params });
+          setTransactionUser(response2.data);
           setCar(response.data);
-         
-        })
-        .catch(error => {
-          console.error("Error fetching cars:", error);
-        });
-    }, []); 
+  
+        }
+        else if (isInventoryClerk) {
+          const response = await axios.get('/api/getCarForInventoryClerk', { params });
 
-    const handleSellVehicle = (e) => {
-      // const { name, value } = e.target;
-      // setSearchFormData({ ...searchFormData, [name]: value });
-      navigate('/SalesOrder', { state: { vehicleInfo: car } });
-    };
+          setCar(response.data);
+        }
+        else {
+          const response = await axios.get('/api/getCar', { params });
+          setCar(response.data);
 
-    return(
-        <div>
-        <NavBar/>
-        <Card style={styles.carComponent}>
-        <CardContent>
-          {/* Using CarIcon instead of CardMedia for an image */}
-          <CarIcon style={{ fontSize: 140 }} />
-          <Typography variant="h2" component="div">
-           {car.vin}
-          </Typography>
-          <Typography variant="h4" component="text.secondary">
-           {car.manufacturer} -- {car.modelYear}
-          </Typography>
-          <Typography variant="h4" color="text.secondary">
-            Manufacturer: {car.manufacturer}
-          </Typography>
-          <Typography variant="h4" color="text.secondary">
-            Vehicle Type: {car.type}
-          </Typography>
-          <Typography variant="h4" color="text.secondary">
-            Mileage: {car.mileage}
-          </Typography>
-          <Typography variant="h4" color="text.secondary">
-            Fuel Type: {car.fuelType}
-          </Typography>
-          <Typography variant="h4" color="text.secondary">
-            Price: ${car.price}
-          </Typography>
-        
-          <Typography variant="h4" color="text.secondary">
-            Colors: {car.colors}
-          </Typography>
-          <Typography variant="h4" color="text.secondary">
-            Description: {car.description}
-          </Typography>
+        }
+      } catch (error) {
+        console.error("Error in fetching data:", error);
+      }
+    }
+    fetchCarDetail();
+  }, []);
 
-          {hasBeenSold && (
-            <div style={{ marginTop: '16px' }}>
-              <Typography variant="h4" color="red">
-              This vehicle has been sold.
+  const handleSellVehicle = (e) => {
+    // const { name, value } = e.target;
+    // setSearchFormData({ ...searchFormData, [name]: value });
+    navigate('/SalesOrder', { state: { vehicleInfo: car } });
+  };
+  return (
+    <div>
+      <NavBar />
+      <Card style={styles.carComponent}>
+
+        <Grid container spacing={3}> {/* Grid container with spacing */}
+        <Grid item xs={12} md={3}>
+          {transactionUser.inventoryClerkFirstName &&
+            <div>
+              <CardContent>
+                <Typography variant="h4">Inventory Clerk Info</Typography>
+                <Typography variant="body1">Name: {transactionUser.inventoryClerkFirstName} {transactionUser.InventoryClerkLastName} </Typography>
+                {/* <Typography variant="body1">Purchase Date: {transactionUser.purchaseDate}</Typography> */}
+                {/* <Typography variant="body1">Purchase Price: {car.purchasePrice}</Typography>
+        <Typography variant="body1">Total Part Cost: {car.totalPartsCost}</Typography> */}
+              </CardContent>
+
+
+              {transactionUser.sellerBusinessName ?
+                <CardContent>
+                  <Typography variant="h4">Seller Info</Typography>
+                  <Typography variant="body1">Company Name: {transactionUser.sellerBusinessName} </Typography>
+                  <Typography variant="body1">Seller Name: {transactionUser.sellerName} </Typography>
+                  <Typography variant="body1">Title: {transactionUser.sellerTitle} </Typography>
+                  <Typography variant="body1">Email: {transactionUser.sellerEmail}</Typography>
+                  <Typography variant="body1">Phone: {transactionUser.sellerPhoneNumber}</Typography>
+                  <Typography variant="body1">Address: {transactionUser.sellerStreet}, {transactionUser.sellerCity}, {transactionUser.sellerState} {transactionUser.sellerPostalCode}</Typography>
+                </CardContent>
+                :
+                <CardContent>
+                  <Typography variant="h4">Seller Info</Typography>
+                  <Typography variant="body1">Name: {transactionUser.sellerFirstName} {transactionUser.sellerLastName} </Typography>
+                  <Typography variant="body1">Email: {transactionUser.sellerEmail}</Typography>
+                  <Typography variant="body1">Phone: {transactionUser.sellerPhoneNumber}</Typography>
+                  <Typography variant="body1">Address: {transactionUser.sellerStreet}, {transactionUser.sellerCity}, {transactionUser.sellerState} {transactionUser.sellerPostalCode}</Typography>
+                </CardContent>
+              }
+            </div>
+          }
+          </Grid>
+
+          {/* Seller Information Column */}
+          <Grid item xs={12} md={6}>
+
+            <CardContent style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              {/* Using CarIcon instead of CardMedia for an image */}
+              <CarIcon style={{ fontSize: 140 }} />
+              <Typography variant="h2" component="div">
+                {car.vin}
+              </Typography>
+              <Typography variant="h4" component="text.secondary">
+                {car.manufacturer} -- {car.modelYear}
+              </Typography>
+              <Typography variant="h4" color="text.secondary">
+                Manufacturer: {car.manufacturer}
+              </Typography>
+              <Typography variant="h4" color="text.secondary">
+                Vehicle Type: {car.type}
+              </Typography>
+              <Typography variant="h4" color="text.secondary">
+                Mileage: {car.mileage}
+              </Typography>
+              <Typography variant="h4" color="text.secondary">
+                Fuel Type: {car.fuelType}
+              </Typography>
+              <Typography variant="h4" color="text.secondary">
+                Price: ${car.price?car.price:0}
               </Typography>
 
-            </div>
-          )
+              <Typography variant="h4" color="text.secondary">
+                Colors: {car.colors}
+              </Typography>
+              <Typography variant="h4" color="text.secondary">
+                Description: {car.description}
+              </Typography>
 
+              {hasBeenSold && (
+                <div style={{ marginTop: '16px' }}>
+                  <Typography variant="h4" color="red">
+                    This vehicle has been sold.
+                  </Typography>
+
+                </div>
+              )
+
+              }
+
+
+              {isSalesperson && !hasBeenSold && (
+
+                <div style={{ marginTop: '16px' }}>
+                  <Button variant="contained"
+                    color="primary"
+                    onClick={handleSellVehicle}
+
+                  >
+                    Sell this vehicle
+                  </Button>
+                </div>
+
+              )}
+
+            </CardContent>
+
+
+          </Grid>
+          {hasBeenSold && transactionUser.salespersonFirstName &&
+            <Grid item xs={12} md={3}>
+              <CardContent>
+                <Typography variant="h4">Sales Person Info</Typography>
+                <Typography variant="body1">Name: {transactionUser.salespersonFirstName} {transactionUser.salesPersonLastName}</Typography>
+              </CardContent>
+
+              {transactionUser.buyerBusinessName ?
+                <CardContent>
+                  <Typography variant="h4">Buyer Info</Typography>
+                  <Typography variant="body1">Company Name: {transactionUser.buyerBusinessName} </Typography>
+                  <Typography variant="body1">Seller Name: {transactionUser.buyerName} </Typography>
+                  <Typography variant="body1">Title: {transactionUser.buyerTitle} </Typography>
+                  <Typography variant="body1">Email: {transactionUser.buyerEmail}</Typography>
+                  <Typography variant="body1">Phone: {transactionUser.buyerPhoneNumber}</Typography>
+                  <Typography variant="body1">Address: {transactionUser.buyerEmail}, {transactionUser.buyerCity}, {transactionUser.buyerState} {transactionUser.buyerPostalCode}</Typography>
+                </CardContent>
+                :
+
+                <CardContent>
+                  <Typography variant="h4">Buyer Info</Typography>
+                  <Typography variant="body1">Name: {transactionUser.buyerFirstName} {transactionUser.buyerLastName}</Typography>
+                  <Typography variant="body1">Email: {transactionUser.buyerEmail}</Typography>
+                  <Typography variant="body1">Phone: {transactionUser.buyerPhoneNumber}</Typography>
+                  <Typography variant="body1">Address: {transactionUser.buyerStreet}, {transactionUser.buyerCity}, {transactionUser.buyerState} {transactionUser.buyerPostalCode}</Typography>
+                </CardContent>
+              }
+
+
+            </Grid>
           }
-
-
-          {isSalesperson && !hasBeenSold && (
-
-          <div style={{ marginTop: '16px' }}>
-          <Button variant="contained" 
-            color="primary" 
-            onClick={handleSellVehicle}
-            
-            >
-                Sell this vehicle
-            </Button>
-          </div>
-                        
-                    )}
-        </CardContent>
+        </Grid>
       </Card>
-      </div>
-    );
-  }
-  
-  const styles = {
-    container: {
-        display: 'flex',
-        justifyContent: 'center',
-        marginTop: "5%"
-    },
-    carList: {
-        width:'60%',
-    },
-    carComponent:{
-        margin:"4%",
-        display: 'flex',
-        justifyContent: 'center',
+    </div>
+  );
+}
 
-    }
+const styles = {
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: "5%",
+  },
+  carList: {
+    width: '60%',
+  },
+  carComponent: {
+    margin: "4% 10%",
+    display: 'flex',
+    justifyContent: 'center',
+
+  }
 };
-  export default CarDetail;
+export default CarDetail;
