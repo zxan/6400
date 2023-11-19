@@ -77,6 +77,7 @@ function CarDetail() {
           const response2 = await axios.get('/api/getCustomerAndUserForManager', { params });
           setTransactionUser(response2.data);
           setCar(response.data);
+          console.log(response.data);
   
         }
         else if (isInventoryClerk) {
@@ -171,9 +172,21 @@ function CarDetail() {
               <Typography variant="h4" color="text.secondary">
                 Fuel Type: {car.fuelType}
               </Typography>
-              <Typography variant="h4" color="text.secondary">
-                Price: ${car.price?car.price:0}
+              {transactionUser.inventoryClerkFirstName&&
+              <>
+                <Typography variant="h4" color="text.secondary">
+                Purchase Price: ${car.purchasePrice}
               </Typography>
+              <Typography variant="h4" color="text.secondary">
+                Parts Cost: ${car.totalPartsCost}
+              </Typography>
+              </>
+              }
+           
+              <Typography variant="h4" color="text.secondary">
+                Sale Price: ${car.price?car.price:0}
+              </Typography>
+              
 
               <Typography variant="h4" color="text.secondary">
                 Colors: {car.colors}
