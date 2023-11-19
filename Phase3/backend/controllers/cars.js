@@ -6,6 +6,7 @@ exports.getCriterias = (req, res) => {
         "Manufacturer": [],
         "Model Year": [],
         "Fuel Type": ['Gas', 'Diesel', 'Natural Gas', 'Hybrid', 'Plugin Hybrid', 'Battery', 'Fuel Cell'],
+        "Car Condition": ['Excellent', 'Very Good', 'Good', 'Fair'],
         "Color": []
     };
 
@@ -472,14 +473,21 @@ exports.addCar = (req, res) => {
         return res.status(500).send("Please provide input in required field.");
     }
      //Check mileage is integer and purchase price is decimal 
-    if (mileage === 'number') {
-        console.log("Required field Empty.");
-        return res.status(500).send("Please provide input in required field.");
+     if ( (!isNaN(parseFloat(mileage)) && mileage.includes('.')) || Number.isInteger(Number(mileage))) {
+        console.log("mileage is a number");
+    } else {
+        console.log("mileage is not a number");
+        return res.status(500).send("Please provide correct format input in required field.");
     }
-    if (purchasePrice === 'number') {
-        console.log("Required field Empty.");
-        return res.status(500).send("Please provide input in required field.");
+
+    if ( (!isNaN(parseFloat(purchasePrice)) && purchasePrice.includes('.')) || Number.isInteger(Number(purchasePrice))) {
+        console.log("purchasePrice is a number");
+    } else {
+        console.log("purchasePrice is not a number");
+        return res.status(500).send("Please provide correct format input in required field.");
     }
+
+
     //Check if purchase date is a date no later than current date 
     if (Date.parse(purchaseDate) < Date.now()) {
         console.log("Purchase date is in the past");
@@ -519,6 +527,7 @@ exports.addCar = (req, res) => {
             [color_values],
             // [vin, color],
             (err, result) => {
+                // print out vin and color in backend, mutiple rows if there are mutiple colors 
                 console.log(color_values);
             if (err) {
                 console.error('Error adding car(of_color):', err);
