@@ -6,6 +6,7 @@ exports.getCriterias = (req, res) => {
         "Manufacturer": [],
         "Model Year": [],
         "Fuel Type": ['Gas', 'Diesel', 'Natural Gas', 'Hybrid', 'Plugin Hybrid', 'Battery', 'Fuel Cell'],
+        "Car Condition": ['Excellent', 'Very Good', 'Good', 'Fair'],
         "Color": []
     };
 
@@ -682,11 +683,27 @@ exports.addCar = (req, res) => {
         purchasePrice,
         description,
     } = req.body;  
+    var found_err;
     //Check if required fields are empty 
+    if (!vin || !type || !username || !modelYear || !company ||  !modelName || !fuelType || !color || !carCondition || !mileage || !customerID || !purchaseDate || !purchasePrice) {
+        console.log("Required field Empty.");
+        return res.status(500).send("Please provide input in required field.");
+    }
+     //Check mileage and purchase price are numerical values
+     if ( (!isNaN(parseFloat(mileage)) && mileage.includes('.')) || Number.isInteger(Number(mileage))) {
+        console.log("mileage is a number");
+    } else {
+        console.log("mileage is not a number");
+        return res.status(500).send("Please provide correct format input in required field.");
+    }
 
-    // if (!vin || !type || !username || !modelYear || !company ||  !modelName || !fuelType || !color || !carCondition || !mileage || !customerID || !purchaseDate || !purchasePrice) {
-    //     return res.status(500).send("Please provide input in required field.");
-    // }
+    if ( (!isNaN(parseFloat(purchasePrice)) && purchasePrice.includes('.')) || Number.isInteger(Number(purchasePrice))) {
+        console.log("purchasePrice is a number");
+    } else {
+        console.log("purchasePrice is not a number");
+        return res.status(500).send("Please provide correct format input in required field.");
+    }
+
     //Check if purchase date is a date no later than current date 
     if (Date.parse(purchaseDate) < Date.now()) {
         console.log("Purchase date is in the past");
@@ -695,6 +712,40 @@ exports.addCar = (req, res) => {
         res.status(500).send('Error with Purchase date');
         return;  
     }
+    //Check if username is in iventoryclerk table 
+    const usernameSQL = `
+    SELECT username from InventoryClerk
+    where username = ?;
+    `;
+    con.query(
+        usernameSQL,
+        [username],
+        (err, result) => {
+        if (err) {
+            console.error('Username Error 1', err);
+            // found_err = true;
+            // return true;
+            return res.status(500).send('Username Error');
+        } 
+
+        if (result.length > 0) {
+            console.log("Username valid");
+            // found_err = false;
+            // return false;
+        } else {
+            console.error('Username Error 2', err);
+            res.status(500).send('Username Error');
+            // found_err = true;
+            // return true;
+            process.exit(1);
+        }
+    });
+    // console.log(err);
+    // if(found_err){
+    //     console.error('Error username adding');
+    //     return;
+    // }
+    
 
     // Perform an SQL INSERT operation to add the car
     const carSQL = `
@@ -714,20 +765,36 @@ exports.addCar = (req, res) => {
         }
        
         const colorSQL = `
-            INSERT INTO Of_Color (vin, color) VALUES (?, ?);`;
+            INSERT INTO Of_Color (vin, color) VALUES ?;`;
+
+        var i ;
+        var color_values = [];
+        for(i=0; i < color.length; i++){
+            color_values.push([vin, color[i]]);
+        }
+        result = false;
         con.query(
             colorSQL,
-            [vin, color],
+            [color_values],
+            // [vin, color],
             (err, result) => {
+                // print out vin and color in backend, mutiple rows if there are mutiple colors 
+                console.log(color_values);
             if (err) {
                 console.error('Error adding car(of_color):', err);
                 res.status(500).send('Error adding car(of_color)');
+                result = true;
                 return; 
             } else {
                 console.log('Car added successfully(of_color)');
             //res.status(200).send('Customer added successfully');
             }
             });        
+        if(result){
+            console.error('Error color adding');
+            return;
+        }
+        result = false;
     // // Perform an SQL INSERT operation to add the car
         const carTypeSQL = `
             INSERT INTO Of_Type (vin, type) VALUES (?, ?);
@@ -746,7 +813,7 @@ exports.addCar = (req, res) => {
             //res.status(200).send('Customer added successfully');
             }
             });
-
+            result = false;
     // // Perform an SQL INSERT operation to add the car
         const carManuSQL = `
             INSERT INTO Manufactured_By (vin, company) VALUES (?, ?);
@@ -758,6 +825,7 @@ exports.addCar = (req, res) => {
             if (err) {
                 console.error('Error adding car(Manufactured_By):', err);
                 res.status(500).send('Error adding car(Manufactured_By)');
+                result = true;
                 return; 
 
             } else {
@@ -765,7 +833,11 @@ exports.addCar = (req, res) => {
             //res.status(200).send('Customer added successfully');
             }
             });
-
+            if(result){
+                console.error('Error manufacturer adding');
+                return;
+            }
+            result = false;
     // // Perform an SQL INSERT operation to add the car
         const carSellSQL = `
             INSERT INTO Sells_To (customerID,username, vin, purchaseDate, purchasePrice) VALUES ( 
@@ -780,6 +852,7 @@ exports.addCar = (req, res) => {
             if (err) {
                 console.error('Error adding car(Sells_To):', err);
                 res.status(500).send('Error adding car(Sells_To)');
+                result = true;
                 return; 
 
             } else {
@@ -788,7 +861,10 @@ exports.addCar = (req, res) => {
             //res.status(200).send('Customer added successfully');
             }
             });
-        
+            if(result){
+                console.error('Error sellto adding');
+                return;
+            }
 
         const carselectSQL = `
         SELECT v.vin, 

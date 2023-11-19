@@ -259,7 +259,7 @@ const styles = {
     width: '60%',
   },
   carComponent: {
-    margin: "4% 10%",
+    margin: "4% 20%",
     display: 'flex',
     justifyContent: 'center',
 

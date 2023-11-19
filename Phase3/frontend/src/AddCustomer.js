@@ -6,7 +6,7 @@ import NavBar from './component/navBar';
 // import axios from 'axios'; 
 
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, TextField, Button, Grid, Tabs, Tab } from '@mui/material';
+import { Card, CardContent, Container, Typography, TextField, Button, Grid, Tabs, Tab } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';//This is to navigate to differnt pages
 import { ToastContainer, toast } from 'react-toastify';
@@ -48,6 +48,7 @@ function AddCustomer() {
   // console.log(vehicleInfo);
   // console.log('AddCustomer.js. addCar: ' + addCar);
 
+  const storedUser = sessionStorage.getItem('user');
   
 
   const [currentTab, setCurrentTab] = useState(0);
@@ -223,7 +224,18 @@ function AddCustomer() {
 //         });
     
 // }
-
+if(storedUser == null){
+  return (
+    <Container maxWidth="xl" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <NavBar />
+      <Typography variant="h5" component="div">
+        <br />Please log in to view this internal page. 
+      </Typography>
+      
+      </Container>
+  );
+}
+else {
   return (
     <div>
       <NavBar />
@@ -420,6 +432,7 @@ function AddCustomer() {
 
 
   );
+}
 }
 
 export default AddCustomer;

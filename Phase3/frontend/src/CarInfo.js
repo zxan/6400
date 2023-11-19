@@ -5,12 +5,19 @@ import { Grid } from '@mui/material';
 import NavBar from './component/navBar';
 import axios from 'axios'; 
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';//This is to navigate to differnt pages
 
 
 function CarInfo() {
   const location = useLocation();
+  const navigate = useNavigate();
+
   const { CarInfo } = location.state;
 
+
+  const redirectToHomePage = (e) => {
+    navigate('/');
+  };
 
   console.log(CarInfo); 
 
@@ -28,7 +35,7 @@ function CarInfo() {
                 {CarInfo.vin ? (
                   <div>
                     <Typography gutterBottom variant="h5" component="div">
-                      Car Details
+                      Transaction Completed!
                     </Typography>
                     <Typography variant="body1" color="textSecondary">
                       Customer ID: {CarInfo.customerID}
@@ -90,7 +97,7 @@ function CarInfo() {
                 type="submit"
                 variant="contained"
                 color="primary"
-                //onClick ={handleSubmit}
+                onClick ={redirectToHomePage}
                 fullWidth
                 
               >
