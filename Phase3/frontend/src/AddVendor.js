@@ -11,46 +11,24 @@ import { TextField, Button, Grid } from '@mui/material';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Link } from 'react-router-dom';
 
-function AddPartsOrder() {
+function AddVendor() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showTable, setShowTable] = useState(false);
-  const [newPartsOrder, setNewPartsOrder] = useState({
-    partName: '',
-    quantity: '',
-    description: '',
-    cost: '',
+  const [newVendor, setNewVendor] = useState({
+    name: '',
+    phoneNumber: '',
+    street: '',
+    city: '',
+    state: '',
+    postalCode: '',
   });
 
-  useEffect(() => {
-    axios.get('/api/getVendors')
-      .then(response => {
-        // Process the response
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.error('Error getting vendor options:', error);
-      });
-  }, []);
-
-  const handleSearchVendors = () => {
-    axios.get(`/api/getSearchVendors?searchstring=${searchText}`)
-      .then((response) => {
-        console.log('Vendor search results:', response.data);
-        setSearchResults(response.data);
-        setShowTable(true);
-      })
-      .catch((error) => {
-        console.error('Error searching for vendors:', error);
-      });
-  };
-
-  const handleAddPartsOrder = () => {
+  const handleAddVendor = () => {
     // Check if any of the fields is empty
-    for (const key in newPartsOrder) {
-      if (newPartsOrder[key].trim() === '') {
+    for (const key in newVendor) {
+      if (newVendor[key].trim() === '') {
         toast.error(`Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`, {
           position: "top-center",
           autoClose: true,
@@ -61,7 +39,7 @@ function AddPartsOrder() {
           progress: undefined,
           theme: "light",
         });
-        return; // Don't proceed with adding the parts order
+        return; // Don't proceed with adding the vendor
       }
     }
 
@@ -69,18 +47,20 @@ function AddPartsOrder() {
       'Content-Type': 'application/json',
     };
 
-    axios.post('/api/addPartsOrder', newPartsOrder, { headers })
+    axios.post('/api/addVendor', newVendor, { headers })
       .then((response) => {
-        console.log('Parts order added:', response.data);
-        setNewPartsOrder({
-          partName: '',
-          quantity: '',
-          description: '',
-          cost: '',
+        console.log('Vendor added:', response.data);
+        setNewVendor({
+          name: '',
+          phoneNumber: '',
+          street: '',
+          city: '',
+          state: '',
+          postalCode: '',
         });
       })
       .catch((error) => {
-        console.error('Error adding a parts order:', error);
+        console.error('Error adding a vendor:', error);
       });
   };
 
@@ -88,11 +68,7 @@ function AddPartsOrder() {
     <div>
       <NavBar />
       <div style={{ textAlign: 'center' }}>
-        <Grid container justifyContent="center">
-          <Grid item xs={12} sm={6}>
-            <Link to="/searchVendor">Search Vendor</Link>
-          </Grid>
-        </Grid>
+
         {showTable && (
           <TableContainer component={Paper}>
             <Table>
@@ -121,39 +97,53 @@ function AddPartsOrder() {
             </Table>
           </TableContainer>
         )}
-        <h1>Add New Parts Order</h1>
+        <h1>Add New Vendor</h1>
         <Grid container justifyContent="center">
           <Grid item xs={12} sm={6}>
             <TextField
-              label="Part Name"
+              label="Name"
               variant="outlined"
-              value={newPartsOrder.partName}
-              onChange={(e) => setNewPartsOrder({ ...newPartsOrder, partName: e.target.value })}
+              value={newVendor.name}
+              onChange={(e) => setNewVendor({ ...newVendor, name: e.target.value })}
               fullWidth
             />
             <TextField
-              label="Quantity"
+              label="Phone Number"
               variant="outlined"
-              value={newPartsOrder.quantity}
-              onChange={(e) => setNewPartsOrder({ ...newPartsOrder, quantity: e.target.value })}
+              value={newVendor.phoneNumber}
+              onChange={(e) => setNewVendor({ ...newVendor, phoneNumber: e.target.value })}
               fullWidth
             />
             <TextField
-              label="Description"
+              label="Street"
               variant="outlined"
-              value={newPartsOrder.description}
-              onChange={(e) => setNewPartsOrder({ ...newPartsOrder, description: e.target.value })}
+              value={newVendor.street}
+              onChange={(e) => setNewVendor({ ...newVendor, street: e.target.value })}
               fullWidth
             />
             <TextField
-              label="Cost"
+              label="City"
               variant="outlined"
-              value={newPartsOrder.cost}
-              onChange={(e) => setNewPartsOrder({ ...newPartsOrder, cost: e.target.value })}
+              value={newVendor.city}
+              onChange={(e) => setNewVendor({ ...newVendor, city: e.target.value })}
               fullWidth
             />
-            <Button variant="contained" color="primary" onClick={handleAddPartsOrder}>
-              Add Parts Order
+            <TextField
+              label="State"
+              variant="outlined"
+              value={newVendor.state}
+              onChange={(e) => setNewVendor({ ...newVendor, state: e.target.value })}
+              fullWidth
+            />
+            <TextField
+              label="Postal Code"
+              variant="outlined"
+              value={newVendor.postalCode}
+              onChange={(e) => setNewVendor({ ...newVendor, postalCode: e.target.value })}
+              fullWidth
+            />
+            <Button variant="contained" color="primary" onClick={handleAddVendor}>
+              Add Vendor
             </Button>
           </Grid>
         </Grid>
@@ -163,4 +153,4 @@ function AddPartsOrder() {
   );
 }
 
-export default AddPartsOrder;
+export default AddVendor;
