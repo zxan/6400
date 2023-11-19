@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ImageList,ImageListItem } from '@mui/material';
-import { Card, CardContent, CardMedia, Typography } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography, Button } from '@mui/material';
 import { Grid } from '@mui/material';
 import NavBar from './component/navBar';
 import axios from 'axios'; 
 import { useLocation } from 'react-router-dom';
 import CarIcon from '@mui/icons-material/DirectionsCar';
+import { useNavigate } from 'react-router-dom';
 
 
 function CarDetail() {
@@ -13,6 +14,33 @@ function CarDetail() {
     const queryParams = new URLSearchParams(location.search);
     const vin = queryParams.get('vin');
     const [car, setCar] = useState({});
+    const navigate = useNavigate();
+
+    // check if the user is eligible to sell a vehicle
+    const [isSalesperson, setIsSalesPerson] = React.useState(false);
+    const storedUser = sessionStorage.getItem('user');
+    axios.get("/api/isSalesperson", { params: { 'username': storedUser } }).then((response) => {
+      if (response.data == true) {
+          setIsSalesPerson(true);
+      }
+      ;
+      }).catch((error) => {
+          console.log(error);
+      });
+    //console.log('Is salesPerson?' + isSalesperson);
+
+    // check if the vehicle has been sold
+    const [hasBeenSold, setHasBeenSold] = React.useState(false);
+    axios.get("/api/hasBeenSold", { params: { 'vin': vin } }).then((response) => {
+      if (response.data == true) {
+        setHasBeenSold(true);
+      }
+      ;
+      }).catch((error) => {
+          console.log(error);
+      });
+    //console.log('Has the car been sold?' + hasBeenSold);
+
     // const location = useLocation();
     // const queryParams = new URLSearchParams(location.search);
     // const vehicleType = queryParams.get('vehicleType');
@@ -47,9 +75,15 @@ function CarDetail() {
         });
     }, []); 
 
+    const handleSellVehicle = (e) => {
+      // const { name, value } = e.target;
+      // setSearchFormData({ ...searchFormData, [name]: value });
+      navigate('/SalesOrder', { state: { vehicleInfo: car } });
+    };
+
     return(
         <div>
-<NavBar/>
+        <NavBar/>
         <Card style={styles.carComponent}>
         <CardContent>
           {/* Using CarIcon instead of CardMedia for an image */}
@@ -82,6 +116,32 @@ function CarDetail() {
           <Typography variant="h4" color="text.secondary">
             Description: {car.description}
           </Typography>
+
+          {hasBeenSold && (
+            <div style={{ marginTop: '16px' }}>
+              <Typography variant="h4" color="red">
+              This vehicle has been sold.
+              </Typography>
+
+            </div>
+          )
+
+          }
+
+
+          {isSalesperson && !hasBeenSold && (
+
+          <div style={{ marginTop: '16px' }}>
+          <Button variant="contained" 
+            color="primary" 
+            onClick={handleSellVehicle}
+            
+            >
+                Sell this vehicle
+            </Button>
+          </div>
+                        
+                    )}
         </CardContent>
       </Card>
       </div>

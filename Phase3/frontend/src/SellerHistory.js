@@ -4,44 +4,66 @@ import { Card, CardContent, CardMedia, Typography } from '@mui/material';
 import { Grid } from '@mui/material';
 import NavBar from './component/navBar';
 import axios from 'axios'; 
-
+import { CircularProgress } from '@mui/material';
 
 const SellerDataRow = ({ seller }) => {
-    const {
-      sellerName,
-      totalNumberOfVehiclesSold,
-      averageSoldPrice,
-      averageNumberOfPartsOrderedPerVehicle,
-      averageCostOfPartsPerVehicle,
-      redHighlighted,
-    } = seller;
-  
-    const rowStyles = {
-      backgroundColor: redHighlighted ? 'red' : 'inherit',
-    };
-  
-    return (
-      <tr style={rowStyles}>
-        <td>{sellerName}</td>
-        <td>{totalNumberOfVehiclesSold}</td>
-        <td>{averageSoldPrice}</td>
-        <td>{averageNumberOfPartsOrderedPerVehicle}</td>
-        <td>{averageCostOfPartsPerVehicle}</td>
-      </tr>
-    );
+  const {
+    sellerName,
+    totalNumberOfVehiclesSold,
+    averageSoldPrice,
+    averageNumberOfPartsOrderedPerVehicle,
+    averageCostOfPartsPerVehicle,
+    redHighlighted,
+  } = seller;
+
+  const rowStyles = {
+    backgroundColor: redHighlighted ? 'red' : 'inherit',
   };
+
+  return (
+    <tr style={rowStyles}>
+      <td>{sellerName}</td>
+      <td>{totalNumberOfVehiclesSold}</td>
+      <td>{averageSoldPrice}</td>
+      <td>{averageNumberOfPartsOrderedPerVehicle}</td>
+      <td>{averageCostOfPartsPerVehicle}</td>
+    </tr>
+  );
+};
 
 const SellerHistory = () => {
   const [sellerData, setSellerData] = useState([]);
+  const [isManagerOrOwner, setIsManagerOrOwner] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/getSellerReports') // Adjust this endpoint as per your backend
+    // Fetch user role information when the component mounts
+    const storedUser = sessionStorage.getItem('user');
+
+    axios.get("/api/isManagerOrOwner", { params: { 'username': storedUser } })
+      .then((response) => {
+        if (response.data === true) {
+          setIsManagerOrOwner(true);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        // Set loading to false when authorization check is complete
+        setLoading(false);
+      });
+
+    // Fetch seller history data
+    axios.get('/api/getSellerReports')
       .then(response => {
         console.log(response.data)
         setSellerData(response.data);
       })
       .catch(error => {
         console.error('Error fetching seller history:', error);
+        // Set loading to false if there's an error fetching the data
+        setLoading(false);
       });
   }, []);
 
@@ -62,28 +84,46 @@ const SellerHistory = () => {
       padding: '8px',
       textAlign: 'left',
     },
+    notAuthorizedMessage: {
+      textAlign: 'center',
+      color: 'red',
+      marginTop: '20px',
+    },
   };
 
   return (
     <div>
       <NavBar />
       <div style={styles.container}>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.columnHeader}>Seller Name</th>
-              <th style={styles.columnHeader}>Total Vehicles Sold</th>
-              <th style={styles.columnHeader}>Average Sold Price</th>
-              <th style={styles.columnHeader}>Average Parts per Vehicle</th>
-              <th style={styles.columnHeader}>Average Cost of Parts</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sellerData.map((seller, index) => (
-              <SellerDataRow key={index} seller={seller} />
-            ))}
-          </tbody>
-        </table>
+        {loading ? (
+          // Show a loading indicator while the data is being fetched
+          <CircularProgress style={{ margin: '20px auto', display: 'block' }} />
+        ) : (
+          <>
+            {isManagerOrOwner ? (
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.columnHeader}>Seller Name</th>
+                    <th style={styles.columnHeader}>Total Vehicles Sold</th>
+                    <th style={styles.columnHeader}>Average Sold Price</th>
+                    <th style={styles.columnHeader}>Average Parts per Vehicle</th>
+                    <th style={styles.columnHeader}>Average Cost of Parts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sellerData.map((seller, index) => (
+                    <SellerDataRow key={index} seller={seller} />
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div style={styles.notAuthorizedMessage}>
+                <p>You are not authorized to view this data.</p>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
-function BasicTable({ columns, data }) {
+function BasicTable({ columns, data , onRowClick}) {
 const styles = {
   table: {
     width: '100%', // Adjust the width to your preference
@@ -23,28 +23,28 @@ const styles = {
 };
 
 
-  return (
-    <TableContainer component={Paper}>
-      <Table style={styles.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            {columns.map((column, index) => (
-              <TableCell key={index} style={styles.columnHeader}>{column.Header}</TableCell>
+return (
+  <TableContainer component={Paper}>
+    <Table>
+      <TableHead>
+        <TableRow>
+          {columns.map((column) => (
+            <TableCell key={column.Header}>{column.Header}</TableCell>
+          ))}
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {data.map((row) => (
+          <TableRow key={row.orderNumber} onClick={() => onRowClick(row)} style={{ cursor: 'pointer' }}>
+            {columns.map((column) => (
+              <TableCell key={column.Header}>{row[column.accessor]}</TableCell>
             ))}
           </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map((item, index) => (
-            <TableRow key={index} style={item.redHighlighted ? styles.highlightedRow : null}>
-              {columns.map((column, columnIndex) => (
-                <TableCell key={columnIndex}>{item[column.accessor]}</TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-}
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+);
+};
 
 export default BasicTable;

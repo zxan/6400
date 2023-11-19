@@ -37,7 +37,7 @@ exports.isManagerOrOwner = (req, res) => {
 
             res.json(false);
         } else {
-           console.log(result[0]);
+           //console.log(result[0]);
             // Example: Returning only the password, but consider the security implications
             res.json(true);
         }
@@ -57,6 +57,79 @@ exports.isInventoryOrOwner = (req, res) => {
             return;
         }
         if (result[0].isInventoryOrOwner === 0) {
+
+            res.json(false);
+        } else {
+           //console.log(result[0]);
+            // Example: Returning only the password, but consider the security implications
+            res.json(true);
+        }
+    });
+};
+
+exports.isSalespersonOrOwner = (req, res) => {
+    
+    const username = req.query.username; // or req.body.username, depending on your setup
+    //console.log('In the user.isSalespersonOrOwner API. username: ' + username);
+    const query = `
+    SELECT CASE 
+        WHEN EXISTS (SELECT 1 FROM Salesperson WHERE username = ?) THEN 1
+        WHEN EXISTS (SELECT 1 FROM Owner WHERE username = ?) THEN 1 ELSE 0 END AS isSalespersonOrOwner;
+`;
+    con.query(query, [username,username], (err, result) => {
+        if (err) {
+            res.status(500).send('Error in database');
+            return;
+        }
+        if (result[0].isSalespersonOrOwner === 0) {
+
+            res.json(false);
+        } else {
+           console.log(result[0]);
+            // Example: Returning only the password, but consider the security implications
+            res.json(true);
+        }
+    });
+};
+
+exports.isSalesperson = (req, res) => {
+    
+    const username = req.query.username; // or req.body.username, depending on your setup
+    //console.log('In the user.isSalesperson API. username: ' + username);
+    const query = `
+    SELECT CASE 
+        WHEN EXISTS (SELECT 1 FROM Salesperson WHERE username = ?) THEN 1 ELSE 0 END AS isSalesperson;
+`;
+    con.query(query, [username], (err, result) => {
+        if (err) {
+            res.status(500).send('Error in database');
+            return;
+        }
+        if (result[0].isSalesperson === 0) {
+
+            res.json(false);
+        } else {
+           console.log(result[0]);
+            // Example: Returning only the password, but consider the security implications
+            res.json(true);
+        }
+    });
+};
+
+exports.isInventoryClerk = (req, res) => {
+    
+    const username = req.query.username; // or req.body.username, depending on your setup
+    //console.log('In the user.isInventoryClerk API. username: ' + username);
+    const query = `
+    SELECT CASE 
+        WHEN EXISTS (SELECT 1 FROM InventoryClerk WHERE username = ?) THEN 1 ELSE 0 END AS isInventoryClerk;
+`;
+    con.query(query, [username], (err, result) => {
+        if (err) {
+            res.status(500).send('Error in database');
+            return;
+        }
+        if (result[0].isInventoryClerk === 0) {
 
             res.json(false);
         } else {
@@ -81,7 +154,7 @@ exports.isAuthorized= (req, res) => {
               SELECT username FROM InventoryClerk
           );`;
     if (username){
-        console.log('here')
+        //console.log('here')
     con.query(query, username, (err, results) => {
       if (err) {
         console.error(err.message);
