@@ -13,6 +13,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
+
 function Home() {
     const navigate = useNavigate();
     //in React.js, you have to set your variable a bit differently becasue it is dynamic
@@ -21,6 +22,7 @@ function Home() {
     const [manufacturer, setManufacturer] = useState('');
     const [year, setYear] = useState('');
     const [color, setColor] = useState([]);
+    const [soldFilter,setSoldFilter]=useState('all');
     const [vehicleType, setVehicleType] = useState('');
     const [fuelType, setFuelType] = useState('');
     const [manufacturerOptions, setManufacturerOptions] = useState([]);
@@ -31,12 +33,12 @@ function Home() {
     const [price, setPrice] = useState(null);
     const [mileage, setMileage] = useState(null);
     const [keyword, setKeyword] = useState('');
-    const [loggedInUser,setLoggedInUser]=useState(null);
     const [vin,setVin]=useState('');
-   
+    const [isManagerOrOwner, setIsManagerorOwner] = React.useState(false);
+    const storedUser = sessionStorage.getItem('user');
     const onSubmit = (event) => {
         event.preventDefault();
-        if (!vin&&!vehicleType && !manufacturer && !year && !fuelType && color.length === 0 && !keyword && !price && !mileage) {
+        if (!vin&&!vehicleType && !manufacturer && !year && !fuelType && color.length === 0 && !keyword && !price && !mileage&&soldFilter=='all') {
 
                 toast.error('Please enter some keywords or choose at least one filtering criteria.', {
                     position: "top-center",
@@ -64,17 +66,23 @@ function Home() {
         if (price) queryParams.set('price', price);
         if (mileage) queryParams.set('mileage', mileage);
         if (vin) queryParams.set('vin', vin);
+        queryParams.set('soldStatus',soldFilter);
         navigate(`/DisplayCar?${queryParams}`);
     }
+
+
     useEffect(() => {
-        const storedUser = sessionStorage.getItem('user');
-    if (storedUser) {
-        setLoggedInUser(storedUser);
-    }
-    }, []);
-    useEffect(() => {
-        //This is important!!!!! Axios is how you communicate with backend
-        //if you go to our backend server.js, you will see this get API endpoint
+
+        axios.get("/api/isManagerOrOwner", { params: { 'username': storedUser } }).then((response) => {
+          
+            if (response.data == true) {
+                setIsManagerorOwner(true);
+            }
+            ;
+        }).catch((error) => {
+            console.log(error);
+        });
+
         axios.get('/api/getCriterias')
             .then(response => {
                 //process the response
@@ -103,7 +111,7 @@ function Home() {
                             <Typography variant="h1" component="h1" style={styles.header}>
                                 BuzzCar
                             </Typography>
-                            {loggedInUser&&
+                            {storedUser&&
                                 <Paper style={styles.search}>
                                 <InputBase
                                     style={styles.input}
@@ -187,6 +195,27 @@ function Home() {
                                     ))}
                                 </Select>
                             </FormControl>
+                            {isManagerOrOwner&&
+                                <FormControl variant="outlined" style={styles.formControl}>
+                                <InputLabel >Sold Status</InputLabel>
+                                <Select
+                                    value={soldFilter}
+                                    onChange={(event) => setSoldFilter(event.target.value)}
+                                 
+                                >
+                                    <MenuItem value='all'>
+                                        <em>All</em>
+                                    </MenuItem>
+                                    <MenuItem value='sold'>
+                                        <em>Only Sold</em>
+                                    </MenuItem>
+                                    <MenuItem value='unsold'>
+                                        <em>Only Unsold</em>
+                                    </MenuItem>
+                                </Select>
+                            </FormControl>
+                            }
+                           
                             <br></br>
                             <FormControl style={styles.formControl}>
                                 <Typography id="price-range-slider" gutterBottom>
