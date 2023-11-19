@@ -7,6 +7,8 @@ import NavBar from './component/navBar';
 import { Card, CardActions, CardContent, Typography, TextField, Button, Grid, Tabs, Tab } from '@mui/material';
 import { useNavigate } from 'react-router-dom';//This is to navigate to differnt pages
 import { useLocation } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AddCar() {
     const [individualFormData, setIndividualFormData] = useState({
@@ -36,6 +38,8 @@ function AddCar() {
     const [vehicleTypeOptions, setVehicleTypeOptions] = useState([]);
     const [fuelTypeOptions, setFuelTypeOptions] = useState([]);
     const [carConditionOptions, setcarConditionOptions] = useState([]);
+    // const [error, setError] = useState(null);
+
 
     const location = useLocation();
 
@@ -48,8 +52,20 @@ function AddCar() {
       setIndividualFormData({ ...individualFormData, [name]: value });
     };
 
-    const handleSearchCustomer = (e) => {
-      navigate('/SearchCustomer', { state: { vehicleInfo: vehicleInfo, addCar: true } });
+    const handleSearchCustomer = async (e) => {
+        e.preventDefault();
+  
+      try {
+        let response;
+        // if (currentTab === 0) {
+        // if (!validateVehiclelForm()) {
+        //     return;
+        // }
+        navigate('/SearchCustomer', { state: { vehicleInfo: vehicleInfo, addCar: true } });
+      } catch (error) {
+        // Handle errors, show an error message, or redirect as needed
+        console.error('Error adding car:', error);
+      }
     };
 
     useEffect(() => {
@@ -65,23 +81,129 @@ function AddCar() {
             })
             .catch(error => {
                 console.error(error);
+                // if (error.response && error.response.data && error.response.data.error) {
+                //     setError(error.response.data.error);
+                // } else {
+                //     setError('Error fetching criteria data');
+                // }
             });
     }, []);
+
+    const displayErrorToast = (message) => {
+        toast.error(message, {
+          position: "top-center",
+          autoClose: true,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      };
+    
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+    const validateVehiclelForm = () => {
+        // Validation logic for vehicle form
+        const {customerID,
+            vin,
+            type,
+            username,
+            modelYear,
+            company,
+            modelName,
+            fuelType,
+            color,
+            mileage,
+            carCondition,
+            purchaseDate,
+            purchasePrice,
+            description } = individualFormData;
+        
+        if (customerID === '') {
+          displayErrorToast('Please enter customerID');
+          return false;
+        }
+        if (vin === '') {
+          displayErrorToast('Please enter vin');
+          return false;
+        }
+        if (type === '') {
+          displayErrorToast('Please select vehicle type');
+          return false;
+        }
+        if (username === '') {
+          displayErrorToast('Please enter username');
+          return false;
+        }
+        if (modelYear === '') {
+          displayErrorToast('Please select model Year');
+          return false;
+        }
+        if (company === '') {
+          displayErrorToast('Please select company');
+          return false;
+        }
+        if (modelName === '') {
+          displayErrorToast('Please enter model name');
+          return false;
+        }
+        if (fuelType === '') {
+          displayErrorToast('Please select fuel type');
+          return false;
+        }
+        if (carCondition === '') {
+            displayErrorToast('Please select car condition');
+            return false;
+          }
+        if (color === []) {
+          displayErrorToast('Please select color');
+          return false;
+        }
+        if (mileage === '' || isNaN(mileage)) {
+            displayErrorToast('Please enter valid mileage');
+            return false;
+          }
+
+        if (purchaseDate === '' || !dateFormatRegex.test(purchaseDate) || Date.parse(purchaseDate) > Date.now()) {
+            displayErrorToast('Please enter valid purchase date');
+          return false;
+        }
+
+        if (purchasePrice === '' || isNaN(purchasePrice)) {
+            displayErrorToast('Please enter valid purchase price');
+            return false;
+          }
+
+        return true;
+    };
+
+      
 
     const handleSubmit = async (e) => {
       e.preventDefault();
   
       try {
         let response;
-        console.log('Car added successfully');
+        if (!validateVehiclelForm()) {
+            return;
+        }
         console.log(individualFormData);
         response = await axios.post('/api/addCar', individualFormData);
+        displayErrorToast('Error adding car 1:', response);
+        if(response.data.error)
+        {
+            displayErrorToast('Error adding car 1:', response.data.error);
+        }
 
-        console.log('Car added successfully');
         navigate('/CarInfo', { state: { CarInfo: response.data[0] } });
       } catch (error) {
         // Handle errors, show an error message, or redirect as needed
-        console.error('Error adding customer:', error);
+        displayErrorToast('Invalid Input. Please double check');
+        displayErrorToast(error);
+        console.error('Error adding car:', error);
       }
     };
 
@@ -89,6 +211,7 @@ function AddCar() {
       return (
         <div>
           <NavBar />
+          <ToastContainer />
           <Grid container justifyContent="center">
             <Grid item xs={12} sm={6}>
             <Typography variant="h4" component="div" position="center">
@@ -101,7 +224,12 @@ function AddCar() {
                   </Typography>
 
                   <CardActions>
-            <Button size="small" onClick = {handleSearchCustomer}>Search Customer</Button>
+            <Button
+                type="submit" 
+                size="small" 
+                onClick = {handleSearchCustomer}>
+                Search Customer
+            </Button>
           </CardActions>
 
                 </CardContent>
@@ -256,7 +384,7 @@ function AddCar() {
                       /> */}
                       <TextField
                         style={styles.formControl}
-                        label="Purchase Date*"
+                        label="Purchase Date(YYYY-MM-DD)*"
                         name="purchaseDate"
                         value={individualFormData.purchaseDate}
                         onChange={handleInputChange}
@@ -303,6 +431,7 @@ function AddCar() {
         individualFormData.customerID = customerInfo.CustomerID;
       return (
         <div>
+          <ToastContainer />
           <NavBar />
           <Grid container justifyContent="center">
             <Grid item xs={12} sm={6}>
@@ -401,7 +530,12 @@ function AddCar() {
 
                   </CardContent>
                   <CardActions>
-            <Button size="small" onClick = {handleSearchCustomer}>Search Customer</Button>
+                  <Button
+                type="submit" 
+                size="small" 
+                onClick = {handleSearchCustomer}>
+                Search Customer
+            </Button>
           </CardActions>
             </Card>
 
@@ -557,7 +691,7 @@ function AddCar() {
                       /> */}
                       <TextField
                         style={styles.formControl}
-                        label="Purchase Date*"
+                        label="Purchase Date(YYYY-MM-DD)*"
                         name="purchaseDate"
                         value={individualFormData.purchaseDate}
                         onChange={handleInputChange}
