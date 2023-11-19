@@ -12,11 +12,14 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 function AddPartsOrder() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showTable, setShowTable] = useState(false);
+  const location = useLocation();
+  const selectedVendor = location.state?.selectedVendor || null;
   const [newPartsOrder, setNewPartsOrder] = useState({
     partName: '',
     quantity: '',
@@ -25,27 +28,9 @@ function AddPartsOrder() {
   });
 
   useEffect(() => {
-    axios.get('/api/getVendors')
-      .then(response => {
-        // Process the response
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.error('Error getting vendor options:', error);
-      });
-  }, []);
-
-  const handleSearchVendors = () => {
-    axios.get(`/api/getSearchVendors?searchstring=${searchText}`)
-      .then((response) => {
-        console.log('Vendor search results:', response.data);
-        setSearchResults(response.data);
-        setShowTable(true);
-      })
-      .catch((error) => {
-        console.error('Error searching for vendors:', error);
-      });
-  };
+    console.log('Location state:', location.state);
+    console.log('Selected vendor:', selectedVendor);
+  }, [location.state, selectedVendor]);
 
   const handleAddPartsOrder = () => {
     // Check if any of the fields is empty
@@ -93,6 +78,20 @@ function AddPartsOrder() {
             <Link to="/searchVendor">Search Vendor</Link>
           </Grid>
         </Grid>
+        {selectedVendor ? (
+        <div>
+          <h2>Selected Vendor:</h2>
+          <p>Name: {selectedVendor.name}</p>
+          <p>Phone Number: {selectedVendor.phoneNumber}</p>
+          <p>Street: {selectedVendor.street}</p>
+          <p>City: {selectedVendor.city}</p>
+          <p>State: {selectedVendor.state}</p>
+          <p>Postal Code: {selectedVendor.postalCode}</p>
+          {/* Add more vendor details as needed */}
+        </div>
+      ) : (
+        <p>No selected vendor.</p>
+      )}
         {showTable && (
           <TableContainer component={Paper}>
             <Table>

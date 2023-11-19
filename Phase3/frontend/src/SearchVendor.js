@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -11,11 +10,16 @@ import { TextField, Button, Grid } from '@mui/material';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 function SearchVendor() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showTable, setShowTable] = useState(false);
+  const [selectedVendor, setSelectedVendor] = useState(null);
+  const navigate = useNavigate(); // React Router's useNavigate hook
 
   const handleSearch = () => {
     axios.get(`/api/getSearchVendors?searchstring=${searchText}`)
@@ -29,9 +33,28 @@ function SearchVendor() {
       });
   };
 
-    const headers = {
-      'Content-Type': 'application/json',
-    };
+  const handleSelectVendor = (vendor) => {
+    setSelectedVendor(vendor);
+    console.log('Selected Vendor in SearchVendor:', vendor);
+    toast.success(`Vendor "${vendor.name}" selected!`, {
+      position: "top-center",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      onClose: () => {
+        // This will be executed after the toast is closed
+        console.log('Navigating to AddPartsOrder with state:', { selectedVendor });
+        navigate('/addpartsorder', { state: { selectedVendor: vendor } });
+      },
+    });
+    console.log('Navigating to AddPartsOrder with state:', { selectedVendor });
+    // Redirect to AddPartsOrder page with selected vendor information
+    navigate('/addpartsorder', { state: { selectedVendor } });
+  };
 
   return (
     <div>
@@ -63,6 +86,7 @@ function SearchVendor() {
                   <TableCell>City</TableCell>
                   <TableCell>State</TableCell>
                   <TableCell>Postal Code</TableCell>
+                  <TableCell>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -74,13 +98,29 @@ function SearchVendor() {
                     <TableCell>{vendor.city}</TableCell>
                     <TableCell>{vendor.state}</TableCell>
                     <TableCell>{vendor.postalCode}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleSelectVendor(vendor)}
+                      >
+                        Select
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
         )}
-        
+        {selectedVendor && (
+          <div>
+            <h2>Selected Vendor Information</h2>
+            <p>Name: {selectedVendor.name}</p>
+            <p>Phone Number: {selectedVendor.phoneNumber}</p>
+            {/* Add more vendor information as needed */}
+          </div>
+        )}
       </div>
       <ToastContainer />
     </div>
