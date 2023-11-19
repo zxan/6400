@@ -35,6 +35,7 @@ function AddCar() {
     const [colorOptions, setColorOptions] = useState([]);
     const [vehicleTypeOptions, setVehicleTypeOptions] = useState([]);
     const [fuelTypeOptions, setFuelTypeOptions] = useState([]);
+    const [carConditionOptions, setcarConditionOptions] = useState([]);
 
     const location = useLocation();
 
@@ -57,6 +58,7 @@ function AddCar() {
                 //process the response
                 setVehicleTypeOptions(response.data['Vehicle Type']);
                 setFuelTypeOptions(response.data['Fuel Type']);
+                setcarConditionOptions(response.data['Car Condition']);
                 setColorOptions(response.data['Color']);
                 setYearOptions(response.data['Model Year']);
                 setManufacturerOptions(response.data['Manufacturer']);
@@ -108,7 +110,7 @@ function AddCar() {
               <Card>
                 <CardContent>
                   <Typography variant="h5" component="div">
-                    Add New Car
+                    Add vehicle form
                   </Typography>
 
                   
@@ -207,6 +209,21 @@ function AddCar() {
                                 </Select>
                       </FormControl>
                       <FormControl variant="outlined" style={styles.formControl}>
+                                <InputLabel >Car Condition*</InputLabel>
+                                <Select
+                                    value={individualFormData.carCondition}
+                                    onChange={handleInputChange}
+                                    name="carCondition"
+                                >
+                                    <MenuItem value={null}>
+                                        <em>Clear</em>
+                                    </MenuItem>
+                                    {carConditionOptions.map(y => (
+                                        <MenuItem key={y} value={y}>{y}</MenuItem>
+                                    ))}
+                                </Select>
+                      </FormControl>
+                      <FormControl variant="outlined" style={styles.formControl}>
                                 <InputLabel >Colors*</InputLabel>
                                 <Select
                                     value={individualFormData.color}
@@ -229,14 +246,14 @@ function AddCar() {
                         onChange={handleInputChange}
                         fullWidth
                       />
-                      <TextField
+                      {/* <TextField
                         style={styles.formControl}
                         label="Car Condition*"
                         name="carCondition"
                         value={individualFormData.carCondition}
                         onChange={handleInputChange}
                         fullWidth
-                      />
+                      /> */}
                       <TextField
                         style={styles.formControl}
                         label="Purchase Date*"
@@ -392,7 +409,7 @@ function AddCar() {
               <Card>
                 <CardContent>
                   <Typography variant="h5" component="div">
-                    Add New Car
+                  Add vehicle form
                   </Typography>
 
                   
@@ -491,6 +508,21 @@ function AddCar() {
                                 </Select>
                       </FormControl>
                       <FormControl variant="outlined" style={styles.formControl}>
+                                <InputLabel >Car Condition*</InputLabel>
+                                <Select
+                                    value={individualFormData.carCondition}
+                                    onChange={handleInputChange}
+                                    name="carCondition"
+                                >
+                                    <MenuItem value={null}>
+                                        <em>Clear</em>
+                                    </MenuItem>
+                                    {carConditionOptions.map(y => (
+                                        <MenuItem key={y} value={y}>{y}</MenuItem>
+                                    ))}
+                                </Select>
+                      </FormControl>
+                      <FormControl variant="outlined" style={styles.formControl}>
                                 <InputLabel >Colors*</InputLabel>
                                 <Select
                                     value={individualFormData.color}
@@ -513,14 +545,14 @@ function AddCar() {
                         onChange={handleInputChange}
                         fullWidth
                       />
-                      <TextField
+                      {/* <TextField
                         style={styles.formControl}
                         label="Car Condition*"
                         name="carCondition"
                         value={individualFormData.carCondition}
                         onChange={handleInputChange}
                         fullWidth
-                      />
+                      /> */}
                       <TextField
                         style={styles.formControl}
                         label="Purchase Date*"
