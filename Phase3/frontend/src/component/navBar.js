@@ -67,6 +67,7 @@ export default function NavBar() {
         setLoggedInUser(null);
         sessionStorage.clear();
         navigate('/');
+        window.location.reload();
 
     }
     React.useEffect(() => {
