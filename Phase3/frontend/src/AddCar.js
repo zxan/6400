@@ -159,7 +159,7 @@ function AddCar() {
             displayErrorToast('Please select car condition');
             return false;
           }
-        if (color === []) {
+        if (color == [] || color.length === 0) {
           displayErrorToast('Please select color');
           return false;
         }
