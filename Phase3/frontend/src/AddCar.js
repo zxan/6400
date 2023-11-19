@@ -4,7 +4,7 @@ import {
 } from '@mui/material';//This is a very useful library for utilizing pre-built stuff for React
 import axios from 'axios';
 import NavBar from './component/navBar';
-import { Card, CardActions, CardContent, Typography, TextField, Button, Grid, Tabs, Tab } from '@mui/material';
+import { Card, CardActions, CardContent, Container, Typography, TextField, Button, Grid, Tabs, Tab } from '@mui/material';
 import { useNavigate } from 'react-router-dom';//This is to navigate to differnt pages
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -31,6 +31,7 @@ function AddCar() {
     const navigate = useNavigate();
 
     const storedUser = sessionStorage.getItem('user');
+    individualFormData.username = storedUser;
 
     const [manufacturerOptions, setManufacturerOptions] = useState([]);
     const [yearOptions, setYearOptions] = useState([]);
@@ -135,7 +136,7 @@ function AddCar() {
           return false;
         }
         if (username === '') {
-          displayErrorToast('Please enter username');
+          displayErrorToast('Please log in');
           return false;
         }
         if (modelYear === '') {
@@ -207,7 +208,18 @@ function AddCar() {
       }
     };
 
-    if (!location.state || !customerInfo) {
+    if(storedUser == null){
+      return (
+        <Container maxWidth="xl" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <NavBar />
+          <Typography variant="h5" component="div">
+            <br />Please log in to view this internal page. 
+          </Typography>
+          
+          </Container>
+      );
+    }
+    else     if (!location.state || !customerInfo) {
       return (
         <div>
           <NavBar />
@@ -244,14 +256,14 @@ function AddCar() {
                   
 
                     <form onSubmit={handleSubmit}>
-                      <TextField
+                      {/* <TextField
                         style={styles.formControl}
                         label="Customer ID*"
                         name="customerID"
                         value={individualFormData.customerID}
                         onChange={handleInputChange}
                         fullWidth
-                      />
+                      /> */}
                       <TextField
                         style={styles.formControl}
                         label="Vin*"
@@ -275,14 +287,14 @@ function AddCar() {
                                     ))}
                                 </Select>
                       </FormControl>
-                      <TextField
+                      {/* <TextField
                         style={styles.formControl}
                         label="Username*"
                         name="username"
                         value={individualFormData.username}
                         onChange={handleInputChange}
                         fullWidth
-                      />
+                      /> */}
                       <FormControl variant="outlined" style={styles.formControl}>
                                 <InputLabel >Model Year*</InputLabel>
                                 <Select
@@ -556,9 +568,9 @@ function AddCar() {
                         onChange={handleInputChange}
                         fullWidth
                       /> */}
-                      <Typography variant="body1" color="textSecondary">
+                      {/* <Typography variant="body1" color="textSecondary">
                         Customer ID: {individualFormData.customerID}
-                      </Typography>
+                      </Typography> */}
                       <TextField
                         style={styles.formControl}
                         label="Vin*"
@@ -582,14 +594,14 @@ function AddCar() {
                                     ))}
                                 </Select>
                       </FormControl>
-                      <TextField
+                      {/* <TextField
                         style={styles.formControl}
                         label="Username*"
                         name="username"
                         value={individualFormData.username}
                         onChange={handleInputChange}
                         fullWidth
-                      />
+                      /> */}
                       <FormControl variant="outlined" style={styles.formControl}>
                                 <InputLabel >Model Year*</InputLabel>
                                 <Select
