@@ -6,6 +6,7 @@ exports.getCriterias = (req, res) => {
         "Manufacturer": [],
         "Model Year": [],
         "Fuel Type": ['Gas', 'Diesel', 'Natural Gas', 'Hybrid', 'Plugin Hybrid', 'Battery', 'Fuel Cell'],
+        "Car Condition": ['Excellent', 'Very Good', 'Good', 'Fair'],
         "Color": []
     };
 
@@ -448,6 +449,7 @@ exports.countVehicleForPublic = (req, res) => {
 };
 
 exports.addCar = (req, res) => {
+    
     //console.log(req.body);
     const {
         customerID,
@@ -466,10 +468,26 @@ exports.addCar = (req, res) => {
         description,
     } = req.body;  
     //Check if required fields are empty 
+    if (!vin || !type || !username || !modelYear || !company ||  !modelName || !fuelType || !color || !carCondition || !mileage || !customerID || !purchaseDate || !purchasePrice) {
+        console.log("Required field Empty.");
+        return res.status(500).send("Please provide input in required field.");
+    }
+     //Check mileage is integer and purchase price is decimal 
+     if ( (!isNaN(parseFloat(mileage)) && mileage.includes('.')) || Number.isInteger(Number(mileage))) {
+        console.log("mileage is a number");
+    } else {
+        console.log("mileage is not a number");
+        return res.status(500).send("Please provide correct format input in required field.");
+    }
 
-    // if (!vin || !type || !username || !modelYear || !company ||  !modelName || !fuelType || !color || !carCondition || !mileage || !customerID || !purchaseDate || !purchasePrice) {
-    //     return res.status(500).send("Please provide input in required field.");
-    // }
+    if ( (!isNaN(parseFloat(purchasePrice)) && purchasePrice.includes('.')) || Number.isInteger(Number(purchasePrice))) {
+        console.log("purchasePrice is a number");
+    } else {
+        console.log("purchasePrice is not a number");
+        return res.status(500).send("Please provide correct format input in required field.");
+    }
+
+
     //Check if purchase date is a date no later than current date 
     if (Date.parse(purchaseDate) < Date.now()) {
         console.log("Purchase date is in the past");
@@ -497,16 +515,26 @@ exports.addCar = (req, res) => {
         }
        
         const colorSQL = `
-            INSERT INTO Of_Color (vin, color) VALUES (?, ?);`;
+            INSERT INTO Of_Color (vin, color) VALUES ?;`;
+
+        var i ;
+        var color_values = [];
+        for(i=0; i < color.length; i++){
+            color_values.push([vin, color[i]]);
+        }
         con.query(
             colorSQL,
-            [vin, color],
+            [color_values],
+            // [vin, color],
             (err, result) => {
+                // print out vin and color in backend, mutiple rows if there are mutiple colors 
+                console.log(color_values);
             if (err) {
                 console.error('Error adding car(of_color):', err);
                 res.status(500).send('Error adding car(of_color)');
                 return; 
             } else {
+                
                 console.log('Car added successfully(of_color)');
             //res.status(200).send('Customer added successfully');
             }
