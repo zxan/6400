@@ -35,7 +35,7 @@ function CarInfo() {
                 {CarInfo.vin ? (
                   <div>
                     <Typography gutterBottom variant="h5" component="div">
-                      Car Details
+                      Transaction Completed!
                     </Typography>
                     <Typography variant="body1" color="textSecondary">
                       Customer ID: {CarInfo.customerID}

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ImageList,ImageListItem } from '@mui/material';
+import { ImageList, ImageListItem } from '@mui/material';
 import { Card, CardContent, CardMedia, Typography, Button } from '@mui/material';
 import { Grid } from '@mui/material';
 import NavBar from './component/navBar';
-import axios from 'axios'; 
+import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import CarIcon from '@mui/icons-material/DirectionsCar';
 import { useNavigate } from 'react-router-dom';

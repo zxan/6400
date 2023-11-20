@@ -45,7 +45,7 @@ function CarComponent(props) {
             Fuel Type: {props.fuelType}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Price: ${props.price}
+            Price: ${props.price?props.price:0}
           </Typography>
 
           <Typography variant="body2" color="text.secondary">
@@ -72,9 +72,9 @@ function DisplayCar() {
   const mileage = queryParams.get('mileage');
   const color = queryParams.getAll('color');
   const vin = queryParams.get('vin');
-
-  const isAuthorized = (username) => {
-    return axios.get('/api/isAuthorized', { params: { username } })
+  const soldStatus=queryParams.get('soldStatus');
+  const isUserInventoryClerk = (username) => {
+    return axios.get('/api/isInventoryClerk', { params: { username } })
       .then(response => {
         return response.data;
 
@@ -84,14 +84,25 @@ function DisplayCar() {
         return false;
       });
   }
+  const isUserManagerOrOwner = (username) => {
+    return axios.get('/api/isManagerOrOwner', { params: { username } })
+      .then(response => {
+  
+        return response.data;
 
+      })
+      .catch(error => {
+        console.error("Error checking user role:", error);
+        return false;
+      });
+  }
   useEffect(() => {
     const storedUser = sessionStorage.getItem('user');
     async function fetchCar() {
       try {
         
-        const isAuthorizedResult = await isAuthorized(storedUser);
-        console.log(isAuthorizedResult);
+        const isManagerOrOwner = await isUserManagerOrOwner(storedUser);
+        const isInventoryClerk = await isUserInventoryClerk(storedUser)
         const params = {
           vin,
           vehicleType,
@@ -102,7 +113,9 @@ function DisplayCar() {
           keyword,
           price,
           mileage,
-          isAuthorized: isAuthorizedResult
+          isManagerOrOwner: isManagerOrOwner,
+          isInventoryClerk: isInventoryClerk,
+          soldStatus
         };
         const response = await axios.get('/api/searchCars', { params });
         setCars(response.data);

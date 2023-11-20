@@ -23,7 +23,6 @@ app.get('/api/searchCars',carController.searchCars);
 app.get('/api/getCar',carController.getCar);
 app.get('/api/getCarForInventoryClerk',carController.getCarForInventoryClerk);
 app.get('/api/getCarForManager',carController.getCarForManager);
-app.get('/api/getCarForManager',carController.getCarForManager);
 app.get('/api/getCustomerAndUserForManager',carController.getCustomerAndUserForManager);
 app.get('/api/hasBeenSold',carController.hasBeenSold);
 app.post('/api/sale',carController.sale);

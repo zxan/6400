@@ -54,9 +54,9 @@ exports.getCriterias = (req, res) => {
 
 
 exports.searchCars = (req, res) => {
-    let {vin=null, vehicleType = null, manufacturer = null, modelYear = null, fuelType = null, color = null, keyword = '', price = null, mileage = null,isAuthorized=null } = req.query;
+    let {vin=null, vehicleType = null, manufacturer = null, modelYear = null, fuelType = null, color = null, keyword = '', price = null, mileage = null,isManagerOrOwner=null, isInventoryClerk=null,soldStatus='all'} = req.query;
     // Validation if no criteria are entered and the keyword field is empty
-    if (!vin&&!vehicleType && !manufacturer && !modelYear && !fuelType && !color && !price && !mileage && !keyword) {
+    if (!vin&&!vehicleType && !manufacturer && !modelYear && !fuelType && !color && !price && !mileage && !keyword&&!soldStatus) {
         return res.status(400).send("Please enter some keywords or choose at least one filtering criteria.");
     }
     let queryall = `
@@ -122,8 +122,204 @@ WHERE (v.vin= ? OR ? IS NULL) AND
         OR modelName LIKE CONCAT('%', ?, '%')
         OR v.description LIKE CONCAT('%', ?, '%'))
 GROUP BY v.vin; -- this groupby is for concatenating colors `;
+
+let queryUnsold = `
+SELECT 
+v.vin,
+ot.type,
+modelYear,
+mb.company AS manufacturer,
+modelName,
+fuelType,
+mileage,
+(1.1 * COALESCE((SELECT -- might not be in partorder, default to have part price 0
+        SUM(P.cost * P.quantity)
+    FROM
+        PartOrder PO
+            JOIN
+        Part P ON P.orderNumber = PO.orderNumber
+    WHERE
+        PO.vin = v.vin),0) + 1.25 * (SELECT 
+        s.purchasePrice
+    FROM
+        Sells_To s
+    WHERE
+        s.vin = v.vin)) AS price, -- This is a subquery to calculate the price
+GROUP_CONCAT(DISTINCT vc.color) AS colors -- concatenate all different colors in a row
+FROM
+Vehicle v
+    JOIN
+Of_Type ot ON v.vin = ot.vin
+    JOIN
+Manufactured_By mb ON v.vin = mb.vin
+    JOIN
+Of_Color vc ON v.vin = vc.vin
+    
+WHERE (v.vin NOT IN ( SELECT bf.vin FROM Buys_From bf)) AND 
+(v.vin= ? OR ? IS NULL) AND
+(ot.type = ?
+    OR ? IS NULL)
+    AND (? = v.modelYear
+    OR ? IS NULL)  -- if it is null, will set to true
+    AND (mb.company = ?
+    OR ? IS NULL)
+    AND (v.fuelType = ?
+    OR ? IS NULL)
+    AND (v.mileage <= ?
+    OR ? IS NULL)
+    AND (1.1 * COALESCE((SELECT 
+        SUM(P.cost * P.quantity)
+    FROM
+        PartOrder PO
+            JOIN
+        Part P ON P.orderNumber = PO.orderNumber
+    WHERE
+        PO.vin = v.vin),0) + 1.25 * (SELECT 
+        s.purchasePrice
+    FROM
+        Sells_To s
+    WHERE
+        s.vin = v.vin) <= ?
+    OR ? IS NULL) -- This is a subquery to compare the sale price and the entered price.
+    AND (ot.type LIKE CONCAT('%', ?, '%') -- This is to search through all the different fields that may include a keyword
+    OR modelYear = ?
+    OR mb.company LIKE CONCAT('%', ?, '%')
+    OR modelName LIKE CONCAT('%', ?, '%')
+    OR v.description LIKE CONCAT('%', ?, '%'))
+GROUP BY v.vin; -- this groupby is for concatenating colors `;
+let querySold = `
+SELECT 
+v.vin,
+ot.type,
+modelYear,
+mb.company AS manufacturer,
+modelName,
+fuelType,
+mileage,
+(1.1 * COALESCE((SELECT -- might not be in partorder, default to have part price 0
+        SUM(P.cost * P.quantity)
+    FROM
+        PartOrder PO
+            JOIN
+        Part P ON P.orderNumber = PO.orderNumber
+    WHERE
+        PO.vin = v.vin),0) + 1.25 * (SELECT 
+        s.purchasePrice
+    FROM
+        Sells_To s
+    WHERE
+        s.vin = v.vin)) AS price, -- This is a subquery to calculate the price
+GROUP_CONCAT(DISTINCT vc.color) AS colors -- concatenate all different colors in a row
+FROM
+Vehicle v
+    JOIN
+Of_Type ot ON v.vin = ot.vin
+    JOIN
+Manufactured_By mb ON v.vin = mb.vin
+    JOIN
+Of_Color vc ON v.vin = vc.vin
+    
+WHERE (v.vin IN ( SELECT bf.vin FROM Buys_From bf)) AND 
+(v.vin= ? OR ? IS NULL) AND
+(ot.type = ?
+    OR ? IS NULL)
+    AND (? = v.modelYear
+    OR ? IS NULL)  -- if it is null, will set to true
+    AND (mb.company = ?
+    OR ? IS NULL)
+    AND (v.fuelType = ?
+    OR ? IS NULL)
+    AND (v.mileage <= ?
+    OR ? IS NULL)
+    AND (1.1 * COALESCE((SELECT 
+        SUM(P.cost * P.quantity)
+    FROM
+        PartOrder PO
+            JOIN
+        Part P ON P.orderNumber = PO.orderNumber
+    WHERE
+        PO.vin = v.vin),0) + 1.25 * (SELECT 
+        s.purchasePrice
+    FROM
+        Sells_To s
+    WHERE
+        s.vin = v.vin) <= ?
+    OR ? IS NULL) -- This is a subquery to compare the sale price and the entered price.
+    AND (ot.type LIKE CONCAT('%', ?, '%') -- This is to search through all the different fields that may include a keyword
+    OR modelYear = ?
+    OR mb.company LIKE CONCAT('%', ?, '%')
+    OR modelName LIKE CONCAT('%', ?, '%')
+    OR v.description LIKE CONCAT('%', ?, '%'))
+GROUP BY v.vin; -- this groupby is for concatenating colors `;
+
+let queryInventoryClerk = `
+SELECT 
+v.vin,
+ot.type,
+modelYear,
+mb.company AS manufacturer,
+modelName,
+fuelType,
+mileage,
+(1.1 * COALESCE((SELECT -- might not be in partorder, default to have part price 0
+        SUM(P.cost * P.quantity)
+    FROM
+        PartOrder PO
+            JOIN
+        Part P ON P.orderNumber = PO.orderNumber
+    WHERE
+        PO.vin = v.vin),0) + 1.25 * (SELECT 
+        s.purchasePrice
+    FROM
+        Sells_To s
+    WHERE
+        s.vin = v.vin)) AS price, -- This is a subquery to calculate the price
+GROUP_CONCAT(DISTINCT vc.color) AS colors -- concatenate all different colors in a row
+FROM
+Vehicle v
+    JOIN
+Of_Type ot ON v.vin = ot.vin
+    JOIN
+Manufactured_By mb ON v.vin = mb.vin
+    JOIN
+Of_Color vc ON v.vin = vc.vin
+    
+WHERE 
+(v.vin NOT IN ( SELECT bf.vin FROM Buys_From bf))
+AND (v.vin= ? OR ? IS NULL) AND
+(ot.type = ?
+    OR ? IS NULL)
+    AND (? = v.modelYear
+    OR ? IS NULL)  -- if it is null, will set to true
+    AND (mb.company = ?
+    OR ? IS NULL)
+    AND (v.fuelType = ?
+    OR ? IS NULL)
+    AND (v.mileage <= ?
+    OR ? IS NULL)
+    AND (1.1 * COALESCE((SELECT 
+        SUM(P.cost * P.quantity)
+    FROM
+        PartOrder PO
+            JOIN
+        Part P ON P.orderNumber = PO.orderNumber
+    WHERE
+        PO.vin = v.vin),0) + 1.25 * (SELECT 
+        s.purchasePrice
+    FROM
+        Sells_To s
+    WHERE
+        s.vin = v.vin) <= ?
+    OR ? IS NULL) -- This is a subquery to compare the sale price and the entered price.
+    AND (ot.type LIKE CONCAT('%', ?, '%') -- This is to search through all the different fields that may include a keyword
+    OR modelYear = ?
+    OR mb.company LIKE CONCAT('%', ?, '%')
+    OR modelName LIKE CONCAT('%', ?, '%')
+    OR v.description LIKE CONCAT('%', ?, '%'))
+GROUP BY v.vin; -- this groupby is for concatenating colors `;
+
     // Setting up the base query
-    let query = `
+    let queryPublic = `
     SELECT 
     v.vin,
     ot.type,
@@ -155,7 +351,9 @@ FROM
         JOIN
     Of_Color vc ON v.vin = vc.vin
         
-WHERE (v.vin NOT IN ( -- filter out the cars that have not been installed
+WHERE 
+(v.vin NOT IN ( SELECT bf.vin FROM Buys_From bf)) AND
+(v.vin NOT IN ( -- filter out the cars that have not been installed
               SELECT p.vin
               FROM Part p
               WHERE p.status != 'installed'))
@@ -203,17 +401,33 @@ GROUP BY v.vin; -- this groupby is for concatenating colors `;
         ];
     // Execute the query
     var querystring='';
-    if (isAuthorized=="true"){
-        querystring=queryall;
+    if (isManagerOrOwner=="true"){
+        if(soldStatus=="sold"){
+            querystring=querySold;
+        }
+        else if(soldStatus=="unsold"){
+            querystring=queryUnsold;
+        }
+        else{
+            querystring=queryall; 
+        }
+       
+    }
+    else if(isInventoryClerk=="true"){
+
+        querystring=queryInventoryClerk;
     }
     else{
-        querystring=query;
+        querystring=queryPublic;
     }
+    console.log(querystring)
     con.query(querystring, params, (err, results) => {
         if (err) {
             console.error(err.message);
             return res.status(500).send('Error with the database');
         }
+        console.log(params);
+        console.log(results);
         return res.json(results);
     });
 };
@@ -277,7 +491,6 @@ exports.getCarForInventoryClerk = (req, res) => {
     JOIN Of_Color vc ON v.vin = vc.vin  
     WHERE v.vin = ? 
     -- the NOT-IN below might not be needed as those vehicles should not show up in the DisplayCarList page before CarDetial page
-    AND v.vin NOT IN (SELECT bf.vin FROM Buys_From bf)
     GROUP BY v.vin
     ORDER BY v.vin ASC;          
     `;
@@ -333,9 +546,9 @@ exports.getCarForManager = (req, res) => {
 exports.getCustomerAndUserForManager = (req, res) => {
     const vin = req.query.vin; 
     const query = `
-    SELECT c.email AS sellerEmail, c.phoneNumber AS sellerPhoneNumber, c.street AS sellerStreet, c.city AS sellerCity, c.state AS sellerState, c.postalCode AS sellerPostalCode,
+    SELECT i.firstName AS sellerFirstName, i.lastName AS sellerLastName,b.businessName AS sellerBusinessName,b.name AS sellerName,b.title AS sellerTitle,c.email AS sellerEmail, c.phoneNumber AS sellerPhoneNumber, c.street AS sellerStreet, c.city AS sellerCity, c.state AS sellerState, c.postalCode AS sellerPostalCode,
     u.firstName AS inventoryClerkFirstName, u.lastName AS InventoryClerkLastName, st.purchaseDate AS purchaseDate,
-    cr.email AS buyerEmail, cr.phoneNumber AS buyerPhoneNumber, cr.street AS buyerStreet, cr.city AS buyerCity, cr.state AS buyerState, cr.postalCode AS buyerPostalCode,
+    ir.firstName AS buyerFirstName,ir.lastName AS buyerLastName,br.businessName AS buyerBusinessName,br.name AS buyerName,br.title AS buyerTitle,cr.email AS buyerEmail, cr.phoneNumber AS buyerPhoneNumber, cr.street AS buyerStreet, cr.city AS buyerCity, cr.state AS buyerState, cr.postalCode AS buyerPostalCode,
     ur.firstName AS salespersonFirstName, ur.lastName AS salesPersonLastName, bf.transactionDate AS salesDate
     
     FROM Vehicle v 
@@ -345,7 +558,11 @@ exports.getCustomerAndUserForManager = (req, res) => {
     LEFT JOIN User ur on ur.username = bf.username
     LEFT JOIN Customer c on c.customerID = st.customerID
     LEFT JOIN Customer cr on cr.customerID = bf.customerID
-    WHERE v.vin = ? 
+    LEFT JOIN Individual i on c.customerID=i.customerID
+    LEFT JOIN Business b on c.customerID=b.customerID
+    LEFT JOIN Individual ir on cr.customerID=ir.customerID
+    LEFT JOIN Business br on cr.customerID=br.customerID
+    WHERE v.vin = ? ;
     `;
   
     con.query(query, vin, (err, results) => {
@@ -449,7 +666,6 @@ exports.countVehicleForPublic = (req, res) => {
 };
 
 exports.addCar = (req, res) => {
-    
     //console.log(req.body);
     const {
         customerID,
@@ -467,12 +683,13 @@ exports.addCar = (req, res) => {
         purchasePrice,
         description,
     } = req.body;  
+    var found_err;
     //Check if required fields are empty 
     if (!vin || !type || !username || !modelYear || !company ||  !modelName || !fuelType || !color || !carCondition || !mileage || !customerID || !purchaseDate || !purchasePrice) {
         console.log("Required field Empty.");
         return res.status(500).send("Please provide input in required field.");
     }
-     //Check mileage is integer and purchase price is decimal 
+     //Check mileage and purchase price are numerical values
      if ( (!isNaN(parseFloat(mileage)) && mileage.includes('.')) || Number.isInteger(Number(mileage))) {
         console.log("mileage is a number");
     } else {
@@ -487,7 +704,6 @@ exports.addCar = (req, res) => {
         return res.status(500).send("Please provide correct format input in required field.");
     }
 
-
     //Check if purchase date is a date no later than current date 
     if (Date.parse(purchaseDate) < Date.now()) {
         console.log("Purchase date is in the past");
@@ -496,6 +712,40 @@ exports.addCar = (req, res) => {
         res.status(500).send('Error with Purchase date');
         return;  
     }
+    //Check if username is in iventoryclerk table 
+    const usernameSQL = `
+    SELECT username from InventoryClerk
+    where username = ?;
+    `;
+    con.query(
+        usernameSQL,
+        [username],
+        (err, result) => {
+        if (err) {
+            console.error('Username Error 1', err);
+            // found_err = true;
+            // return true;
+            return res.status(500).send('Username Error');
+        } 
+
+        if (result.length > 0) {
+            console.log("Username valid");
+            // found_err = false;
+            // return false;
+        } else {
+            console.error('Username Error 2', err);
+            res.status(500).send('Username Error');
+            // found_err = true;
+            // return true;
+            process.exit(1);
+        }
+    });
+    // console.log(err);
+    // if(found_err){
+    //     console.error('Error username adding');
+    //     return;
+    // }
+    
 
     // Perform an SQL INSERT operation to add the car
     const carSQL = `
@@ -522,6 +772,7 @@ exports.addCar = (req, res) => {
         for(i=0; i < color.length; i++){
             color_values.push([vin, color[i]]);
         }
+        result = false;
         con.query(
             colorSQL,
             [color_values],
@@ -532,13 +783,18 @@ exports.addCar = (req, res) => {
             if (err) {
                 console.error('Error adding car(of_color):', err);
                 res.status(500).send('Error adding car(of_color)');
+                result = true;
                 return; 
             } else {
-                
                 console.log('Car added successfully(of_color)');
             //res.status(200).send('Customer added successfully');
             }
             });        
+        if(result){
+            console.error('Error color adding');
+            return;
+        }
+        result = false;
     // // Perform an SQL INSERT operation to add the car
         const carTypeSQL = `
             INSERT INTO Of_Type (vin, type) VALUES (?, ?);
@@ -557,7 +813,7 @@ exports.addCar = (req, res) => {
             //res.status(200).send('Customer added successfully');
             }
             });
-
+            result = false;
     // // Perform an SQL INSERT operation to add the car
         const carManuSQL = `
             INSERT INTO Manufactured_By (vin, company) VALUES (?, ?);
@@ -569,6 +825,7 @@ exports.addCar = (req, res) => {
             if (err) {
                 console.error('Error adding car(Manufactured_By):', err);
                 res.status(500).send('Error adding car(Manufactured_By)');
+                result = true;
                 return; 
 
             } else {
@@ -576,7 +833,11 @@ exports.addCar = (req, res) => {
             //res.status(200).send('Customer added successfully');
             }
             });
-
+            if(result){
+                console.error('Error manufacturer adding');
+                return;
+            }
+            result = false;
     // // Perform an SQL INSERT operation to add the car
         const carSellSQL = `
             INSERT INTO Sells_To (customerID,username, vin, purchaseDate, purchasePrice) VALUES ( 
@@ -591,6 +852,7 @@ exports.addCar = (req, res) => {
             if (err) {
                 console.error('Error adding car(Sells_To):', err);
                 res.status(500).send('Error adding car(Sells_To)');
+                result = true;
                 return; 
 
             } else {
@@ -599,7 +861,10 @@ exports.addCar = (req, res) => {
             //res.status(200).send('Customer added successfully');
             }
             });
-        
+            if(result){
+                console.error('Error sellto adding');
+                return;
+            }
 
         const carselectSQL = `
         SELECT v.vin, 
