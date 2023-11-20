@@ -42,6 +42,9 @@ app.get('/api/getSearchVendors', vendorController.getSearchVendors);
 app.post('/api/addVendor', vendorController.addVendor);
 app.get('/api/getPartOrder', partController.getPartOrder);
 app.put('/api/updatePartOrderStatus/:orderNumber/:partNumber/:vin', partController.updatePartOrderStatus);
+app.get('/api/getVendorByName', vendorController.getVendorByName);
+app.get('/api/countPartOrdersByVin', partController.countPartOrdersByVin);
+
 
 // report API
 app.get('/api/getSellerReports', reportsController.getSellerReports);

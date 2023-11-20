@@ -11,25 +11,27 @@ import { TextField, Button, Grid } from '@mui/material';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Link } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-function AddPartsOrder() {
+function AddVendor() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showTable, setShowTable] = useState(false);
-  const location = useLocation();
-  const selectedVendor = location.state?.selectedVendor || null;
-  const [newPartsOrder, setNewPartsOrder] = useState({
-    partNumber: '',
-    quantity: '',
-    description: '',
-    cost: '',
+  const [newVendor, setNewVendor] = useState({
+    name: '',
+    phoneNumber: '',
+    street: '',
+    city: '',
+    state: '',
+    postalCode: '',
   });
-  const handleAddPartsOrder = () => {
+
+  const navigate = useNavigate();
+
+  const handleAddVendor = () => {
     // Check if any of the fields is empty
-    for (const key in newPartsOrder) {
-      if (newPartsOrder[key].trim() === '') {
+    for (const key in newVendor) {
+      if (newVendor[key].trim() === '') {
         toast.error(`Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`, {
           position: "top-center",
           autoClose: true,
@@ -40,26 +42,44 @@ function AddPartsOrder() {
           progress: undefined,
           theme: "light",
         });
-        return; // Don't proceed with adding the parts order
+        return; // Don't proceed with adding the vendor
       }
     }
-
+  
     const headers = {
       'Content-Type': 'application/json',
     };
-
-    axios.post('/api/addPartsOrder', newPartsOrder, { headers })
+  
+    axios.post('/api/addVendor', newVendor, { headers })
       .then((response) => {
-        console.log('Parts order added:', response.data);
-        setNewPartsOrder({
-          partNumber: '',
-          quantity: '',
-          description: '',
-          cost: '',
+        console.log('Vendor added:', response.data);
+        setNewVendor({
+          name: '',
+          phoneNumber: '',
+          street: '',
+          city: '',
+          state: '',
+          postalCode: '',
+        });
+  
+        // Show a success toast and redirect to AddPartsOrder after it's closed
+        const addedVendor = response.data.vendor;
+        toast.success(`Vendor "${addedVendor.name}" added!`, {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          onClose: () => {
+            navigate('/addpartsorder', { state: { selectedVendor: addedVendor } });
+          },
         });
       })
       .catch((error) => {
-        console.error('Error adding a parts order:', error);
+        console.error('Error adding a vendor:', error);
       });
   };
 
@@ -67,25 +87,7 @@ function AddPartsOrder() {
     <div>
       <NavBar />
       <div style={{ textAlign: 'center' }}>
-        <Grid container justifyContent="center">
-          <Grid item xs={12} sm={6}>
-            <Link to="/searchVendor">Search Vendor</Link>
-          </Grid>
-        </Grid>
-        {selectedVendor ? (
-        <div>
-          <h2>Selected Vendor:</h2>
-          <p>Name: {selectedVendor.name}</p>
-          <p>Phone Number: {selectedVendor.phoneNumber}</p>
-          <p>Street: {selectedVendor.street}</p>
-          <p>City: {selectedVendor.city}</p>
-          <p>State: {selectedVendor.state}</p>
-          <p>Postal Code: {selectedVendor.postalCode}</p>
-          {/* Add more vendor details as needed */}
-        </div>
-      ) : (
-        <p>No selected vendor.</p>
-      )}
+
         {showTable && (
           <TableContainer component={Paper}>
             <Table>
@@ -114,42 +116,54 @@ function AddPartsOrder() {
             </Table>
           </TableContainer>
         )}
-        <h1>Add New Parts Order</h1>
+        <h1>Add New Vendor</h1>
         <Grid container justifyContent="center">
           <Grid item xs={12} sm={6}>
             <TextField
-              label="Part Number"
+              label="Name"
               variant="outlined"
-              value={newPartsOrder.partNumber}
-              onChange={(e) => setNewPartsOrder({ ...newPartsOrder, partNumber: e.target.value })}
+              value={newVendor.name}
+              onChange={(e) => setNewVendor({ ...newVendor, name: e.target.value })}
               fullWidth
             />
             <TextField
-              label="Quantity"
+              label="Phone Number"
               variant="outlined"
-              value={newPartsOrder.quantity}
-              onChange={(e) => setNewPartsOrder({ ...newPartsOrder, quantity: e.target.value })}
+              value={newVendor.phoneNumber}
+              onChange={(e) => setNewVendor({ ...newVendor, phoneNumber: e.target.value })}
               fullWidth
             />
             <TextField
-              label="Description"
+              label="Street"
               variant="outlined"
-              value={newPartsOrder.description}
-              onChange={(e) => setNewPartsOrder({ ...newPartsOrder, description: e.target.value })}
+              value={newVendor.street}
+              onChange={(e) => setNewVendor({ ...newVendor, street: e.target.value })}
               fullWidth
             />
             <TextField
-              label="Cost"
+              label="City"
               variant="outlined"
-              value={newPartsOrder.cost}
-              onChange={(e) => setNewPartsOrder({ ...newPartsOrder, cost: e.target.value })}
+              value={newVendor.city}
+              onChange={(e) => setNewVendor({ ...newVendor, city: e.target.value })}
               fullWidth
             />
-            <Button variant="contained" color="primary" onClick={handleAddPartsOrder}>
-              Add Parts Order
+            <TextField
+              label="State"
+              variant="outlined"
+              value={newVendor.state}
+              onChange={(e) => setNewVendor({ ...newVendor, state: e.target.value })}
+              fullWidth
+            />
+            <TextField
+              label="Postal Code"
+              variant="outlined"
+              value={newVendor.postalCode}
+              onChange={(e) => setNewVendor({ ...newVendor, postalCode: e.target.value })}
+              fullWidth
+            />
+            <Button variant="contained" color="primary" onClick={handleAddVendor}>
+              Add Vendor
             </Button>
-
-            
           </Grid>
         </Grid>
       </div>
@@ -158,4 +172,4 @@ function AddPartsOrder() {
   );
 }
 
-export default AddPartsOrder;
+export default AddVendor;
