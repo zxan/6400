@@ -53,7 +53,6 @@ exports.getSearchVendors = (req, res) => {
   });
 };
 
-
 exports.addVendor = (req, res) => {
   const { name, phoneNumber, street, city, state, postalCode } = req.body;
   console.log('Request body:', req.body);
@@ -83,12 +82,65 @@ exports.addVendor = (req, res) => {
         return;
       }
 
-      const message =
-        results.affectedRows > 0
-          ? 'Vendor added successfully'
-          : 'Vendor already exists and cannot be added';
+      if (results.affectedRows > 0) {
+        // Vendor added successfully, fetch the complete vendor information
+        const selectQuery = `
+          SELECT *
+          FROM Vendor
+          WHERE name = ?;
+        `;
 
-      res.json({ message });
+        con.query(selectQuery, [name], (err, vendorResults) => {
+          if (err) {
+            console.error('Error fetching vendor information:', err);
+            res.status(500).send('Error with the database');
+            return;
+          }
+
+          const vendor = vendorResults[0];
+          res.json({ message: 'Vendor added successfully', vendor });
+        });
+      } else {
+        // Vendor already exists and cannot be added
+        res.json({ message: 'Vendor already exists and cannot be added' });
+      }
     }
   );
+};
+
+
+// Endpoint to get vendor information by name
+exports.getVendorByName = (req, res) => {
+  const vendorName = req.query.name || req.body.name;
+
+  if (!vendorName) {
+    res.status(400).send('Vendor name is required');
+    return;
+  }
+
+  // SQL query to get vendor information by name
+  const getVendorQuery = `
+    SELECT name, phoneNumber, street, city, state, postalCode
+    FROM vendor
+    WHERE name = ?;
+  `;
+
+  console.log('Query results:', results); // Log the results to the console
+  const vendorData = results[0];
+
+
+  con.query(getVendorQuery, [vendorName], (err, results) => {
+    if (err) {
+      console.error('Error fetching vendor information:', err);
+      res.status(500).send('Error with the database');
+      return;
+    }
+
+    if (results.length === 0) {
+      res.status(404).send('Vendor not found');
+      return;
+    }
+
+    res.json(vendorData);
+  });
 };

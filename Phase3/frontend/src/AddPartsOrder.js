@@ -26,12 +26,6 @@ function AddPartsOrder() {
     description: '',
     cost: '',
   });
-
-  useEffect(() => {
-    console.log('Location state:', location.state);
-    console.log('Selected vendor:', selectedVendor);
-  }, [location.state, selectedVendor]);
-
   const handleAddPartsOrder = () => {
     // Check if any of the fields is empty
     for (const key in newPartsOrder) {
@@ -154,6 +148,8 @@ function AddPartsOrder() {
             <Button variant="contained" color="primary" onClick={handleAddPartsOrder}>
               Add Parts Order
             </Button>
+
+            
           </Grid>
         </Grid>
       </div>

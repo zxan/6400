@@ -48,12 +48,9 @@ function SearchVendor() {
       onClose: () => {
         // This will be executed after the toast is closed
         console.log('Navigating to AddPartsOrder with state:', { selectedVendor });
-        navigate('/addpartsorder', { state: { selectedVendor: vendor } });
+        navigate('/AddPartsOrder', { state: { selectedVendor: vendor } });
       },
     });
-    console.log('Navigating to AddPartsOrder with state:', { selectedVendor });
-    // Redirect to AddPartsOrder page with selected vendor information
-    navigate('/addpartsorder', { state: { selectedVendor } });
   };
 
   return (
@@ -113,6 +110,16 @@ function SearchVendor() {
             </Table>
           </TableContainer>
         )}
+
+
+        <Button
+          variant="contained" color="primary"
+          component={Link}
+          to="/AddVendor"  // Make sure the path matches the one in your Route component
+          style={{ marginTop: '20px' }}
+        >
+          Add New Vendor
+        </Button>
         {selectedVendor && (
           <div>
             <h2>Selected Vendor Information</h2>
@@ -122,7 +129,9 @@ function SearchVendor() {
           </div>
         )}
       </div>
+      
       <ToastContainer />
+      
     </div>
   );
 }

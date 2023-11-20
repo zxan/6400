@@ -11,6 +11,7 @@ import { TextField, Button, Grid } from '@mui/material';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 function AddVendor() {
   const [searchText, setSearchText] = useState('');
@@ -24,6 +25,8 @@ function AddVendor() {
     state: '',
     postalCode: '',
   });
+
+  const navigate = useNavigate();
 
   const handleAddVendor = () => {
     // Check if any of the fields is empty
@@ -42,11 +45,11 @@ function AddVendor() {
         return; // Don't proceed with adding the vendor
       }
     }
-
+  
     const headers = {
       'Content-Type': 'application/json',
     };
-
+  
     axios.post('/api/addVendor', newVendor, { headers })
       .then((response) => {
         console.log('Vendor added:', response.data);
@@ -57,6 +60,22 @@ function AddVendor() {
           city: '',
           state: '',
           postalCode: '',
+        });
+  
+        // Show a success toast and redirect to AddPartsOrder after it's closed
+        const addedVendor = response.data.vendor;
+        toast.success(`Vendor "${addedVendor.name}" added!`, {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          onClose: () => {
+            navigate('/addpartsorder', { state: { selectedVendor: addedVendor } });
+          },
         });
       })
       .catch((error) => {
