@@ -131,3 +131,24 @@ exports.updatePartOrderStatus = (req, res) => {
     }
   });
 };
+
+exports.countPartOrdersByVin = (vin) => {
+  return new Promise((resolve, reject) => {
+    const countQuery = `
+      SELECT COUNT(*) AS partOrdersCount
+      FROM PartOrder
+      WHERE vin = ?;
+    `;
+
+    con.query(countQuery, [vin], (countErr, countResults) => {
+      if (countErr) {
+        console.error('Error counting part orders:', countErr);
+        reject('Error with the database');
+        return;
+      }
+
+      const partOrdersCount = countResults[0].partOrdersCount;
+      resolve(partOrdersCount);
+    });
+  });
+};

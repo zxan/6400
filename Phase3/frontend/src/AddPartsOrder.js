@@ -21,7 +21,7 @@ function AddPartsOrder() {
   const location = useLocation();
   const selectedVendor = location.state?.selectedVendor || null;
   const [newPartsOrder, setNewPartsOrder] = useState({
-    partName: '',
+    partNumber: '',
     quantity: '',
     description: '',
     cost: '',
@@ -52,7 +52,7 @@ function AddPartsOrder() {
       .then((response) => {
         console.log('Parts order added:', response.data);
         setNewPartsOrder({
-          partName: '',
+          partNumber: '',
           quantity: '',
           description: '',
           cost: '',
@@ -118,10 +118,10 @@ function AddPartsOrder() {
         <Grid container justifyContent="center">
           <Grid item xs={12} sm={6}>
             <TextField
-              label="Part Name"
+              label="Part Number"
               variant="outlined"
-              value={newPartsOrder.partName}
-              onChange={(e) => setNewPartsOrder({ ...newPartsOrder, partName: e.target.value })}
+              value={newPartsOrder.partNumber}
+              onChange={(e) => setNewPartsOrder({ ...newPartsOrder, partNumber: e.target.value })}
               fullWidth
             />
             <TextField
