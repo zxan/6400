@@ -131,7 +131,7 @@ function AddCar() {
           displayErrorToast('Please enter vin');
           return false;
         }
-        if (type === '') {
+        if (type === ''|| type.length === 0) {
           displayErrorToast('Please select vehicle type');
           return false;
         }
@@ -139,11 +139,11 @@ function AddCar() {
           displayErrorToast('Please log in');
           return false;
         }
-        if (modelYear === '') {
+        if (modelYear === ''|| modelYear.length === 0) {
           displayErrorToast('Please select model Year');
           return false;
         }
-        if (company === '') {
+        if (company === ''|| company.length === 0) {
           displayErrorToast('Please select company');
           return false;
         }
@@ -151,11 +151,11 @@ function AddCar() {
           displayErrorToast('Please enter model name');
           return false;
         }
-        if (fuelType === '') {
+        if (fuelType === ''|| fuelType.length === 0) {
           displayErrorToast('Please select fuel type');
           return false;
         }
-        if (carCondition === '') {
+        if (carCondition === ''|| carCondition.length === 0) {
             displayErrorToast('Please select car condition');
             return false;
           }
