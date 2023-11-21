@@ -23,7 +23,7 @@ function SearchVendor() {
   const vehicleInfo = location.state?.vehicleInfo || {};
   const navigate = useNavigate(); // React Router's useNavigate hook
 
-  console.log('vehicleInfo on load:', vehicleInfo);
+  console.log('vehicleInfo on load searchvendor:', vehicleInfo);
 
   const handleSearch = () => {
     axios.get(`/api/getSearchVendors?searchstring=${searchText}`)
@@ -56,6 +56,10 @@ function SearchVendor() {
         navigate('/AddPartsOrder', { state: { selectedVendor: vendor, vehicleInfo: vehicleInfo} });
       },
     });
+  };
+
+  const handleAddVendor = () => {
+    navigate('/AddVendor', { state: { vehicleInfo: vehicleInfo } });
   };
 
   return (
@@ -119,8 +123,7 @@ function SearchVendor() {
 
         <Button
           variant="contained" color="primary"
-          component={Link}
-          to="/AddVendor"  // Make sure the path matches the one in your Route component
+          onClick={handleAddVendor}
           style={{ marginTop: '20px' }}
         >
           Add New Vendor

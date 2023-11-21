@@ -31,6 +31,8 @@ function AddVendor() {
 
   const navigate = useNavigate();
 
+  console.log('vehicleInfo on load addvendor:', vehicleInfo);
+
   const handleAddVendor = () => {
     // Check if any of the fields is empty
     for (const key in newVendor) {
