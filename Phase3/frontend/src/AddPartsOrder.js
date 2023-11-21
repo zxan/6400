@@ -220,6 +220,9 @@ function AddPartsOrder() {
     <div>
       <NavBar />
       <div style={{ textAlign: 'center' }}>
+
+        <h2>VIN: {vehicleInfo.vin}</h2>
+
         <Grid container justifyContent="center">
           <Grid item xs={12} sm={6}>
             <Button variant="contained" color="primary" onClick={handleSearchVendor}>
