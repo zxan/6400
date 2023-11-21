@@ -16,6 +16,7 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 function AddPartsOrder() {
+  //const [selectedVendor, setSelectedVendor] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showTable, setShowTable] = useState(false);
@@ -25,6 +26,8 @@ function AddPartsOrder() {
   const storedUser = sessionStorage.getItem('user');
   const [partOrderNumbers, setPartOrderNumbers] = useState([]);
   const selectedVendor = location.state?.selectedVendor || null;
+  
+  const [vendorInfo, setVendorInfo] = useState(null);
   const [newPartsOrder, setNewPartsOrder] = useState({
     partNumber: '',
     quantity: '',
@@ -150,8 +153,24 @@ function AddPartsOrder() {
 
   const handleSelectPartOrder = (selectedOrderNumber) => {
     setSelectedOrderNumber(selectedOrderNumber);
-    // Add your logic for handling the selected part order number
-    console.log(`Selected part order: ${selectedOrderNumber}`);
+  
+    // Fetch vendor information based on the selected part order number
+    axios.get(`/api/getVendorInfoByPartOrder?orderNumber=${selectedOrderNumber}`)
+      .then((response) => {
+        const vendorInfo = response.data;
+  
+        // Now you have the vendor information, you can do whatever you want with it
+          
+        // Set the vendor information in your component state if needed
+        setVendorInfo(vendorInfo);
+  
+        // Add any additional logic for handling the selected part order number
+        console.log(`Selected part order: ${selectedOrderNumber}`);
+      })
+      .catch((error) => {
+        console.error('Error fetching vendor information:', error);
+        // Handle the error, you can use toast.error or another method to notify the user
+      });
   };
 
   return (
@@ -165,19 +184,32 @@ function AddPartsOrder() {
             </Button>
           </Grid>
         </Grid>
-        {selectedVendor ? (
-          <div>
-            <h2>Selected Vendor:</h2>
-            <p>Name: {selectedVendor.name}</p>
-            <p>Phone Number: {selectedVendor.phoneNumber}</p>
-            <p>Street: {selectedVendor.street}</p>
-            <p>City: {selectedVendor.city}</p>
-            <p>State: {selectedVendor.state}</p>
-            <p>Postal Code: {selectedVendor.postalCode}</p>
-          </div>
-        ) : (
-          <p>No selected vendor.</p>
-        )}
+        {vendorInfo ? (
+  // Render details of the selected vendor using selectedVendorInfo
+  <div>
+    <h2>Selected Vendor:</h2>
+    <p>Name: {vendorInfo.name}</p>
+    <p>Phone Number: {vendorInfo.phoneNumber}</p>
+    <p>Street: {vendorInfo.street}</p>
+    <p>City: {vendorInfo.city}</p>
+    <p>State: {vendorInfo.state}</p>
+    <p>Postal Code: {vendorInfo.postalCode}</p>
+  </div>
+) : selectedVendor ? (
+  // Render details of the selected vendor using selectedVendor
+  <div>
+    <h2>Selected Vendor:</h2>
+    <p>Name: {selectedVendor.name}</p>
+    <p>Phone Number: {selectedVendor.phoneNumber}</p>
+    <p>Street: {selectedVendor.street}</p>
+    <p>City: {selectedVendor.city}</p>
+    <p>State: {selectedVendor.state}</p>
+    <p>Postal Code: {selectedVendor.postalCode}</p>
+  </div>
+) : (
+  // Render this if no vendor is selected
+  <p>No selected vendor.</p>
+)}
         {showTable && (
           <TableContainer component={Paper}>
             <Table>
