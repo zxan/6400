@@ -45,7 +45,8 @@ app.put('/api/updatePartOrderStatus/:orderNumber/:partNumber/:vin', partControll
 app.get('/api/getVendorByName', vendorController.getVendorByName);
 app.get('/api/countPartOrdersByVin', partController.countPartOrdersByVin);
 app.get('/api/getPartOrderNumbersByVin', partController.getPartOrderNumbersByVin);
-app.post('/api/addpartsorder', partController.addpartsorder);
+app.post('/api/addPartsOrder', partController.addPartsOrder);
+
 
 
 // report API

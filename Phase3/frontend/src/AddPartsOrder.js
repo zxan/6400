@@ -22,6 +22,7 @@ function AddPartsOrder() {
   const location = useLocation();
   const vehicleInfo = location.state?.vehicleInfo || {};
   const navigate = useNavigate();
+  const storedUser = sessionStorage.getItem('user');
   const [partOrderNumbers, setPartOrderNumbers] = useState([]);
   const selectedVendor = location.state?.selectedVendor || null;
   const [newPartsOrder, setNewPartsOrder] = useState({
@@ -59,6 +60,7 @@ function AddPartsOrder() {
 
 
   console.log("VehicleInfo: ", vehicleInfo.vin);
+  console.log("storedUser: ", storedUser);
   const handleAddPartsOrder = () => {
     // Check if any of the fields is empty
     for (const key in newPartsOrder) {
@@ -86,6 +88,7 @@ function AddPartsOrder() {
     const partsOrderData = {
       ...newPartsOrder,
       vin: vehicleInfo.vin,
+      storedUser: storedUser,
       vendorInfo: {
         name: selectedVendor.name,
         phoneNumber: selectedVendor.phoneNumber,
@@ -102,6 +105,7 @@ function AddPartsOrder() {
       .then((response) => {
         console.log('Parts order added:', response.data);
         console.log('vehicleInfo data:', vehicleInfo);
+        console.log('storedUser data:', storedUser);
         setNewPartsOrder({
           partNumber: '',
           quantity: '',
@@ -116,6 +120,11 @@ function AddPartsOrder() {
 
   const handleSearchVendor = () => {
     navigate('/searchVendor', { state: { vehicleInfo: vehicleInfo } });
+  };
+
+  const handleSelectPartOrder = (selectedOrderNumber) => {
+    // Add your logic for handling the selected part order number
+    console.log(`Selected part order: ${selectedOrderNumber}`);
   };
 
   return (
@@ -213,7 +222,7 @@ function AddPartsOrder() {
                     </TableHead>
                     <TableBody>
                       {partOrderNumbers.map((orderNumber, index) => (
-                        <TableRow key={index}>
+                        <TableRow key={index} onClick={() => handleSelectPartOrder(orderNumber)}>
                           <TableCell>{orderNumber}</TableCell>
                         </TableRow>
                       ))}

@@ -184,14 +184,59 @@ exports.getPartOrderNumbersByVin = (req, res) => {
     res.json({ partOrderNumbers });
   });
 };
+exports.addPartsOrder = (req, res) => {
+  const {
+    partNumber,
+    quantity,
+    description,
+    cost,
+    vin,
+    storedUser, // Assuming the username is sent as part of the storedUser object
+    vendorInfo: { name: vendorName },
+  } = req.body;
 
+  console.log('Stored User:', storedUser);
 
-exports.addpartsorder = (req, res) => {
-  // Log received data to the console
-  console.log('Received data:', req.body);
+  // Generate PurchaseOrderNumber
+  const username = storedUser;
+  const purchaseOrderNumberQuery = `
+    SELECT CONCAT(SUBSTRING('${vin}', 4), '-', LPAD((SELECT COUNT(*) + 1 FROM PartOrder WHERE vin = '${vin}'), 2, '0')) AS PurchaseOrderNumber
+  `;
 
-  // Send a response
-  res.json({ message: 'Data received successfully' });
+  con.query(purchaseOrderNumberQuery, (error, results) => {
+    if (error) {
+      console.error('Error generating PurchaseOrderNumber:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    const purchaseOrderNumber = results[0].PurchaseOrderNumber;
+
+    // Insert into PartOrder table
+    const partOrderQuery = `
+      INSERT INTO PartOrder (vin, orderNumber, username, vendorName)
+      VALUES ('${vin}', '${purchaseOrderNumber}', '${username}', '${vendorName}')
+    `;
+
+    con.query(partOrderQuery, (partOrderError) => {
+      if (partOrderError) {
+        console.error('Error adding to PartOrder table:', partOrderError);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      // Insert into Part table
+      const partQuery = `
+        INSERT INTO Part (partNumber, vin, orderNumber, quantity, status, description, cost)
+        VALUES ('${partNumber}', '${vin}', '${purchaseOrderNumber}', '${quantity}', 'ordered', '${description}', '${cost}')
+      `;
+
+      con.query(partQuery, (partError) => {
+        if (partError) {
+          console.error('Error adding to Part table:', partError);
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        res.json({ message: 'Parts order added successfully' });
+      });
+    });
+  });
 };
-
-
