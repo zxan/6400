@@ -152,3 +152,15 @@ exports.countPartOrdersByVin = (vin) => {
     });
   });
 };
+
+
+
+exports.addpartsorder = (req, res) => {
+  // Log received data to the console
+  console.log('Received data:', req.body);
+
+  // Send a response
+  res.json({ message: 'Data received successfully' });
+};
+
+

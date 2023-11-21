@@ -28,11 +28,6 @@ function CarDetail() {
           console.log(error);
       });
 
-    // for add part order button
-    const handleAddPartOrder = () => {
-      navigate('/AddPartsOrder', { state: { vin: car.vin } });
-    };
-
     // check if the vehicle has been sold
     const [hasBeenSold, setHasBeenSold] = React.useState(false);
   axios.get("/api/hasBeenSold", { params: { 'vin': vin } }).then((response) => {
@@ -108,6 +103,11 @@ function CarDetail() {
     navigate('/SalesOrder', { state: { vehicleInfo: car } });
   };
 
+  // for add part order button
+  const handleAddPartOrder = () => {
+    navigate('/AddPartsOrder', { state: { vehicleInfo: car } });
+  };
+  
     return (
       <div>
         <NavBar />

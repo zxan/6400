@@ -13,12 +13,15 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function AddPartsOrder() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showTable, setShowTable] = useState(false);
   const location = useLocation();
+  const vehicleInfo = location.state?.vehicleInfo || {};
+  const navigate = useNavigate();
   const selectedVendor = location.state?.selectedVendor || null;
   const [newPartsOrder, setNewPartsOrder] = useState({
     partNumber: '',
@@ -26,6 +29,8 @@ function AddPartsOrder() {
     description: '',
     cost: '',
   });
+
+  console.log("VehicleInfo: ", vehicleInfo.vin);
   const handleAddPartsOrder = () => {
     // Check if any of the fields is empty
     for (const key in newPartsOrder) {
@@ -48,9 +53,23 @@ function AddPartsOrder() {
       'Content-Type': 'application/json',
     };
 
-    axios.post('/api/addPartsOrder', newPartsOrder, { headers })
+    const partsOrderData = {
+      ...newPartsOrder,
+      vin: vehicleInfo.vin,
+      vendorInfo: {
+        name: selectedVendor.name,
+        phoneNumber: selectedVendor.phoneNumber,
+        street: selectedVendor.street,
+        city: selectedVendor.city,
+        state: selectedVendor.state,
+        postalCode: selectedVendor.postalCode,
+      },
+    };
+  
+    axios.post('/api/addPartsOrder', partsOrderData, { headers })
       .then((response) => {
         console.log('Parts order added:', response.data);
+        console.log('vehicleInfo data:', vehicleInfo);
         setNewPartsOrder({
           partNumber: '',
           quantity: '',
@@ -63,13 +82,19 @@ function AddPartsOrder() {
       });
   };
 
+  const handleSearchVendor = () => {
+    navigate('/searchVendor', { state: { vehicleInfo: vehicleInfo } });
+  };
+
   return (
     <div>
       <NavBar />
       <div style={{ textAlign: 'center' }}>
         <Grid container justifyContent="center">
           <Grid item xs={12} sm={6}>
-            <Link to="/searchVendor">Search Vendor</Link>
+          <Button variant="contained" color="primary" onClick={handleSearchVendor}>
+              Search Vendor
+            </Button>
           </Grid>
         </Grid>
         {selectedVendor ? (

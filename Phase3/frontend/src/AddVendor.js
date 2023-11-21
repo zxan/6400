@@ -12,11 +12,14 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 function AddVendor() {
+  const location = useLocation();
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showTable, setShowTable] = useState(false);
+  const vehicleInfo = location.state?.vehicleInfo || {};
   const [newVendor, setNewVendor] = useState({
     name: '',
     phoneNumber: '',
@@ -74,7 +77,8 @@ function AddVendor() {
           progress: undefined,
           theme: "light",
           onClose: () => {
-            navigate('/addpartsorder', { state: { selectedVendor: addedVendor } });
+            console.log('vehicleInfo data:', vehicleInfo);
+            navigate('/addpartsorder', { state: { selectedVendor: addedVendor, vehicleInfo: vehicleInfo} });
           },
         });
       })
