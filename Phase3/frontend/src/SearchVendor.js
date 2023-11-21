@@ -15,11 +15,15 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 function SearchVendor() {
+  const location = useLocation();
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showTable, setShowTable] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState(null);
+  const vehicleInfo = location.state?.vehicleInfo || {};
   const navigate = useNavigate(); // React Router's useNavigate hook
+
+  console.log('vehicleInfo on load searchvendor:', vehicleInfo);
 
   const handleSearch = () => {
     axios.get(`/api/getSearchVendors?searchstring=${searchText}`)
@@ -48,9 +52,14 @@ function SearchVendor() {
       onClose: () => {
         // This will be executed after the toast is closed
         console.log('Navigating to AddPartsOrder with state:', { selectedVendor });
-        navigate('/AddPartsOrder', { state: { selectedVendor: vendor } });
+        console.log('vehicleInfo data:', vehicleInfo);
+        navigate('/AddPartsOrder', { state: { selectedVendor: vendor, vehicleInfo: vehicleInfo} });
       },
     });
+  };
+
+  const handleAddVendor = () => {
+    navigate('/AddVendor', { state: { vehicleInfo: vehicleInfo } });
   };
 
   return (
@@ -114,8 +123,7 @@ function SearchVendor() {
 
         <Button
           variant="contained" color="primary"
-          component={Link}
-          to="/AddVendor"  // Make sure the path matches the one in your Route component
+          onClick={handleAddVendor}
           style={{ marginTop: '20px' }}
         >
           Add New Vendor

@@ -12,11 +12,14 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 function AddVendor() {
+  const location = useLocation();
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showTable, setShowTable] = useState(false);
+  const vehicleInfo = location.state?.vehicleInfo || {};
   const [newVendor, setNewVendor] = useState({
     name: '',
     phoneNumber: '',
@@ -27,6 +30,8 @@ function AddVendor() {
   });
 
   const navigate = useNavigate();
+
+  console.log('vehicleInfo on load addvendor:', vehicleInfo);
 
   const handleAddVendor = () => {
     // Check if any of the fields is empty
@@ -64,24 +69,30 @@ function AddVendor() {
   
         // Show a success toast and redirect to AddPartsOrder after it's closed
         const addedVendor = response.data.vendor;
-        toast.success(`Vendor "${addedVendor.name}" added!`, {
-          position: "top-center",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          onClose: () => {
-            navigate('/addpartsorder', { state: { selectedVendor: addedVendor } });
-          },
-        });
+        if (addedVendor) {
+          toast.success(`Vendor "${addedVendor.name}" added!`, {
+            position: "top-center",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            onClose: () => {
+              console.log('vehicleInfo data:', vehicleInfo);
+              navigate('/addpartsorder', { state: { selectedVendor: addedVendor, vehicleInfo: vehicleInfo} });
+            },
+          });
+        } else {
+          // Handle the case where addedVendor is undefined
+          console.error('Error: addedVendor is undefined');
+        }
       })
       .catch((error) => {
         console.error('Error adding a vendor:', error);
       });
-  };
+    };
 
   return (
     <div>

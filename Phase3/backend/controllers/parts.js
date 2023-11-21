@@ -132,23 +132,146 @@ exports.updatePartOrderStatus = (req, res) => {
   });
 };
 
-exports.countPartOrdersByVin = (vin) => {
-  return new Promise((resolve, reject) => {
-    const countQuery = `
-      SELECT COUNT(*) AS partOrdersCount
-      FROM PartOrder
-      WHERE vin = ?;
+exports.countPartOrdersByVin = (req, res) => {
+  const vin = req.query.vin;
+
+  if (vin === undefined) {
+    res.status(400).send('VIN is undefined');
+    return;
+  }
+
+  const countQuery = `
+    SELECT COUNT(*) AS partOrdersCount
+    FROM PartOrder
+    WHERE vin = ?;
+  `;
+
+  con.query(countQuery, [vin], (countErr, countResults) => {
+    if (countErr) {
+      console.error('Error counting part orders:', countErr);
+      res.status(500).send('Error with the database');
+      return;
+    }
+
+    const partOrdersCount = countResults[0].partOrdersCount;
+    res.json({ partOrdersCount });
+  });
+};
+
+
+exports.getPartOrderNumbersByVin = (req, res) => {
+  const vin = req.query.vin;
+
+  if (vin === undefined) {
+    res.status(400).send('VIN is undefined');
+    return;
+  }
+
+  const query = `
+    SELECT orderNumber
+    FROM PartOrder
+    WHERE vin = ?;
+  `;
+
+  con.query(query, [vin], (err, results) => {
+    if (err) {
+      console.error('Error fetching part order numbers:', err);
+      res.status(500).send('Error with the database');
+      return;
+    }
+
+    const partOrderNumbers = results.map((result) => result.orderNumber);
+    res.json({ partOrderNumbers });
+  });
+};
+exports.addPartsOrder = (req, res) => {
+  const {
+    partNumber,
+    quantity,
+    description,
+    cost,
+    vin,
+    storedUser,
+    orderNumber,
+    vendorInfo: { name: vendorName },
+  } = req.body;
+
+  console.log('Stored User:', storedUser);
+  console.log('orderNumber:', orderNumber);
+
+  // Generate PurchaseOrderNumber
+  const username = storedUser;
+  const purchaseOrderNumberQuery = `
+    SELECT CONCAT(SUBSTRING('${vin}', 4), '-', LPAD((SELECT COUNT(*) + 1 FROM PartOrder WHERE vin = '${vin}'), 2, '0')) AS PurchaseOrderNumber
+  `;
+
+  con.query(purchaseOrderNumberQuery, (error, results) => {
+    if (error) {
+      console.error('Error generating PurchaseOrderNumber:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    const purchaseOrderNumber = results[0].PurchaseOrderNumber;
+
+    // Insert into PartOrder table
+    const partOrderQuery = `
+      INSERT INTO PartOrder (vin, orderNumber, username, vendorName)
+      VALUES ('${vin}', '${purchaseOrderNumber}', '${username}', '${vendorName}')
     `;
 
-    con.query(countQuery, [vin], (countErr, countResults) => {
-      if (countErr) {
-        console.error('Error counting part orders:', countErr);
-        reject('Error with the database');
-        return;
+    con.query(partOrderQuery, (partOrderError) => {
+      if (partOrderError) {
+        console.error('Error adding to PartOrder table:', partOrderError);
+        return res.status(500).json({ error: 'Internal Server Error' });
       }
 
-      const partOrdersCount = countResults[0].partOrdersCount;
-      resolve(partOrdersCount);
+      // Insert into Part table
+      const partQuery = `
+        INSERT INTO Part (partNumber, vin, orderNumber, quantity, status, description, cost)
+        VALUES ('${partNumber}', '${vin}', '${purchaseOrderNumber}', '${quantity}', 'ordered', '${description}', '${cost}')
+      `;
+
+      con.query(partQuery, (partError) => {
+        if (partError) {
+          console.error('Error adding to Part table:', partError);
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        res.json({ message: 'Parts order added successfully' });
+      });
     });
+  });
+};
+
+// Update an existing part order
+exports.updatePartsOrderwithParts = (req, res) => {
+  const {
+    partNumber,
+    quantity,
+    description,
+    cost,
+    orderNumber,
+    vendorInfo: { name: vendorName },
+  } = req.body;
+
+  // Update the Part table based on the provided orderNumber
+  const updatePartQuery = `
+    UPDATE Part
+    SET partNumber = '${partNumber}',
+        quantity = '${quantity}',
+        description = '${description}',
+        cost = '${cost}'
+    WHERE orderNumber = '${orderNumber}'
+  `;
+
+  con.query(updatePartQuery, (error, results) => {
+    if (error) {
+      console.error('Error updating Part table:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Optionally, you can update other related tables if needed
+
+    res.json({ message: 'Part order updated successfully' });
   });
 };
