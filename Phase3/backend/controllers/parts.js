@@ -132,27 +132,58 @@ exports.updatePartOrderStatus = (req, res) => {
   });
 };
 
-exports.countPartOrdersByVin = (vin) => {
-  return new Promise((resolve, reject) => {
-    const countQuery = `
-      SELECT COUNT(*) AS partOrdersCount
-      FROM PartOrder
-      WHERE vin = ?;
-    `;
+exports.countPartOrdersByVin = (req, res) => {
+  const vin = req.query.vin;
 
-    con.query(countQuery, [vin], (countErr, countResults) => {
-      if (countErr) {
-        console.error('Error counting part orders:', countErr);
-        reject('Error with the database');
-        return;
-      }
+  if (vin === undefined) {
+    res.status(400).send('VIN is undefined');
+    return;
+  }
 
-      const partOrdersCount = countResults[0].partOrdersCount;
-      resolve(partOrdersCount);
-    });
+  const countQuery = `
+    SELECT COUNT(*) AS partOrdersCount
+    FROM PartOrder
+    WHERE vin = ?;
+  `;
+
+  con.query(countQuery, [vin], (countErr, countResults) => {
+    if (countErr) {
+      console.error('Error counting part orders:', countErr);
+      res.status(500).send('Error with the database');
+      return;
+    }
+
+    const partOrdersCount = countResults[0].partOrdersCount;
+    res.json({ partOrdersCount });
   });
 };
 
+
+exports.getPartOrderNumbersByVin = (req, res) => {
+  const vin = req.query.vin;
+
+  if (vin === undefined) {
+    res.status(400).send('VIN is undefined');
+    return;
+  }
+
+  const query = `
+    SELECT orderNumber
+    FROM PartOrder
+    WHERE vin = ?;
+  `;
+
+  con.query(query, [vin], (err, results) => {
+    if (err) {
+      console.error('Error fetching part order numbers:', err);
+      res.status(500).send('Error with the database');
+      return;
+    }
+
+    const partOrderNumbers = results.map((result) => result.orderNumber);
+    res.json({ partOrderNumbers });
+  });
+};
 
 
 exports.addpartsorder = (req, res) => {

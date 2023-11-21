@@ -22,6 +22,7 @@ function AddPartsOrder() {
   const location = useLocation();
   const vehicleInfo = location.state?.vehicleInfo || {};
   const navigate = useNavigate();
+  const [partOrderNumbers, setPartOrderNumbers] = useState([]);
   const selectedVendor = location.state?.selectedVendor || null;
   const [newPartsOrder, setNewPartsOrder] = useState({
     partNumber: '',
@@ -29,6 +30,33 @@ function AddPartsOrder() {
     description: '',
     cost: '',
   });
+
+  const [partOrdersCount, setPartOrdersCount] = useState(null); // State to store part orders count
+
+  // Fetch the count of part orders and part order numbers for the VIN on page load
+  useEffect(() => {
+    // Fetch count of part orders
+    axios.get(`/api/countPartOrdersByVin?vin=${vehicleInfo.vin}`)
+      .then((response) => {
+        const count = response.data.partOrdersCount;
+        setPartOrdersCount(count);
+        console.log(`Number of part orders for VIN ${vehicleInfo.vin}: ${count}`);
+
+        // Fetch part order numbers
+        axios.get(`/api/getPartOrderNumbersByVin?vin=${vehicleInfo.vin}`)
+          .then((response) => {
+            const numbers = response.data.partOrderNumbers;
+            setPartOrderNumbers(numbers);
+          })
+          .catch((error) => {
+            console.error('Error fetching part order numbers:', error);
+          });
+      })
+      .catch((error) => {
+        console.error('Error counting part orders:', error);
+      });
+  }, [vehicleInfo.vin]);
+
 
   console.log("VehicleInfo: ", vehicleInfo.vin);
   const handleAddPartsOrder = () => {
@@ -53,6 +81,8 @@ function AddPartsOrder() {
       'Content-Type': 'application/json',
     };
 
+    
+
     const partsOrderData = {
       ...newPartsOrder,
       vin: vehicleInfo.vin,
@@ -66,6 +96,8 @@ function AddPartsOrder() {
       },
     };
   
+
+    
     axios.post('/api/addPartsOrder', partsOrderData, { headers })
       .then((response) => {
         console.log('Parts order added:', response.data);
@@ -92,25 +124,20 @@ function AddPartsOrder() {
       <div style={{ textAlign: 'center' }}>
         <Grid container justifyContent="center">
           <Grid item xs={12} sm={6}>
-          <Button variant="contained" color="primary" onClick={handleSearchVendor}>
+            <Button variant="contained" color="primary" onClick={handleSearchVendor}>
               Search Vendor
             </Button>
           </Grid>
         </Grid>
         {selectedVendor ? (
-        <div>
-          <h2>Selected Vendor:</h2>
-          <p>Name: {selectedVendor.name}</p>
-          <p>Phone Number: {selectedVendor.phoneNumber}</p>
-          <p>Street: {selectedVendor.street}</p>
-          <p>City: {selectedVendor.city}</p>
-          <p>State: {selectedVendor.state}</p>
-          <p>Postal Code: {selectedVendor.postalCode}</p>
-          {/* Add more vendor details as needed */}
-        </div>
-      ) : (
-        <p>No selected vendor.</p>
-      )}
+          <div>
+            <h2>Selected Vendor:</h2>
+            <p>Name: {selectedVendor.name}</p>
+            {/* Add more vendor details as needed */}
+          </div>
+        ) : (
+          <p>No selected vendor.</p>
+        )}
         {showTable && (
           <TableContainer component={Paper}>
             <Table>
@@ -173,14 +200,35 @@ function AddPartsOrder() {
             <Button variant="contained" color="primary" onClick={handleAddPartsOrder}>
               Add Parts Order
             </Button>
-
-            
+  
+            {partOrderNumbers.length > 0 && (
+              <div>
+                <h2>Part Order Numbers:</h2>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Order Number</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {partOrderNumbers.map((orderNumber, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{orderNumber}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </div>
+            )}
           </Grid>
         </Grid>
       </div>
       <ToastContainer />
     </div>
   );
+  
 }
 
 export default AddPartsOrder;
