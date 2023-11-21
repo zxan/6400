@@ -26,7 +26,7 @@ exports.getSearchVendors = (req, res) => {
     return;
   }
 
-  // SQL query to search for vendors based on the searchstring
+  // SQL query to search fosr vendors based on the searchstring
   const searchQuery = `
     SELECT name, phoneNumber, street, city, state, postalCode
     FROM Vendor
@@ -52,6 +52,7 @@ exports.getSearchVendors = (req, res) => {
     res.json(vendorData);
   });
 };
+
 
 exports.addVendor = (req, res) => {
   const { name, phoneNumber, street, city, state, postalCode } = req.body;
@@ -82,28 +83,12 @@ exports.addVendor = (req, res) => {
         return;
       }
 
-      if (results.affectedRows > 0) {
-        // Vendor added successfully, fetch the complete vendor information
-        const selectQuery = `
-          SELECT *
-          FROM Vendor
-          WHERE name = ?;
-        `;
+      const message =
+        results.affectedRows > 0
+          ? 'Vendor added successfully'
+          : 'Vendor already exists and cannot be added';
 
-        con.query(selectQuery, [name], (err, vendorResults) => {
-          if (err) {
-            console.error('Error fetching vendor information:', err);
-            res.status(500).send('Error with the database');
-            return;
-          }
-
-          const vendor = vendorResults[0];
-          res.json({ message: 'Vendor added successfully', vendor });
-        });
-      } else {
-        // Vendor already exists and cannot be added
-        res.json({ message: 'Vendor already exists and cannot be added' });
-      }
+      res.json({ message });
     }
   );
 };
@@ -141,6 +126,40 @@ exports.getVendorByName = (req, res) => {
       return;
     }
 
+    res.json(vendorData);
+  });
+};
+
+
+exports.getVendorInfoByPartOrder = (req, res) => {
+  const orderNumber = req.query.orderNumber || req.body.orderNumber;
+
+  if (!orderNumber) {
+    res.status(400).send('Order number is required');
+    return;
+  }
+
+  // SQL query to get vendor information by part order number
+  const getVendorQuery = `
+    SELECT v.name, v.phoneNumber, v.street, v.city, v.state, v.postalCode
+    FROM Vendor v
+    INNER JOIN PartOrder po ON v.name = po.vendorName
+    WHERE po.orderNumber = ?;
+  `;
+
+  con.query(getVendorQuery, [orderNumber], (err, results) => {
+    if (err) {
+      console.error('Error fetching vendor information:', err);
+      res.status(500).send('Error with the database');
+      return;
+    }
+
+    if (results.length === 0) {
+      res.status(404).send('Vendor not found for the given part order');
+      return;
+    }
+
+    const vendorData = results[0];
     res.json(vendorData);
   });
 };

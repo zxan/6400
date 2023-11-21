@@ -46,6 +46,7 @@ app.get('/api/getVendorByName', vendorController.getVendorByName);
 app.get('/api/countPartOrdersByVin', partController.countPartOrdersByVin);
 app.get('/api/getPartOrderNumbersByVin', partController.getPartOrderNumbersByVin);
 app.post('/api/addPartsOrder', partController.addPartsOrder);
+app.get('/api/getVendorInfoByPartOrder', vendorController.getVendorInfoByPartOrder);
 
 
 

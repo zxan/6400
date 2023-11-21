@@ -11,7 +11,7 @@ import { TextField, Button, Grid } from '@mui/material';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Link } from 'react-router-dom';
+
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,6 +31,10 @@ function AddPartsOrder() {
     description: '',
     cost: '',
   });
+
+  const [selectedOrderNumber, setSelectedOrderNumber] = useState(null);
+
+
 
   const [partOrdersCount, setPartOrdersCount] = useState(null); // State to store part orders count
 
@@ -145,6 +149,7 @@ function AddPartsOrder() {
   };
 
   const handleSelectPartOrder = (selectedOrderNumber) => {
+    setSelectedOrderNumber(selectedOrderNumber);
     // Add your logic for handling the selected part order number
     console.log(`Selected part order: ${selectedOrderNumber}`);
   };
@@ -164,7 +169,11 @@ function AddPartsOrder() {
           <div>
             <h2>Selected Vendor:</h2>
             <p>Name: {selectedVendor.name}</p>
-            {/* Add more vendor details as needed */}
+            <p>Phone Number: {selectedVendor.phoneNumber}</p>
+            <p>Street: {selectedVendor.street}</p>
+            <p>City: {selectedVendor.city}</p>
+            <p>State: {selectedVendor.state}</p>
+            <p>Postal Code: {selectedVendor.postalCode}</p>
           </div>
         ) : (
           <p>No selected vendor.</p>
@@ -244,8 +253,13 @@ function AddPartsOrder() {
                     </TableHead>
                     <TableBody>
                       {partOrderNumbers.map((orderNumber, index) => (
-                        <TableRow key={index} onClick={() => handleSelectPartOrder(orderNumber)}>
-                          <TableCell>{orderNumber}</TableCell>
+                        <TableRow key={index} onClick={() => handleSelectPartOrder(orderNumber)}
+                        style={{
+                          backgroundColor: selectedOrderNumber === orderNumber ? '#a6a6a6' : 'inherit',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <TableCell>{orderNumber}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
