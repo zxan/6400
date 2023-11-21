@@ -242,3 +242,36 @@ exports.addPartsOrder = (req, res) => {
     });
   });
 };
+
+// Update an existing part order
+exports.updatePartsOrderwithParts = (req, res) => {
+  const {
+    partNumber,
+    quantity,
+    description,
+    cost,
+    orderNumber,
+    vendorInfo: { name: vendorName },
+  } = req.body;
+
+  // Update the Part table based on the provided orderNumber
+  const updatePartQuery = `
+    UPDATE Part
+    SET partNumber = '${partNumber}',
+        quantity = '${quantity}',
+        description = '${description}',
+        cost = '${cost}'
+    WHERE orderNumber = '${orderNumber}'
+  `;
+
+  con.query(updatePartQuery, (error, results) => {
+    if (error) {
+      console.error('Error updating Part table:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Optionally, you can update other related tables if needed
+
+    res.json({ message: 'Part order updated successfully' });
+  });
+};

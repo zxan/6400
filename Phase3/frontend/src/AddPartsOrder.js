@@ -26,6 +26,7 @@ function AddPartsOrder() {
   const storedUser = sessionStorage.getItem('user');
   const [partOrderNumbers, setPartOrderNumbers] = useState([]);
   const selectedVendor = location.state?.selectedVendor || null;
+  const [isAddingToExistingOrder, setIsAddingToExistingOrder] = useState(false);
   
   const [vendorInfo, setVendorInfo] = useState(null);
   const [newPartsOrder, setNewPartsOrder] = useState({
@@ -43,6 +44,10 @@ function AddPartsOrder() {
 
   // Fetch the count of part orders and part order numbers for the VIN on page load
   useEffect(() => {
+
+    //to set condition about if it is for an existing part order back to false
+    setIsAddingToExistingOrder(false);
+
     // Fetch count of part orders
     axios.get(`/api/countPartOrdersByVin?vin=${vehicleInfo.vin}`)
       .then((response) => {
@@ -70,80 +75,115 @@ function AddPartsOrder() {
   console.log("storedUser: ", storedUser);
   
   const handleAddPartsOrder = () => {
+
+    // if this is for a new order
+    if (!isAddingToExistingOrder) {
     // Check if any of the fields is empty
-    for (const key in newPartsOrder) {
-      if (newPartsOrder[key].trim() === '') {
-        toast.error(`Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`, {
-          position: "top-center",
-          autoClose: true,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        return; // Don't proceed with adding the parts order
+      for (const key in newPartsOrder) {
+        if (newPartsOrder[key].trim() === '') {
+          toast.error(`Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`, {
+            position: "top-center",
+            autoClose: true,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          return; // Don't proceed with adding the parts order
+        }
       }
-    }
-  
-    let orderNumber = '';
-    for (let i = vehicleInfo.vin.length - 1; i >= 0; i--) {
-      const char = vehicleInfo.vin[i];
-      if (!Number.isNaN(Number(char))) {
-        // Continue prepending to orderNumber if the character is a number
-        orderNumber = char + orderNumber;
-      } else {
-        // Stop when a non-number character is encountered
-        break;
+    
+      let orderNumber = '';
+      for (let i = vehicleInfo.vin.length - 1; i >= 0; i--) {
+        const char = vehicleInfo.vin[i];
+        if (!Number.isNaN(Number(char))) {
+          // Continue prepending to orderNumber if the character is a number
+          orderNumber = char + orderNumber;
+        } else {
+          // Stop when a non-number character is encountered
+          break;
+        }
       }
-    }
-  
-    // Append "-" followed by the count of partOrderNumbers.length
-    orderNumber += `-${String(partOrderNumbers.length).padStart(2, '0')}`;
-  
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-  
-    const partsOrderData = {
-      ...newPartsOrder,
-      vin: vehicleInfo.vin,
-      storedUser: storedUser,
-      orderNumber: orderNumber,
-      vendorInfo: {
-        name: selectedVendor.name,
-        phoneNumber: selectedVendor.phoneNumber,
-        street: selectedVendor.street,
-        city: selectedVendor.city,
-        state: selectedVendor.state,
-        postalCode: selectedVendor.postalCode,
-      },
-    };
-  
-    axios.post('/api/addPartsOrder', partsOrderData, { headers })
-      .then((response) => {
-        console.log('Parts order added:', response.data);
-        console.log('vehicleInfo data:', vehicleInfo);
-        console.log('storedUser data:', storedUser);
-        setNewPartsOrder({
-          partNumber: '',
-          quantity: '',
-          description: '',
-          cost: '',
+    
+      // Append "-" followed by the count of partOrderNumbers.length
+      orderNumber += `-${String(partOrderNumbers.length).padStart(2, '0')}`;
+    
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+    
+      const partsOrderData = {
+        ...newPartsOrder,
+        vin: vehicleInfo.vin,
+        storedUser: storedUser,
+        orderNumber: orderNumber,
+        vendorInfo: {
+          name: selectedVendor.name,
+          phoneNumber: selectedVendor.phoneNumber,
+          street: selectedVendor.street,
+          city: selectedVendor.city,
+          state: selectedVendor.state,
+          postalCode: selectedVendor.postalCode,
+        },
+      };
+    
+      axios.post('/api/addPartsOrder', partsOrderData, { headers })
+        .then((response) => {
+          console.log('Parts order added:', response.data);
+          console.log('vehicleInfo data:', vehicleInfo);
+          console.log('storedUser data:', storedUser);
+          setNewPartsOrder({
+            partNumber: '',
+            quantity: '',
+            description: '',
+            cost: '',
+          });
+    
+          const updatedLocation = { ...location, state: { ...location.state, vehicleInfo } };
+
+          // Refresh the page with the updated state
+          navigate(location.pathname, updatedLocation);
+
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error('Error adding a parts order:', error);
+          // Handle the error, you can use toast.error or another method to notify the user
         });
+     } else {
+      // Handle the case where isAddingToExistingOrder is true
+      // Logic for updating an existing part order
   
-        const updatedLocation = { ...location, state: { ...location.state, vehicleInfo } };
-
-        // Refresh the page with the updated state
-        navigate(location.pathname, updatedLocation);
-
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error('Error adding a parts order:', error);
-        // Handle the error, you can use toast.error or another method to notify the user
-      });
+      // Construct the updated part information object
+      const updatedPartInfo = {
+        partNumber: newPartsOrder.partNumber,
+        quantity: newPartsOrder.quantity,
+        description: newPartsOrder.description,
+        cost: newPartsOrder.cost,
+        orderNumber: selectedOrderNumber, // Pass the selected order number for the update
+        vendorInfo: {
+          name: selectedVendor.name,
+          // Add other vendor information if needed
+        },
+      };
+  
+      // Make a request to update the existing part order
+      axios.post('/api/updatePartsOrderwithParts', updatedPartInfo)
+        .then((response) => {
+          console.log('Part order updated:', response.data);
+  
+          // Reset the state after updating the part order
+          setIsAddingToExistingOrder(false);
+  
+          // Optionally, you can perform additional actions after the update
+        })
+        .catch((error) => {
+          console.error('Error updating part order:', error);
+          // Handle the error, you can use toast.error or another method to notify the user
+        });
+    }
   };
   
 
@@ -153,6 +193,9 @@ function AddPartsOrder() {
 
   const handleSelectPartOrder = (selectedOrderNumber) => {
     setSelectedOrderNumber(selectedOrderNumber);
+
+    // Set isAddingToExistingOrder to true when selecting an existing part order
+    setIsAddingToExistingOrder(true);
   
     // Fetch vendor information based on the selected part order number
     axios.get(`/api/getVendorInfoByPartOrder?orderNumber=${selectedOrderNumber}`)
