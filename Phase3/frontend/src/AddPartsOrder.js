@@ -61,6 +61,7 @@ function AddPartsOrder() {
 
   console.log("VehicleInfo: ", vehicleInfo.vin);
   console.log("storedUser: ", storedUser);
+  
   const handleAddPartsOrder = () => {
     // Check if any of the fields is empty
     for (const key in newPartsOrder) {
@@ -78,17 +79,31 @@ function AddPartsOrder() {
         return; // Don't proceed with adding the parts order
       }
     }
-
+  
+    let orderNumber = '';
+    for (let i = vehicleInfo.vin.length - 1; i >= 0; i--) {
+      const char = vehicleInfo.vin[i];
+      if (!Number.isNaN(Number(char))) {
+        // Continue prepending to orderNumber if the character is a number
+        orderNumber = char + orderNumber;
+      } else {
+        // Stop when a non-number character is encountered
+        break;
+      }
+    }
+  
+    // Append "-" followed by the count of partOrderNumbers.length
+    orderNumber += `-${String(partOrderNumbers.length).padStart(2, '0')}`;
+  
     const headers = {
       'Content-Type': 'application/json',
     };
-
-    
-
+  
     const partsOrderData = {
       ...newPartsOrder,
       vin: vehicleInfo.vin,
       storedUser: storedUser,
+      orderNumber: orderNumber,
       vendorInfo: {
         name: selectedVendor.name,
         phoneNumber: selectedVendor.phoneNumber,
@@ -99,8 +114,6 @@ function AddPartsOrder() {
       },
     };
   
-
-    
     axios.post('/api/addPartsOrder', partsOrderData, { headers })
       .then((response) => {
         console.log('Parts order added:', response.data);
@@ -112,11 +125,20 @@ function AddPartsOrder() {
           description: '',
           cost: '',
         });
+  
+        const updatedLocation = { ...location, state: { ...location.state, vehicleInfo } };
+
+        // Refresh the page with the updated state
+        navigate(location.pathname, updatedLocation);
+
+        window.location.reload();
       })
       .catch((error) => {
         console.error('Error adding a parts order:', error);
+        // Handle the error, you can use toast.error or another method to notify the user
       });
   };
+  
 
   const handleSearchVendor = () => {
     navigate('/searchVendor', { state: { vehicleInfo: vehicleInfo } });

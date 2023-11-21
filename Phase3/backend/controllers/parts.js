@@ -191,11 +191,13 @@ exports.addPartsOrder = (req, res) => {
     description,
     cost,
     vin,
-    storedUser, // Assuming the username is sent as part of the storedUser object
+    storedUser,
+    orderNumber,
     vendorInfo: { name: vendorName },
   } = req.body;
 
   console.log('Stored User:', storedUser);
+  console.log('orderNumber:', orderNumber);
 
   // Generate PurchaseOrderNumber
   const username = storedUser;
