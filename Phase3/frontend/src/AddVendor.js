@@ -69,25 +69,30 @@ function AddVendor() {
   
         // Show a success toast and redirect to AddPartsOrder after it's closed
         const addedVendor = response.data.vendor;
-        toast.success(`Vendor "${addedVendor.name}" added!`, {
-          position: "top-center",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          onClose: () => {
-            console.log('vehicleInfo data:', vehicleInfo);
-            navigate('/addpartsorder', { state: { selectedVendor: addedVendor, vehicleInfo: vehicleInfo} });
-          },
-        });
+        if (addedVendor) {
+          toast.success(`Vendor "${addedVendor.name}" added!`, {
+            position: "top-center",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            onClose: () => {
+              console.log('vehicleInfo data:', vehicleInfo);
+              navigate('/addpartsorder', { state: { selectedVendor: addedVendor, vehicleInfo: vehicleInfo} });
+            },
+          });
+        } else {
+          // Handle the case where addedVendor is undefined
+          console.error('Error: addedVendor is undefined');
+        }
       })
       .catch((error) => {
         console.error('Error adding a vendor:', error);
       });
-  };
+    };
 
   return (
     <div>
