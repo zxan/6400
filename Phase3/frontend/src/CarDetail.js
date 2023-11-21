@@ -18,6 +18,7 @@ function CarDetail() {
     const [transactionUser, setTransactionUser] = useState({});//inventory clerk, customer info
     // check if the user is eligible to sell a vehicle
     const [isSalesperson, setIsSalesPerson] = React.useState(false);
+    const [isInventoryClerk, setisInventoryClerk] = React.useState(false);
     const storedUser = sessionStorage.getItem('user');
     axios.get("/api/isSalesperson", { params: { 'username': storedUser } }).then((response) => {
       if (response.data == true) {
@@ -27,6 +28,17 @@ function CarDetail() {
       }).catch((error) => {
           console.log(error);
       });
+
+      // check if the user is eligible to add part to a vehicle
+      axios.get("/api/isInventoryClerk", { params: { 'username': storedUser } }).then((response) => {
+        if (response.data == true) {
+          setisInventoryClerk(true);
+        }
+        ;
+        }).catch((error) => {
+            console.log(error);
+        });
+      
 
     // check if the vehicle has been sold
     const [hasBeenSold, setHasBeenSold] = React.useState(false);
@@ -228,7 +240,7 @@ function CarDetail() {
                 )}
   
       
-      {!hasBeenSold && (
+      {!hasBeenSold && isInventoryClerk && (
               <div style={{ marginTop: '16px' }}>
                 <Button
                   variant="contained"
