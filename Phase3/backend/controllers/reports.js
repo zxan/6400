@@ -189,7 +189,7 @@ exports.getSummaryReport = (req, res) => {
                 PO.vin,
                 COALESCE(SUM(P.cost * P.quantity), 0) AS PartsCost
             FROM PartOrder PO
-            JOIN Part P ON P.orderNumber = PO.orderNumber
+            JOIN Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
             GROUP BY PO.vin
         ) PartsPrice ON ST.vin = PartsPrice.vin
         GROUP BY SaleYear, SaleMonth
@@ -224,7 +224,7 @@ exports.getSummaryReportDetail = (req, res) => {
         LEFT JOIN (
             SELECT PO.vin, SUM(COALESCE(P.cost * P.quantity, 0)) AS PartsCost
             FROM PartOrder PO
-            LEFT JOIN Part P ON PO.orderNumber = P.orderNumber
+            LEFT JOIN Part P ON PO.orderNumber = P.orderNumber AND P.vin=PO.vin
             GROUP BY PO.vin
         ) Parts ON BF.vin = Parts.vin
         WHERE YEAR(BF.transactionDate) = ? AND (MONTH(BF.transactionDate) = ? OR ? = 0)

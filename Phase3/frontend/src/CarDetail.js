@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import CarIcon from '@mui/icons-material/DirectionsCar';
 import { useNavigate } from 'react-router-dom';
-
+import PartOrderStatus from './PartOrderStatus';
 
 function CarDetail() {
     const location = useLocation();
@@ -283,11 +283,12 @@ function CarDetail() {
                   </CardContent>
                 }
   
-  
+
               </Grid>
             }
           </Grid>
         </Card>
+        {transactionUser.inventoryClerkFirstName&&<PartOrderStatus></PartOrderStatus>}
       </div>
     );
   }
@@ -302,7 +303,7 @@ function CarDetail() {
       width: '60%',
     },
     carComponent: {
-      margin: "4% 20%",
+      margin: "4% 20% 2% 20%",
       display: 'flex',
       justifyContent: 'center',
   

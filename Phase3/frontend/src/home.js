@@ -241,7 +241,7 @@ function Home() {
                                     valueLabelDisplay="auto"
                                     aria-labelledby="mileage-range-slider"
                                     min={0}
-                                    max={100000}
+                                    max={250000}
                                 />
                             </FormControl>
                             <Paper component="form" style={styles.search}>

@@ -39,7 +39,7 @@ exports.getCriterias = (req, res) => {
 
                 let modelYears = [];
                 const currentYear = new Date().getFullYear();
-                for (let i = 1990; i <= currentYear + 1; i++) {
+                for (let i = 2000; i <= currentYear + 1; i++) {
                     modelYears.push(i);
                 }
                 criterias["Model Year"] = modelYears;
@@ -73,7 +73,7 @@ exports.searchCars = (req, res) => {
         FROM
             PartOrder PO
                 JOIN
-            Part P ON P.orderNumber = PO.orderNumber
+            Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
         WHERE
             PO.vin = v.vin),0) + 1.25 * (SELECT 
             s.purchasePrice
@@ -107,7 +107,7 @@ WHERE (v.vin= ? OR ? IS NULL) AND
         FROM
             PartOrder PO
                 JOIN
-            Part P ON P.orderNumber = PO.orderNumber
+            Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
         WHERE
             PO.vin = v.vin),0) + 1.25 * (SELECT 
             s.purchasePrice
@@ -137,7 +137,7 @@ mileage,
     FROM
         PartOrder PO
             JOIN
-        Part P ON P.orderNumber = PO.orderNumber
+        Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
     WHERE
         PO.vin = v.vin),0) + 1.25 * (SELECT 
         s.purchasePrice
@@ -172,7 +172,7 @@ WHERE (v.vin NOT IN ( SELECT bf.vin FROM Buys_From bf)) AND
     FROM
         PartOrder PO
             JOIN
-        Part P ON P.orderNumber = PO.orderNumber
+        Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
     WHERE
         PO.vin = v.vin),0) + 1.25 * (SELECT 
         s.purchasePrice
@@ -201,7 +201,7 @@ mileage,
     FROM
         PartOrder PO
             JOIN
-        Part P ON P.orderNumber = PO.orderNumber
+        Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
     WHERE
         PO.vin = v.vin),0) + 1.25 * (SELECT 
         s.purchasePrice
@@ -236,7 +236,7 @@ WHERE (v.vin IN ( SELECT bf.vin FROM Buys_From bf)) AND
     FROM
         PartOrder PO
             JOIN
-        Part P ON P.orderNumber = PO.orderNumber
+        Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
     WHERE
         PO.vin = v.vin),0) + 1.25 * (SELECT 
         s.purchasePrice
@@ -266,7 +266,7 @@ mileage,
     FROM
         PartOrder PO
             JOIN
-        Part P ON P.orderNumber = PO.orderNumber
+        Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
     WHERE
         PO.vin = v.vin),0) + 1.25 * (SELECT 
         s.purchasePrice
@@ -302,7 +302,7 @@ AND (v.vin= ? OR ? IS NULL) AND
     FROM
         PartOrder PO
             JOIN
-        Part P ON P.orderNumber = PO.orderNumber
+        Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
     WHERE
         PO.vin = v.vin),0) + 1.25 * (SELECT 
         s.purchasePrice
@@ -333,7 +333,7 @@ GROUP BY v.vin; -- this groupby is for concatenating colors `;
         FROM
             PartOrder PO
                 JOIN
-            Part P ON P.orderNumber = PO.orderNumber
+            Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
         WHERE
             PO.vin = v.vin),0) + 1.25 * (SELECT 
             s.purchasePrice
@@ -373,7 +373,7 @@ WHERE
         FROM
             PartOrder PO
                 JOIN
-            Part P ON P.orderNumber = PO.orderNumber
+            Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
         WHERE
             PO.vin = v.vin),0) + 1.25 * (SELECT 
             s.purchasePrice
@@ -439,7 +439,7 @@ exports.getCar = (req, res) => {
              GROUP_CONCAT(DISTINCT vc.color) AS colors, v.description,
              (1.1 * COALESCE((SELECT SUM(P.cost * P.quantity)
                               FROM PartOrder PO
-                              JOIN Part P ON P.orderNumber = PO.orderNumber
+                              JOIN Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
                               WHERE PO.vin = v.vin), 0) +
               1.25 * (SELECT s.purchasePrice
                       FROM Sells_To s
@@ -473,7 +473,7 @@ exports.getCarForInventoryClerk = (req, res) => {
         GROUP_CONCAT(DISTINCT vc.color) AS colors, v.description,
         (1.1 * COALESCE((SELECT SUM(P.cost * P.quantity)
                           FROM PartOrder PO
-                          JOIN Part P ON P.orderNumber = PO.orderNumber
+                          JOIN Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
                           WHERE PO.vin = v.vin), 0) +
             1.25 * (SELECT s.purchasePrice
                   FROM Sells_To s
@@ -483,7 +483,7 @@ exports.getCarForInventoryClerk = (req, res) => {
           WHERE s.vin = v.vin) AS purchasePrice,
         COALESCE((SELECT SUM(P.cost * P.quantity)
                   FROM PartOrder PO
-                  JOIN Part P ON P.orderNumber = PO.orderNumber
+                  JOIN Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
                   WHERE PO.vin = v.vin), 0) AS totalPartsCost
     FROM Vehicle v 
     JOIN Of_Type ot ON v.vin = ot.vin
@@ -512,7 +512,7 @@ exports.getCarForManager = (req, res) => {
         GROUP_CONCAT(DISTINCT vc.color) AS colors, v.description,
         (1.1 * COALESCE((SELECT SUM(P.cost * P.quantity)
                           FROM PartOrder PO
-                          JOIN Part P ON P.orderNumber = PO.orderNumber
+                          JOIN Part P ON P.orderNumber = PO.orderNumber AND PO.vin=P.vin
                           WHERE PO.vin = v.vin), 0) +
             1.25 * (SELECT s.purchasePrice
                   FROM Sells_To s
@@ -522,7 +522,7 @@ exports.getCarForManager = (req, res) => {
           WHERE s.vin = v.vin) AS purchasePrice,
         COALESCE((SELECT SUM(P.cost * P.quantity)
                   FROM PartOrder PO
-                  JOIN Part P ON P.orderNumber = PO.orderNumber
+                  JOIN Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
                   WHERE PO.vin = v.vin), 0) AS totalPartsCost
     FROM Vehicle v 
     JOIN Of_Type ot ON v.vin = ot.vin

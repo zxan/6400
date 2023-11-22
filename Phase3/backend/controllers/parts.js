@@ -24,41 +24,41 @@ exports.getPartOrder = (req, res) => {
     params.push(status);
   }
 
-  if (orderNumber) {
-    conditions.push('po.orderNumber LIKE ?');
-    params.push(`%${orderNumber}%`);
-  }
+  // if (orderNumber) {
+  //   conditions.push('po.orderNumber LIKE ?');
+  //   params.push(`%${orderNumber}%`);
+  // }
 
-  if (vendorName) {
-    conditions.push('po.vendorName LIKE ?');
-    params.push(`%${vendorName}%`);
-  }
+  // if (vendorName) {
+  //   conditions.push('po.vendorName LIKE ?');
+  //   params.push(`%${vendorName}%`);
+  // }
 
   if (vin) {
-    conditions.push('po.vin LIKE ?');
-    params.push(`%${vin}%`);
+    conditions.push('po.vin =?');
+    params.push(vin);
   }
 
-  if (partNumber) {
-    conditions.push('p.partNumber LIKE ?');
-    params.push(`%${partNumber}%`);
-  }
+  // if (partNumber) {
+  //   conditions.push('p.partNumber LIKE ?');
+  //   params.push(`%${partNumber}%`);
+  // }
 
-  if (quantity) {
-    conditions.push('p.quantity = ?');
-    params.push(quantity);
-  }
+  // if (quantity) {
+  //   conditions.push('p.quantity = ?');
+  //   params.push(quantity);
+  // }
 
-  if (cost) {
-    conditions.push('p.cost = ?');
-    params.push(cost);
-  }
+  // if (cost) {
+  //   conditions.push('p.cost = ?');
+  //   params.push(cost);
+  // }
 
   const searchQuery = `
     SELECT
       po.orderNumber, po.vendorName, po.vin, p.partNumber, p.quantity, p.cost, p.status
     FROM PartOrder po
-    JOIN Part p ON po.orderNumber = p.orderNumber
+    JOIN Part p ON po.orderNumber = p.orderNumber AND p.vin=po.vin
     WHERE ${conditions.join(' AND ')};
   `;
 

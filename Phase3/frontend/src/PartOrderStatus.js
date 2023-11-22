@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {
   TextField,
   Button,
@@ -19,6 +19,8 @@ import BasicTable from './component/basicTable';
 import Checkbox from '@mui/material/Checkbox';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useLocation } from 'react-router-dom';
+
 
 function PartOrderStatus() {
   const [searchOrderNumber, setSearchOrderNumber] = useState('');
@@ -34,6 +36,9 @@ function PartOrderStatus() {
   const orderNumber = selectedOrder.orderNumber;
   const partNumber = selectedOrder.partNumber;
   const vin = selectedOrder.vin;
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const vin1 = queryParams.get('vin');
 
   const columns = [
     { Header: 'Order Number', accessor: 'orderNumber' },
@@ -46,6 +51,20 @@ function PartOrderStatus() {
   ];
 
   const [searchResults, setSearchResults] = useState([]);
+  useEffect(() => {
+    axios.get(`/api/getPartOrder`, {
+      params: {
+        vin: vin1,
+      },
+    })
+    .then((response) => {
+      console.log('Search results:', response.data);
+      setSearchResults(response.data);
+    })
+    .catch((error) => {
+      console.error('Error searching for part orders:', error);
+    });
+  }, []);
 
   const handleSearch = () => {
     // Check if at least one status is selected
@@ -65,15 +84,9 @@ function PartOrderStatus() {
     }
   
     // Make an HTTP request to search for part orders based on the search criteria
-    console.log('Search status:', searchStatus);
     axios.get(`/api/getPartOrder`, {
       params: {
-        orderNumber: searchOrderNumber,
-        vendorName: searchVendorName,
-        vin: searchVin,
-        partNumber: searchPartNumber,
-        quantity: searchQuantity,
-        cost: searchCost,
+        vin: vin1,
         status: searchStatus,
       },
     })
@@ -96,6 +109,7 @@ function PartOrderStatus() {
       // Add the value if not present
       setSearchStatus([...searchStatus, value]);
     }
+    console.log(searchResults)
   };
 
   
@@ -140,14 +154,13 @@ function PartOrderStatus() {
 
   return (
     <div>
-      <NavBar />
+      {/* <NavBar /> */}
       <ToastContainer />
       <div style={{ textAlign: 'center' }}>
         <h1>Part Order Status</h1>
-        <h2>Search, View Part Order</h2>
-        <Grid container justifyContent="center" spacing={2}>
+        <Grid container justifyContent="center"  spacing={2}>
           <Grid item xs={12} sm={6}>
-            <TextField
+            {/* <TextField
               label="Order Number"
               variant="outlined"
               value={searchOrderNumber}
@@ -190,7 +203,7 @@ function PartOrderStatus() {
               value={searchCost}
               onChange={(e) => setSearchCost(e.target.value)}
               fullWidth
-            />
+            /> */}
             <div>
               <label>Order Status:</label>
               <Checkbox
@@ -215,15 +228,23 @@ function PartOrderStatus() {
               Search Part Order
             </Button>
           </Grid>
+          
         </Grid>
+          
         {searchResults.length > 0 && (
-        <Paper elevation={3} style={{ marginTop: '20px' }}>
-          <BasicTable
-            columns={columns}
-            data={searchResults}
-            onRowClick={(row) => handleOrderClick(row)}
-          />
-        </Paper>
+   
+
+        <div style={{ display: 'flex', justifyContent: 'center'}}>
+    <Paper elevation={3} style={{ marginTop: '20px', width: '60%' }}>
+    
+            <BasicTable
+                columns={columns}
+                data={searchResults}
+                onRowClick={(row) => handleOrderClick(row)}
+            />
+     
+    </Paper>
+</div>
       )}
 
         {/* Dialog for updating order status */}
