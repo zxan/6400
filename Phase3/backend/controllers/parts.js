@@ -197,26 +197,18 @@ exports.addPartsOrder = (req, res) => {
   } = req.body;
 
   console.log('Stored User:', storedUser);
-  console.log('orderNumber:', orderNumber);
+  console.log('orderNumber for add part:', orderNumber);
 
   // Generate PurchaseOrderNumber
   const username = storedUser;
-  const purchaseOrderNumberQuery = `
-    SELECT CONCAT(SUBSTRING('${vin}', 4), '-', LPAD((SELECT COUNT(*) + 1 FROM PartOrder WHERE vin = '${vin}'), 2, '0')) AS PurchaseOrderNumber
-  `;
 
-  con.query(purchaseOrderNumberQuery, (error, results) => {
-    if (error) {
-      console.error('Error generating PurchaseOrderNumber:', error);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
 
-    const purchaseOrderNumber = results[0].PurchaseOrderNumber;
+
 
     // Insert into PartOrder table
     const partOrderQuery = `
       INSERT INTO PartOrder (vin, orderNumber, username, vendorName)
-      VALUES ('${vin}', '${purchaseOrderNumber}', '${username}', '${vendorName}')
+      VALUES ('${vin}', '${orderNumber}', '${username}', '${vendorName}')
     `;
 
     con.query(partOrderQuery, (partOrderError) => {
@@ -228,7 +220,7 @@ exports.addPartsOrder = (req, res) => {
       // Insert into Part table
       const partQuery = `
         INSERT INTO Part (partNumber, vin, orderNumber, quantity, status, description, cost)
-        VALUES ('${partNumber}', '${vin}', '${purchaseOrderNumber}', '${quantity}', 'ordered', '${description}', '${cost}')
+        VALUES ('${partNumber}', '${vin}', '${orderNumber}', '${quantity}', 'ordered', '${description}', '${cost}')
       `;
 
       con.query(partQuery, (partError) => {
@@ -240,12 +232,12 @@ exports.addPartsOrder = (req, res) => {
         res.json({ message: 'Parts order added successfully' });
       });
     });
-  });
 };
 
 // Update an existing part order
 exports.updatePartsOrderwithParts = (req, res) => {
   const {
+    vin,
     partNumber,
     quantity,
     description,
@@ -254,14 +246,30 @@ exports.updatePartsOrderwithParts = (req, res) => {
     vendorInfo: { name: vendorName },
   } = req.body;
 
-  // Update the Part table based on the provided orderNumber
+  console.log('Received data for update:', req.body);
+
+  console.log('orderNumber for update part:', orderNumber);
+
+  // insert a new row into the Part table only if the combination of vin, orderNumber, and partNumber doesn't already exist.
   const updatePartQuery = `
-    UPDATE Part
-    SET partNumber = '${partNumber}',
-        quantity = '${quantity}',
-        description = '${description}',
-        cost = '${cost}'
-    WHERE orderNumber = '${orderNumber}'
+  INSERT INTO Part (partNumber, vin, orderNumber, quantity, status, description, cost)
+  SELECT
+    '${partNumber}' AS partNumber,
+    '${vin}' AS vin,
+    '${orderNumber}' AS orderNumber,
+    '${quantity}' AS quantity,
+    'ordered' AS status,
+    '${description}' AS description,
+    '${cost}' AS cost
+  FROM dual
+  WHERE NOT EXISTS (
+    SELECT 1
+    FROM Part
+    WHERE vin = '${vin}'
+      AND orderNumber = '${orderNumber}'
+      AND partNumber = '${partNumber}'
+  );
+  
   `;
 
   con.query(updatePartQuery, (error, results) => {

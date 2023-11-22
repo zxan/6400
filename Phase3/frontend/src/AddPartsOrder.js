@@ -76,6 +76,20 @@ function AddPartsOrder() {
   
   const handleAddPartsOrder = () => {
 
+    if (!selectedVendor) {
+      toast.error('Please select a vendor before adding or updating a part order', {
+        position: "top-center",
+        autoClose: true,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      return; // Don't proceed with adding or updating the parts order
+    }
+
     // if this is for a new order
     if (!isAddingToExistingOrder) {
     // Check if any of the fields is empty
@@ -108,7 +122,7 @@ function AddPartsOrder() {
       }
     
       // Append "-" followed by the count of partOrderNumbers.length
-      orderNumber += `-${String(partOrderNumbers.length).padStart(2, '0')}`;
+      orderNumber += `-${String(partOrderNumbers.length + 1).padStart(3, '0')}`;
     
       const headers = {
         'Content-Type': 'application/json',
@@ -134,30 +148,47 @@ function AddPartsOrder() {
           console.log('Parts order added:', response.data);
           console.log('vehicleInfo data:', vehicleInfo);
           console.log('storedUser data:', storedUser);
+
           setNewPartsOrder({
             partNumber: '',
             quantity: '',
             description: '',
             cost: '',
           });
+          const toastMessage = `Part order updated successfully:
+        `;
     
-          const updatedLocation = { ...location, state: { ...location.state, vehicleInfo } };
+          toast.success(toastMessage, {
+            position: "top-center",
+            autoClose: true,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            onClose: () => {
+              const updatedLocation = { ...location, state: { ...location.state, vehicleInfo } };
 
           // Refresh the page with the updated state
           navigate(location.pathname, updatedLocation);
 
+          // Reload the page
           window.location.reload();
-        })
-        .catch((error) => {
-          console.error('Error adding a parts order:', error);
-          // Handle the error, you can use toast.error or another method to notify the user
-        });
+      },
+    });
+  })
+  .catch((error) => {
+    console.error('Error adding a parts order:', error);
+    // Handle the error, you can use toast.error or another method to notify the user
+  });
      } else {
       // Handle the case where isAddingToExistingOrder is true
       // Logic for updating an existing part order
   
       // Construct the updated part information object
       const updatedPartInfo = {
+        vin: vehicleInfo.vin,
         partNumber: newPartsOrder.partNumber,
         quantity: newPartsOrder.quantity,
         description: newPartsOrder.description,
@@ -177,7 +208,28 @@ function AddPartsOrder() {
           // Reset the state after updating the part order
           setIsAddingToExistingOrder(false);
   
-          // Optionally, you can perform additional actions after the update
+          const toastMessage = `Part order updated successfully:
+        `;
+    
+          toast.success(toastMessage, {
+            position: "top-center",
+            autoClose: true,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            onClose: () => {
+              const updatedLocation = { ...location, state: { ...location.state, vehicleInfo } };
+
+          // Refresh the page with the updated state
+          navigate(location.pathname, updatedLocation);
+
+          // Reload the page
+          window.location.reload();
+      },
+    });
         })
         .catch((error) => {
           console.error('Error updating part order:', error);
@@ -191,30 +243,34 @@ function AddPartsOrder() {
     navigate('/searchVendor', { state: { vehicleInfo: vehicleInfo } });
   };
 
-  const handleSelectPartOrder = (selectedOrderNumber) => {
-    setSelectedOrderNumber(selectedOrderNumber);
-
-    // Set isAddingToExistingOrder to true when selecting an existing part order
-    setIsAddingToExistingOrder(true);
+  const handleSelectPartOrder = (clickedOrderNumber) => {
+    if (clickedOrderNumber === selectedOrderNumber) {
+      // If the same order number is clicked again, switch back to adding a new order
+      setIsAddingToExistingOrder(false);
+      setSelectedOrderNumber(null);
+      setVendorInfo(null); // Reset vendor info if needed
+    } else {
+      // If a different order number is clicked, set it as the selected order
+      setIsAddingToExistingOrder(true);
+      console.log(isAddingToExistingOrder);
+      setSelectedOrderNumber(clickedOrderNumber);
   
-    // Fetch vendor information based on the selected part order number
-    axios.get(`/api/getVendorInfoByPartOrder?orderNumber=${selectedOrderNumber}`)
-      .then((response) => {
-        const vendorInfo = response.data;
+      // Fetch vendor information based on the selected part order number
+      axios.get(`/api/getVendorInfoByPartOrder?orderNumber=${clickedOrderNumber}`)
+        .then((response) => {
+          const vendorInfo = response.data;
   
-        // Now you have the vendor information, you can do whatever you want with it
-          
-        // Set the vendor information in your component state if needed
-        setVendorInfo(vendorInfo);
+          //this need to be commented because when adding a part to an existing part order i need to be able to choose a different vendor
+          //setVendorInfo(vendorInfo);
   
-        // Add any additional logic for handling the selected part order number
-        console.log(`Selected part order: ${selectedOrderNumber}`);
-      })
-      .catch((error) => {
-        console.error('Error fetching vendor information:', error);
-        // Handle the error, you can use toast.error or another method to notify the user
-      });
+          console.log(`Selected part order: ${clickedOrderNumber}`);
+        })
+        .catch((error) => {
+          console.error('Error fetching vendor information:', error);
+        });
+    }
   };
+  
 
   return (
     <div>
