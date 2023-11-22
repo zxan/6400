@@ -86,12 +86,7 @@ function PartOrderStatus() {
     // Make an HTTP request to search for part orders based on the search criteria
     axios.get(`/api/getPartOrder`, {
       params: {
-        orderNumber: searchOrderNumber,
-        vendorName: searchVendorName,
         vin: vin1,
-        partNumber: searchPartNumber,
-        quantity: searchQuantity,
-        cost: searchCost,
         status: searchStatus,
       },
     })

@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import CarIcon from '@mui/icons-material/DirectionsCar';
 import { useNavigate } from 'react-router-dom';//This is to navigate to differnt pages
+import { CircularProgress } from '@mui/material';
 
 function CarComponent(props) {
 
@@ -73,6 +74,7 @@ function DisplayCar() {
   const color = queryParams.getAll('color');
   const vin = queryParams.get('vin');
   const soldStatus=queryParams.get('soldStatus');
+  const [loading, setLoading] = useState(true);
   const isUserInventoryClerk = (username) => {
     return axios.get('/api/isInventoryClerk', { params: { username } })
       .then(response => {
@@ -123,15 +125,17 @@ function DisplayCar() {
         console.error("Error in fetching data:", error);
       }
     }
-    fetchCar();
+    fetchCar().finally(() => setLoading(false));;
   }, []);
-  
+
   return (
     <div>
       <NavBar></NavBar>
       <div style={styles.container}>
-
-        <Grid style={styles.carList} container spacing={2} >
+        {loading ? (
+          <CircularProgress style={{ alignSelf: 'center', margin: '20px' }} />
+        ) : (
+          <Grid style={styles.carList} container spacing={2}>
           {
             cars.length > 0 ? (
               cars.map((item, index) => (
@@ -151,11 +155,13 @@ function DisplayCar() {
               ))
             ) : (
               <div style={{ textAlign: 'center'}}>
-              <Typography variant="h4" style={{ color: 'red', textAlign: 'center', margin: '20px' }}>Sorry, it looks like we don’t have that in stock!</Typography>
+                <Typography variant="h4" style={{ color: 'red', textAlign: 'center', margin: '20px' }}>
+                  Sorry, it looks like we don’t have that in stock!
+                </Typography>
               </div>
-            )
-          }
-        </Grid>
+            )}
+          </Grid>
+        )}
       </div>
     </div>
   );

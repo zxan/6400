@@ -21,7 +21,7 @@ const styles = {
     backgroundColor: 'red',
   },
 };
-
+console.log(data)
 
 return (
   <TableContainer component={Paper}>
@@ -35,7 +35,7 @@ return (
       </TableHead>
       <TableBody>
         {data.map((row) => (
-          <TableRow key={row.orderNumber} onClick={() => onRowClick(row)} style={{ cursor: 'pointer' }}>
+          <TableRow key={`${row.vin}-${row.orderNumber}-${row.partNumber}`} onClick={() => onRowClick(row)} style={{ cursor: 'pointer' }}>
             {columns.map((column) => (
               <TableCell key={column.Header}>{row[column.accessor]}</TableCell>
             ))}
