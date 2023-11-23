@@ -51,11 +51,21 @@ function CarDetail() {
     console.log(error);
   });
 
+  // check if the vehicle has no pending parts. true if no parts pending.
+  const [hasNoPendingParts, setHasNoPendingParts] = React.useState(false);
+  axios.get("/api/hasNoPendingParts", { params: { 'vin': vin } }).then((response) => {
+    if (response.data == true) {
+      setHasNoPendingParts(true);
+    }
+    ;
+  }).catch((error) => {
+    console.log(error);
+  });
+
   const isUserInventoryClerk = (username) => {
     return axios.get('/api/isInventoryClerk', { params: { username } })
       .then(response => {
         return response.data;
-
       })
       .catch(error => {
         console.error("Error checking user role:", error);
@@ -119,6 +129,8 @@ function CarDetail() {
   const handleAddPartOrder = () => {
     navigate('/AddPartsOrder', { state: { vehicleInfo: car } });
   };
+
+
   
     return (
       <div>
@@ -213,7 +225,7 @@ function CarDetail() {
                   Description: {car.description}
                 </Typography>
   
-                {hasBeenSold && (
+                {/* {hasBeenSold && (
                   <div style={{ marginTop: '16px' }}>
                     <Typography variant="h4" color="red">
                       This vehicle has been sold.
@@ -223,9 +235,20 @@ function CarDetail() {
                 )
   
                 }
+
+                {!hasNoPendingParts && (
+                  <div style={{ marginTop: '16px' }}>
+                    <Typography variant="h4" color="red">
+                      This vehicle has pending parts.
+                    </Typography>
+  
+                  </div>
+                )
+  
+                } */}
   
   
-                {isSalesperson && !hasBeenSold && (
+                {isSalesperson && !hasBeenSold && hasNoPendingParts && (
   
                   <div style={{ marginTop: '16px' }}>
                     <Button variant="contained"
