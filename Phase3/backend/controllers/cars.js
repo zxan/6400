@@ -597,6 +597,28 @@ exports.hasBeenSold = (req, res) => {
     });
 };
 
+exports.hasNoPendingParts = (req, res) => {
+    const vin = req.query.vin; 
+
+    const query = `
+    SELECT CASE WHEN EXISTS (SELECT 1 FROM Part p WHERE p.status != 'installed' AND vin = ?) THEN 0 ELSE 1 END AS hasNoPendingParts;
+`;
+    con.query(query, [vin], (err, result) => {
+        if (err) {
+            res.status(500).send('Error in database');
+            return;
+        }
+        console.log(result);
+        if (result[0].hasNoPendingParts === 0) {
+            console.log(result[0]);
+            res.json(false);
+        } else {
+           console.log(result[0]);
+            res.json(true);
+        }
+    });
+};
+
 
 exports.sale = (req, res) => {
 
