@@ -28,18 +28,6 @@ function CarDetail() {
       }).catch((error) => {
           console.log(error);
       });
-
-      // check if the user is eligible to add part to a vehicle
-      axios.get("/api/isInventoryClerk", { params: { 'username': storedUser } }).then((response) => {
-        if (response.data == true) {
-          setisInventoryClerk(true);
-        }
-        ;
-        }).catch((error) => {
-            console.log(error);
-        });
-      
-
     // check if the vehicle has been sold
     const [hasBeenSold, setHasBeenSold] = React.useState(false);
   axios.get("/api/hasBeenSold", { params: { 'vin': vin } }).then((response) => {
@@ -80,7 +68,7 @@ function CarDetail() {
       try {
 
         const isManagerOrOwner = await isUserManagerOrOwner(storedUser);
-        const isInventoryClerk = await isUserInventoryClerk(storedUser)
+        const isIC = await isUserInventoryClerk(storedUser)
         const params = {
           vin
         };
@@ -92,9 +80,9 @@ function CarDetail() {
           console.log(response.data);
   
         }
-        else if (isInventoryClerk) {
+        else if (isIC) {
           const response = await axios.get('/api/getCarForInventoryClerk', { params });
-
+          setisInventoryClerk(true);
           setCar(response.data);
         }
         else {
@@ -288,7 +276,7 @@ function CarDetail() {
             }
           </Grid>
         </Card>
-        {transactionUser.inventoryClerkFirstName&&<PartOrderStatus></PartOrderStatus>}
+        {(transactionUser.inventoryClerkFirstName || isInventoryClerk)&&<PartOrderStatus></PartOrderStatus>}
       </div>
     );
   }

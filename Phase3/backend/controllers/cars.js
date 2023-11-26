@@ -54,11 +54,11 @@ exports.getCriterias = (req, res) => {
 
 
 exports.searchCars = (req, res) => {
-    let {vin=null, vehicleType = null, manufacturer = null, modelYear = null, fuelType = null, color = null, keyword = '', price = null, mileage = null,isManagerOrOwner=null, isInventoryClerk=null,soldStatus='all'} = req.query;
+    let {vin=null, vehicleType = null, manufacturer = null, modelYear = null, fuelType = null, color = null, keyword = '', isManagerOrOwner=null, isInventoryClerk=null,soldStatus='all'} = req.query;
     // Validation if no criteria are entered and the keyword field is empty
-    if (!vin&&!vehicleType && !manufacturer && !modelYear && !fuelType && !color && !price && !mileage && !keyword&&!soldStatus) {
-        return res.status(400).send("Please enter some keywords or choose at least one filtering criteria.");
-    }
+    // if (!vin&&!vehicleType && !manufacturer && !modelYear && !fuelType && !color && !price && !mileage && !keyword&&!soldStatus) {
+    //     return res.status(400).send("Please enter some keywords or choose at least one filtering criteria.");
+    // }
     let queryall = `
     SELECT 
     v.vin,
@@ -98,24 +98,9 @@ WHERE (v.vin= ? OR ? IS NULL) AND
         OR ? IS NULL)  -- if it is null, will set to true
         AND (mb.company = ?
         OR ? IS NULL)
+        AND (vc.color  =? OR ? IS NULL)
         AND (v.fuelType = ?
         OR ? IS NULL)
-        AND (v.mileage <= ?
-        OR ? IS NULL)
-        AND (1.1 * COALESCE((SELECT 
-            SUM(P.cost * P.quantity)
-        FROM
-            PartOrder PO
-                JOIN
-            Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
-        WHERE
-            PO.vin = v.vin),0) + 1.25 * (SELECT 
-            s.purchasePrice
-        FROM
-            Sells_To s
-        WHERE
-            s.vin = v.vin) <= ?
-        OR ? IS NULL) -- This is a subquery to compare the sale price and the entered price.
         AND (ot.type LIKE CONCAT('%', ?, '%') -- This is to search through all the different fields that may include a keyword
         OR modelYear = ?
         OR mb.company LIKE CONCAT('%', ?, '%')
@@ -163,24 +148,9 @@ WHERE (v.vin NOT IN ( SELECT bf.vin FROM Buys_From bf)) AND
     OR ? IS NULL)  -- if it is null, will set to true
     AND (mb.company = ?
     OR ? IS NULL)
+    AND (vc.color  =? OR ? IS NULL)
     AND (v.fuelType = ?
     OR ? IS NULL)
-    AND (v.mileage <= ?
-    OR ? IS NULL)
-    AND (1.1 * COALESCE((SELECT 
-        SUM(P.cost * P.quantity)
-    FROM
-        PartOrder PO
-            JOIN
-        Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
-    WHERE
-        PO.vin = v.vin),0) + 1.25 * (SELECT 
-        s.purchasePrice
-    FROM
-        Sells_To s
-    WHERE
-        s.vin = v.vin) <= ?
-    OR ? IS NULL) -- This is a subquery to compare the sale price and the entered price.
     AND (ot.type LIKE CONCAT('%', ?, '%') -- This is to search through all the different fields that may include a keyword
     OR modelYear = ?
     OR mb.company LIKE CONCAT('%', ?, '%')
@@ -218,7 +188,6 @@ Of_Type ot ON v.vin = ot.vin
 Manufactured_By mb ON v.vin = mb.vin
     JOIN
 Of_Color vc ON v.vin = vc.vin
-    
 WHERE (v.vin IN ( SELECT bf.vin FROM Buys_From bf)) AND 
 (v.vin= ? OR ? IS NULL) AND
 (ot.type = ?
@@ -227,24 +196,9 @@ WHERE (v.vin IN ( SELECT bf.vin FROM Buys_From bf)) AND
     OR ? IS NULL)  -- if it is null, will set to true
     AND (mb.company = ?
     OR ? IS NULL)
+    AND (vc.color  =? OR ? IS NULL)
     AND (v.fuelType = ?
     OR ? IS NULL)
-    AND (v.mileage <= ?
-    OR ? IS NULL)
-    AND (1.1 * COALESCE((SELECT 
-        SUM(P.cost * P.quantity)
-    FROM
-        PartOrder PO
-            JOIN
-        Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
-    WHERE
-        PO.vin = v.vin),0) + 1.25 * (SELECT 
-        s.purchasePrice
-    FROM
-        Sells_To s
-    WHERE
-        s.vin = v.vin) <= ?
-    OR ? IS NULL) -- This is a subquery to compare the sale price and the entered price.
     AND (ot.type LIKE CONCAT('%', ?, '%') -- This is to search through all the different fields that may include a keyword
     OR modelYear = ?
     OR mb.company LIKE CONCAT('%', ?, '%')
@@ -293,24 +247,9 @@ AND (v.vin= ? OR ? IS NULL) AND
     OR ? IS NULL)  -- if it is null, will set to true
     AND (mb.company = ?
     OR ? IS NULL)
+    AND (vc.color  =? OR ? IS NULL)
     AND (v.fuelType = ?
     OR ? IS NULL)
-    AND (v.mileage <= ?
-    OR ? IS NULL)
-    AND (1.1 * COALESCE((SELECT 
-        SUM(P.cost * P.quantity)
-    FROM
-        PartOrder PO
-            JOIN
-        Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
-    WHERE
-        PO.vin = v.vin),0) + 1.25 * (SELECT 
-        s.purchasePrice
-    FROM
-        Sells_To s
-    WHERE
-        s.vin = v.vin) <= ?
-    OR ? IS NULL) -- This is a subquery to compare the sale price and the entered price.
     AND (ot.type LIKE CONCAT('%', ?, '%') -- This is to search through all the different fields that may include a keyword
     OR modelYear = ?
     OR mb.company LIKE CONCAT('%', ?, '%')
@@ -364,24 +303,9 @@ WHERE
         OR ? IS NULL)  -- if it is null, will set to true
         AND (mb.company = ?
         OR ? IS NULL)
+        AND (vc.color  =? OR ? IS NULL)
         AND (v.fuelType = ?
         OR ? IS NULL)
-        AND (v.mileage <= ?
-        OR ? IS NULL)
-        AND (1.1 * COALESCE((SELECT 
-            SUM(P.cost * P.quantity)
-        FROM
-            PartOrder PO
-                JOIN
-            Part P ON P.orderNumber = PO.orderNumber AND P.vin=PO.vin
-        WHERE
-            PO.vin = v.vin),0) + 1.25 * (SELECT 
-            s.purchasePrice
-        FROM
-            Sells_To s
-        WHERE
-            s.vin = v.vin) <= ?
-        OR ? IS NULL) -- This is a subquery to compare the sale price and the entered price.
         AND (ot.type LIKE CONCAT('%', ?, '%') -- This is to search through all the different fields that may include a keyword
         OR modelYear = ?
         OR mb.company LIKE CONCAT('%', ?, '%')
@@ -394,9 +318,8 @@ GROUP BY v.vin; -- this groupby is for concatenating colors `;
             vehicleType, vehicleType,
             modelYear, modelYear,
             manufacturer, manufacturer,
+            color,color,
             fuelType, fuelType,
-            mileage, mileage,
-            price, price,
             keyword, keyword, keyword, keyword, keyword
         ];
     // Execute the query
@@ -420,14 +343,13 @@ GROUP BY v.vin; -- this groupby is for concatenating colors `;
     else{
         querystring=queryPublic;
     }
-    console.log(querystring)
+
     con.query(querystring, params, (err, results) => {
         if (err) {
             console.error(err.message);
             return res.status(500).send('Error with the database');
         }
-        console.log(params);
-        console.log(results);
+
         return res.json(results);
     });
 };
@@ -639,10 +561,7 @@ exports.countVehicleForPublic = (req, res) => {
     console.log(req.body);
 
     const query = `
-    SELECT COUNT(v.vin) AS countVehicleForPublic FROM Vehicle v 
-    JOIN Of_Type ot ON v.vin = ot.vin
-    JOIN Manufactured_By mb ON v.vin = mb.vin 
-    JOIN Of_Color vc ON v.vin = vc.vin  
+    SELECT COUNT(DISTINCT v.vin) AS countVehicleForPublic FROM Vehicle v 
     WHERE v.vin NOT IN (SELECT bf.vin FROM Buys_From bf) AND 
           v.vin NOT IN (SELECT p.vin
                         FROM Part p
@@ -658,8 +577,36 @@ exports.countVehicleForPublic = (req, res) => {
             } 
             else 
             {
+                console.log(result);
                 res.status(200).send(result);
-                console.log('Sale transaction added successfully');
+                console.log('count successfully');
+            }
+        }
+    );
+};
+
+exports.countVehicleWithPartsPending = (req, res) => {
+    console.log(req.body);
+    const query = `
+    SELECT COUNT(DISTINCT v.vin) AS countVehicleWithPartsPending FROM Vehicle v 
+    WHERE v.vin NOT IN (SELECT bf.vin FROM Buys_From bf) AND 
+          v.vin IN (SELECT p.vin
+                        FROM Part p
+                        WHERE p.status != 'installed')
+    `;
+    
+    con.query(query,
+        (err, result) => {
+            if (err) 
+            {
+                console.error('Error counting the number of vehicles availabel for customer to purchase:', err);
+                res.status(500).send('Error counting the number of vehicles availabel for customer to purchase');
+            } 
+            else 
+            {
+                console.log(result);
+                res.status(200).send(result);
+                console.log('count successfully');
             }
         }
     );

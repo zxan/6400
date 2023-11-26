@@ -28,6 +28,7 @@ app.get('/api/hasBeenSold',carController.hasBeenSold);
 app.post('/api/sale',carController.sale);
 app.get('/api/countVehicleForPublic',carController.countVehicleForPublic);
 app.post('/api/addCar',carController.addCar);
+app.get('/api/countVehicleWithPartsPending',carController.countVehicleWithPartsPending);
 
 //app.post('/api/addCar',carController1.addCar);
 
