@@ -69,12 +69,15 @@ function DisplayCar() {
   const modelYear = queryParams.get('modelYear');
   const fuelType = queryParams.get('fuelType');
   const keyword = queryParams.get('keyword');
-  const price = queryParams.get('price');
-  const mileage = queryParams.get('mileage');
-  const color = queryParams.getAll('color');
+  // const price = queryParams.get('price');
+  // const mileage = queryParams.get('mileage');
+  const [publicCount,setPublicCount]=useState(0);
+  const[pendingCount,setPendingCount]=useState(0);
+  const color = queryParams.get('color');
   const vin = queryParams.get('vin');
   const soldStatus=queryParams.get('soldStatus');
   const [loading, setLoading] = useState(true);
+  const [isAuthorized,setisAuthorized]=useState(false);
   const isUserInventoryClerk = (username) => {
     return axios.get('/api/isInventoryClerk', { params: { username } })
       .then(response => {
@@ -98,13 +101,38 @@ function DisplayCar() {
         return false;
       });
   }
+  const countVehicleForPublic = () => {
+    return axios.get('/api/countVehicleForPublic')
+      .then(response => {
+        return response.data;
+
+      })
+      .catch(error => {
+        console.error("Error counting vehicle for public:", error);
+        return false;
+      });
+  }
+  const countVehicleWithPartsPending = () => {
+    return axios.get('/api/countVehicleWithPartsPending')
+      .then(response => {
+        return response.data;
+
+      })
+      .catch(error => {
+        console.error("Error counting vehicle for public:", error);
+        return false;
+      });
+  }
   useEffect(() => {
     const storedUser = sessionStorage.getItem('user');
     async function fetchCar() {
       try {
         
+        // const pc=12;
         const isManagerOrOwner = await isUserManagerOrOwner(storedUser);
-        const isInventoryClerk = await isUserInventoryClerk(storedUser)
+        const isInventoryClerk = await isUserInventoryClerk(storedUser);
+        const pc=await countVehicleForPublic();
+        const pendingC=await countVehicleWithPartsPending();
         const params = {
           vin,
           vehicleType,
@@ -113,14 +141,15 @@ function DisplayCar() {
           fuelType,
           color,
           keyword,
-          price,
-          mileage,
           isManagerOrOwner: isManagerOrOwner,
           isInventoryClerk: isInventoryClerk,
           soldStatus
         };
         const response = await axios.get('/api/searchCars', { params });
         setCars(response.data);
+        setPublicCount(pc[0].countVehicleForPublic);
+        setPendingCount(pendingC[0].countVehicleWithPartsPending);
+        setisAuthorized(isManagerOrOwner || isInventoryClerk);
       } catch (error) {
         console.error("Error in fetching data:", error);
       }
@@ -131,11 +160,25 @@ function DisplayCar() {
   return (
     <div>
       <NavBar></NavBar>
+      {isAuthorized &&  <div style={{ width: '100%', textAlign: 'center' }}>
+            <Typography variant="h6" style={{ color: 'blue' }}>
+            Number of Cars available for Sales: {publicCount}
+            </Typography>
+            <br></br>
+            <Typography variant="h6" style={{ color: 'red' }}>
+              Number of Cars with Pending Parts: {pendingCount}
+            </Typography>
+          </div>}
+     
       <div style={styles.container}>
         {loading ? (
           <CircularProgress style={{ alignSelf: 'center', margin: '20px' }} />
         ) : (
+          <>
+        
+      <br></br>
           <Grid style={styles.carList} container spacing={2}>
+         
           {
             cars.length > 0 ? (
               cars.map((item, index) => (
@@ -152,15 +195,20 @@ function DisplayCar() {
                     mileage={item.mileage}
                   />
                 </Grid>
+              
               ))
+         
             ) : (
               <div style={{ textAlign: 'center'}}>
                 <Typography variant="h4" style={{ color: 'red', textAlign: 'center', margin: '20px' }}>
                   Sorry, it looks like we don’t have that in stock!
                 </Typography>
               </div>
+
             )}
+
           </Grid>
+          </>
         )}
       </div>
     </div>
@@ -171,7 +219,7 @@ const styles = {
   container: {
     display: 'flex',
     justifyContent: 'center',
-    marginTop: "5%"
+    marginTop: "1%"
   },
   carList: {
     width: '60%',

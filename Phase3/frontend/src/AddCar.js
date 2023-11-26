@@ -199,7 +199,10 @@ function AddCar() {
             displayErrorToast('Error adding car 1:', response.data.error);
         }
 
-        navigate('/CarInfo', { state: { CarInfo: response.data[0] } });
+        //navigate('/CarInfo', { state: { CarInfo: response.data[0] } });
+        const queryParams = new URLSearchParams();
+        queryParams.set('vin', individualFormData.vin);
+        navigate(`/CarDetail?${queryParams}`);
       } catch (error) {
         // Handle errors, show an error message, or redirect as needed
         displayErrorToast('Invalid Input. Please double check');

@@ -21,7 +21,7 @@ function Home() {
     //use the 'setSomething' to change the value of 'something'
     const [manufacturer, setManufacturer] = useState('');
     const [year, setYear] = useState('');
-    const [color, setColor] = useState([]);
+    const [color, setColor] = useState('');
     const [soldFilter,setSoldFilter]=useState('all');
     const [vehicleType, setVehicleType] = useState('');
     const [fuelType, setFuelType] = useState('');
@@ -38,28 +38,26 @@ function Home() {
     const storedUser = sessionStorage.getItem('user');
     const onSubmit = (event) => {
         event.preventDefault();
-        if (!vin&&!vehicleType && !manufacturer && !year && !fuelType && color.length === 0 && !keyword && !price && !mileage&&soldFilter=='all') {
+        // if (!vin&&!vehicleType && !manufacturer && !year && !fuelType && color.length === 0 && !keyword && !price && !mileage&&soldFilter=='all') {
 
-                toast.error('Please enter some keywords or choose at least one filtering criteria.', {
-                    position: "top-center",
-                    autoClose: false,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                    });
-            return; 
-          }
+        //         toast.error('Please enter some keywords or choose at least one filtering criteria.', {
+        //             position: "top-center",
+        //             autoClose: false,
+        //             hideProgressBar: false,
+        //             closeOnClick: true,
+        //             pauseOnHover: true,
+        //             draggable: true,
+        //             progress: undefined,
+        //             theme: "light",
+        //             });
+        //     return; 
+        //   }
         const queryParams = new URLSearchParams();
         if (vehicleType) queryParams.set('vehicleType', vehicleType);
         if (manufacturer) queryParams.set('manufacturer', manufacturer);
         if (year) queryParams.set('modelYear', year);
         if (fuelType) queryParams.set('fuelType', fuelType);
-        if (color && Array.isArray(color)) {
-            color.forEach(c => queryParams.append('color', c));
-        } else if (color) {
+        if (color) {
             queryParams.set('color', color);
         }
         if (keyword) queryParams.set('keyword', keyword);
@@ -182,12 +180,12 @@ function Home() {
                                 </Select>
                             </FormControl>
                             <FormControl variant="outlined" style={styles.formControl}>
-                                <InputLabel >Colors</InputLabel>
+                                <InputLabel >Color</InputLabel>
                                 <Select
                                     value={color}
                                     onChange={(event) => setColor(event.target.value)}
-                                    multiple
-                                    renderValue={(selected) => selected.join(', ')}
+                                    // multiple
+                                    // renderValue={(selected) => selected.join(', ')}
                                 >
                                 
                                     {colorOptions.map(y => (
@@ -216,7 +214,7 @@ function Home() {
                             </FormControl>
                             }
                            
-                            <br></br>
+                            {/* <br></br>
                             <FormControl style={styles.formControl}>
                                 <Typography id="price-range-slider" gutterBottom>
                                     Price Range
@@ -243,7 +241,7 @@ function Home() {
                                     min={0}
                                     max={250000}
                                 />
-                            </FormControl>
+                            </FormControl> */}
                             <Paper component="form" style={styles.search}>
                                 <InputBase
                                     style={styles.input}
