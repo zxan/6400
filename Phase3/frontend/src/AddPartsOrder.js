@@ -254,7 +254,7 @@ function AddPartsOrder() {
       setIsAddingToExistingOrder(true);
       console.log(isAddingToExistingOrder);
       setSelectedOrderNumber(clickedOrderNumber);
-  
+      console.log(`Selected part order: ${clickedOrderNumber}`);
       // Fetch vendor information based on the selected part order number
       axios.get(`/api/getVendorInfoByPartOrder?orderNumber=${clickedOrderNumber}`)
         .then((response) => {
