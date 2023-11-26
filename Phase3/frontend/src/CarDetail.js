@@ -128,7 +128,6 @@ function CarDetail() {
     navigate('/AddPartsOrder', { state: { vehicleInfo: car } });
   };
 
-  console.log("is inventory clerk or Owner? " +isInventoryClerkOrOwner);
 
 
   
@@ -314,6 +313,7 @@ function CarDetail() {
           </Grid>
         </Card>
         {(transactionUser.inventoryClerkFirstName || isInventoryClerk)&&<PartOrderStatus></PartOrderStatus>}
+        <br></br><br></br>
       </div>
     );
   }
