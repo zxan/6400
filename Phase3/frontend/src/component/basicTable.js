@@ -35,7 +35,7 @@ return (
       </TableHead>
       <TableBody>
         {data.map((row) => (
-          <TableRow key={`${row.vin}-${row.orderNumber}-${row.partNumber}`} onClick={() => onRowClick(row)} style={{ cursor: 'pointer' }}>
+          <TableRow key={`${row.orderNumber}-${row.partNumber}`} onClick={() => onRowClick(row)} style={{ cursor: 'pointer' }}>
             {columns.map((column) => (
               <TableCell key={column.Header}>{row[column.accessor]}</TableCell>
             ))}

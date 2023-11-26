@@ -39,11 +39,11 @@ function PartOrderStatus() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const vin1 = queryParams.get('vin');
-
+  const [isInventoryOrOwner,setisInventoryClerkorOwner]=useState(false);
+  const storedUser = sessionStorage.getItem('user');
   const columns = [
     { Header: 'Order Number', accessor: 'orderNumber' },
     { Header: 'Vendor Name', accessor: 'vendorName' },
-    { Header: 'VIN', accessor: 'vin' },
     { Header: 'Part Number', accessor: 'partNumber' },
     { Header: 'Quantity', accessor: 'quantity' },
     { Header: 'Cost', accessor: 'cost' },
@@ -52,14 +52,31 @@ function PartOrderStatus() {
 
   const [searchResults, setSearchResults] = useState([]);
   useEffect(() => {
+    axios.get("/api/isInventoryOrOwner", { params: { 'username': storedUser } }).then((response) => {
+      if (response.data == true) {
+        setisInventoryClerkorOwner(true);
+      }
+      ;
+  }).catch((error) => {
+      console.log(error);
+  });
+
+
     axios.get(`/api/getPartOrder`, {
       params: {
         vin: vin1,
       },
     })
     .then((response) => {
-      console.log('Search results:', response.data);
-      setSearchResults(response.data);
+      const modifiedData = response.data.map(({ vin, orderNumber, ...rest }) => {
+        const combinedOrderNumber = `${vin}-${orderNumber}`;
+        return {
+          ...rest,
+          orderNumber: combinedOrderNumber
+        };
+      });
+      console.log(modifiedData)
+      setSearchResults(modifiedData);
     })
     .catch((error) => {
       console.error('Error searching for part orders:', error);
@@ -248,7 +265,7 @@ function PartOrderStatus() {
       )}
 
         {/* Dialog for updating order status */}
-        {selectedOrder && (
+        {selectedOrder&&isInventoryOrOwner && (
           <Dialog open={openDialog} onClose={handleDialogClose}>
             <DialogTitle>Update Order Status</DialogTitle>
             <DialogContent>
