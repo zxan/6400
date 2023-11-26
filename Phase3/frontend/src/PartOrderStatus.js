@@ -46,7 +46,7 @@ function PartOrderStatus() {
     { Header: 'Vendor Name', accessor: 'vendorName' },
     { Header: 'Part Number', accessor: 'partNumber' },
     { Header: 'Quantity', accessor: 'quantity' },
-    { Header: 'Cost', accessor: 'cost' },
+    { Header: 'Unit Price', accessor: 'cost' },
     { Header: 'Status', accessor: 'status' },
   ];
 
@@ -173,7 +173,7 @@ function PartOrderStatus() {
     <div>
       {/* <NavBar /> */}
       <ToastContainer />
-      <div style={{ textAlign: 'center' }}>
+      <div style={{marginBottom:"5%", textAlign: 'center' }}>
         <h1>Part Order Status</h1>
         <Grid container justifyContent="center"  spacing={2}>
           <Grid item xs={12} sm={6}>

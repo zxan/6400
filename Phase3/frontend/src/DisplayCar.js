@@ -27,7 +27,7 @@ function CarComponent(props) {
         <CardContent>
           {/* Using CarIcon instead of CardMedia for an image */}
           <CarIcon style={{ fontSize: 140 }} />
-          <Typography variant="h5" component="div">
+          <Typography variant="body1" component="div">
             {props.vin} 
           </Typography>
           <Typography variant="body2" color="text.secondary">
