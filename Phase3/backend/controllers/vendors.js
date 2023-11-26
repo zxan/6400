@@ -134,7 +134,10 @@ exports.getVendorByName = (req, res) => {
 
 
 exports.getVendorInfoByPartOrder = (req, res) => {
-  const orderNumber = req.query.orderNumber || req.body.orderNumber;
+  let orderNumber = req.query.orderNumber || req.body.orderNumber;
+
+  // Extract the last 3 characters from orderNumber
+  orderNumber = orderNumber.slice(-3);
 
   if (!orderNumber) {
     res.status(400).send('Order number is required');
