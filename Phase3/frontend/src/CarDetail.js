@@ -42,93 +42,93 @@ function CarDetail() {
 
     // check if the vehicle has been sold
     const [hasBeenSold, setHasBeenSold] = React.useState(false);
-  axios.get("/api/hasBeenSold", { params: { 'vin': vin } }).then((response) => {
-    if (response.data == true) {
-      setHasBeenSold(true);
-    }
-    ;
-  }).catch((error) => {
-    console.log(error);
-  });
-
-  // check if the vehicle has no pending parts. true if no parts pending.
-  const [hasNoPendingParts, setHasNoPendingParts] = React.useState(false);
-  axios.get("/api/hasNoPendingParts", { params: { 'vin': vin } }).then((response) => {
-    if (response.data == true) {
-      setHasNoPendingParts(true);
-    }
-    ;
-  }).catch((error) => {
-    console.log(error);
-  });
-
-  const isUserInventoryClerk = (username) => {
-    return axios.get('/api/isInventoryClerk', { params: { username } })
-      .then(response => {
-        return response.data;
-      })
-      .catch(error => {
-        console.error("Error checking user role:", error);
-        return false;
-      });
-  }
-  const isUserManagerOrOwner = (username) => {
-    return axios.get('/api/isManagerOrOwner', { params: { username } })
-      .then(response => {
-
-        return response.data;
-
-      })
-      .catch(error => {
-        console.error("Error checking user role:", error);
-        return false;
-      });
-  }
-  useEffect(() => {
-
-    async function fetchCarDetail() {
-      try {
-
-        const isManagerOrOwner = await isUserManagerOrOwner(storedUser);
-        const isInventoryClerk = await isUserInventoryClerk(storedUser)
-        const params = {
-          vin
-        };
-        if (isManagerOrOwner) {
-          const response = await axios.get('/api/getCarForManager', { params });
-          const response2 = await axios.get('/api/getCustomerAndUserForManager', { params });
-          setTransactionUser(response2.data);
-          setCar(response.data);
-          console.log(response.data);
-  
-        }
-        else if (isInventoryClerk) {
-          const response = await axios.get('/api/getCarForInventoryClerk', { params });
-
-          setCar(response.data);
-        }
-        else {
-          const response = await axios.get('/api/getCar', { params });
-          setCar(response.data);
-
-        }
-      } catch (error) {
-        console.error("Error in fetching data:", error);
+    axios.get("/api/hasBeenSold", { params: { 'vin': vin } }).then((response) => {
+      if (response.data == true) {
+        setHasBeenSold(true);
       }
+      ;
+    }).catch((error) => {
+      console.log(error);
+    });
+
+    // check if the vehicle has no pending parts. true if no parts pending.
+    const [hasNoPendingParts, setHasNoPendingParts] = React.useState(false);
+    axios.get("/api/hasNoPendingParts", { params: { 'vin': vin } }).then((response) => {
+      if (response.data == true) {
+        setHasNoPendingParts(true);
+      }
+      ;
+    }).catch((error) => {
+      console.log(error);
+    });
+
+    const isUserInventoryClerk = (username) => {
+      return axios.get('/api/isInventoryClerk', { params: { username } })
+        .then(response => {
+          return response.data;
+        })
+        .catch(error => {
+          console.error("Error checking user role:", error);
+          return false;
+        });
     }
-    fetchCarDetail();
-  }, []);
+    const isUserManagerOrOwner = (username) => {
+      return axios.get('/api/isManagerOrOwner', { params: { username } })
+        .then(response => {
 
-  const handleSellVehicle = (e) => {
-    // const { name, value } = e.target;
-    // setSearchFormData({ ...searchFormData, [name]: value });
-    navigate('/SalesOrder', { state: { vehicleInfo: car } });
-  };
+          return response.data;
 
-  // for add part order button
-  const handleAddPartOrder = () => {
-    navigate('/AddPartsOrder', { state: { vehicleInfo: car } });
-  };
+        })
+        .catch(error => {
+          console.error("Error checking user role:", error);
+          return false;
+        });
+    }
+    useEffect(() => {
+
+      async function fetchCarDetail() {
+        try {
+
+          const isManagerOrOwner = await isUserManagerOrOwner(storedUser);
+          const isInventoryClerk = await isUserInventoryClerk(storedUser)
+          const params = {
+            vin
+          };
+          if (isManagerOrOwner) {
+            const response = await axios.get('/api/getCarForManager', { params });
+            const response2 = await axios.get('/api/getCustomerAndUserForManager', { params });
+            setTransactionUser(response2.data);
+            setCar(response.data);
+            console.log(response.data);
+    
+          }
+          else if (isInventoryClerk) {
+            const response = await axios.get('/api/getCarForInventoryClerk', { params });
+
+            setCar(response.data);
+          }
+          else {
+            const response = await axios.get('/api/getCar', { params });
+            setCar(response.data);
+
+          }
+        } catch (error) {
+          console.error("Error in fetching data:", error);
+        }
+      }
+      fetchCarDetail();
+    }, []);
+
+    const handleSellVehicle = (e) => {
+      // const { name, value } = e.target;
+      // setSearchFormData({ ...searchFormData, [name]: value });
+      navigate('/SalesOrder', { state: { vehicleInfo: car } });
+    };
+
+    // for add part order button
+    const handleAddPartOrder = () => {
+      navigate('/AddPartsOrder', { state: { vehicleInfo: car } });
+    };
 
 
   
@@ -263,7 +263,7 @@ function CarDetail() {
                 )}
   
       
-      {!hasBeenSold && isInventoryClerk && (
+            {!hasBeenSold && isInventoryClerk && (
               <div style={{ marginTop: '16px' }}>
                 <Button
                   variant="contained"
