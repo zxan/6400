@@ -311,7 +311,6 @@ function CarDetail() {
           </Grid>
         </Card>
         {(transactionUser.inventoryClerkFirstName || isInventoryClerk)&&<PartOrderStatus></PartOrderStatus>}
-        <br></br><br></br>
       </div>
     );
   }
