@@ -110,19 +110,9 @@ function AddPartsOrder() {
       }
     
       let orderNumber = '';
-      for (let i = vehicleInfo.vin.length - 1; i >= 0; i--) {
-        const char = vehicleInfo.vin[i];
-        if (!Number.isNaN(Number(char))) {
-          // Continue prepending to orderNumber if the character is a number
-          orderNumber = char + orderNumber;
-        } else {
-          // Stop when a non-number character is encountered
-          break;
-        }
-      }
     
       // Append "-" followed by the count of partOrderNumbers.length
-      orderNumber += `-${String(partOrderNumbers.length + 1).padStart(3, '0')}`;
+      orderNumber += `${String(partOrderNumbers.length + 1).padStart(3, '0')}`;
     
       const headers = {
         'Content-Type': 'application/json',
@@ -254,7 +244,7 @@ function AddPartsOrder() {
       setIsAddingToExistingOrder(true);
       console.log(isAddingToExistingOrder);
       setSelectedOrderNumber(clickedOrderNumber);
-  
+      console.log(`Selected part order: ${clickedOrderNumber}`);
       // Fetch vendor information based on the selected part order number
       axios.get(`/api/getVendorInfoByPartOrder?orderNumber=${clickedOrderNumber}`)
         .then((response) => {

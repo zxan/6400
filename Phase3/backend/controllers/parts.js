@@ -180,7 +180,7 @@ exports.getPartOrderNumbersByVin = (req, res) => {
       return;
     }
 
-    const partOrderNumbers = results.map((result) => result.orderNumber);
+    const partOrderNumbers = results.map((result) => vin + '-' + result.orderNumber);
     res.json({ partOrderNumbers });
   });
 };
@@ -236,7 +236,7 @@ exports.addPartsOrder = (req, res) => {
 
 // Update an existing part order
 exports.updatePartsOrderwithParts = (req, res) => {
-  const {
+  let {
     vin,
     partNumber,
     quantity,
@@ -245,9 +245,9 @@ exports.updatePartsOrderwithParts = (req, res) => {
     orderNumber,
     vendorInfo: { name: vendorName },
   } = req.body;
-
+  orderNumber = orderNumber.slice(-3);
   console.log('Received data for update:', req.body);
-
+  
   console.log('orderNumber for update part:', orderNumber);
 
   // insert a new row into the Part table only if the combination of vin, orderNumber, and partNumber doesn't already exist.
