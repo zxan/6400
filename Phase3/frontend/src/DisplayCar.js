@@ -27,7 +27,7 @@ function CarComponent(props) {
         <CardContent>
           {/* Using CarIcon instead of CardMedia for an image */}
           <CarIcon style={{ fontSize: 140 }} />
-          <Typography variant="h5" component="div">
+          <Typography variant="body1" component="div">
             {props.vin} 
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -160,7 +160,7 @@ function DisplayCar() {
   return (
     <div>
       <NavBar></NavBar>
-      {isAuthorized &&  <div style={{ width: '100%', textAlign: 'center' }}>
+      {/* {isAuthorized &&  <div style={{ width: '100%', textAlign: 'center' }}>
             <Typography variant="h6" style={{ color: 'blue' }}>
             Number of Cars available for Sales: {publicCount}
             </Typography>
@@ -168,7 +168,7 @@ function DisplayCar() {
             <Typography variant="h6" style={{ color: 'red' }}>
               Number of Cars with Pending Parts: {pendingCount}
             </Typography>
-          </div>}
+          </div>} */}
      
       <div style={styles.container}>
         {loading ? (

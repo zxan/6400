@@ -128,8 +128,6 @@ function CarDetail() {
     navigate('/AddPartsOrder', { state: { vehicleInfo: car } });
   };
 
-
-
   
     return (
       <div>
@@ -141,7 +139,7 @@ function CarDetail() {
             {transactionUser.inventoryClerkFirstName &&
               <div>
                 <CardContent>
-                  <Typography variant="h4">Inventory Clerk Info</Typography>
+                  <Typography variant="h5">Inventory Clerk Info</Typography>
                   <Typography variant="body1">Name: {transactionUser.inventoryClerkFirstName} {transactionUser.InventoryClerkLastName} </Typography>
                   {/* <Typography variant="body1">Purchase Date: {transactionUser.purchaseDate}</Typography> */}
                   {/* <Typography variant="body1">Purchase Price: {car.purchasePrice}</Typography>
@@ -151,7 +149,7 @@ function CarDetail() {
   
                 {transactionUser.sellerBusinessName ?
                   <CardContent>
-                    <Typography variant="h4">Seller Info</Typography>
+                    <Typography variant="h5">Seller Info</Typography>
                     <Typography variant="body1">Company Name: {transactionUser.sellerBusinessName} </Typography>
                     <Typography variant="body1">Seller Name: {transactionUser.sellerName} </Typography>
                     <Typography variant="body1">Title: {transactionUser.sellerTitle} </Typography>
@@ -161,7 +159,7 @@ function CarDetail() {
                   </CardContent>
                   :
                   <CardContent>
-                    <Typography variant="h4">Seller Info</Typography>
+                    <Typography variant="h5">Seller Info</Typography>
                     <Typography variant="body1">Name: {transactionUser.sellerFirstName} {transactionUser.sellerLastName} </Typography>
                     <Typography variant="body1">Email: {transactionUser.sellerEmail}</Typography>
                     <Typography variant="body1">Phone: {transactionUser.sellerPhoneNumber}</Typography>
@@ -183,44 +181,44 @@ function CarDetail() {
               }}>
                 {/* Using CarIcon instead of CardMedia for an image */}
                 <CarIcon style={{ fontSize: 140 }} />
-                <Typography variant="h2" component="div">
+                <Typography variant="h4" component="div">
                   {car.vin}
                 </Typography>
-                <Typography variant="h4" component="text.secondary">
+                <Typography variant="h6" component="text.secondary">
                   {car.manufacturer} -- {car.modelYear}
                 </Typography>
-                <Typography variant="h4" color="text.secondary">
+                <Typography variant="h6" color="text.secondary">
                   Manufacturer: {car.manufacturer}
                 </Typography>
-                <Typography variant="h4" color="text.secondary">
+                <Typography variant="h6" color="text.secondary">
                   Vehicle Type: {car.type}
                 </Typography>
-                <Typography variant="h4" color="text.secondary">
+                <Typography variant="h6" color="text.secondary">
                   Mileage: {car.mileage}
                 </Typography>
-                <Typography variant="h4" color="text.secondary">
+                <Typography variant="h6" color="text.secondary">
                   Fuel Type: {car.fuelType}
                 </Typography>
                 {transactionUser.inventoryClerkFirstName&&
                 <>
-                  <Typography variant="h4" color="text.secondary">
+                  <Typography variant="h6" color="text.secondary">
                   Purchase Price: ${car.purchasePrice}
                 </Typography>
-                <Typography variant="h4" color="text.secondary">
+                <Typography variant="h6" color="text.secondary">
                   Parts Cost: ${car.totalPartsCost}
                 </Typography>
                 </>
                 }
              
-                <Typography variant="h4" color="text.secondary">
+                <Typography variant="h6" color="text.secondary">
                   Sale Price: ${car.price?car.price:0}
                 </Typography>
                 
   
-                <Typography variant="h4" color="text.secondary">
+                <Typography variant="h6" color="text.secondary">
                   Colors: {car.colors}
                 </Typography>
-                <Typography variant="h4" color="text.secondary">
+                <Typography variant="h6" color="text.secondary">
                   Description: {car.description}
                 </Typography>
   
@@ -282,13 +280,13 @@ function CarDetail() {
             {hasBeenSold && transactionUser.salespersonFirstName &&
               <Grid item xs={12} md={3}>
                 <CardContent>
-                  <Typography variant="h4">Sales Person Info</Typography>
+                  <Typography variant="h5">Sales Person Info</Typography>
                   <Typography variant="body1">Name: {transactionUser.salespersonFirstName} {transactionUser.salesPersonLastName}</Typography>
                 </CardContent>
   
                 {transactionUser.buyerBusinessName ?
                   <CardContent>
-                    <Typography variant="h4">Buyer Info</Typography>
+                    <Typography variant="h5">Buyer Info</Typography>
                     <Typography variant="body1">Company Name: {transactionUser.buyerBusinessName} </Typography>
                     <Typography variant="body1">Seller Name: {transactionUser.buyerName} </Typography>
                     <Typography variant="body1">Title: {transactionUser.buyerTitle} </Typography>
@@ -299,7 +297,7 @@ function CarDetail() {
                   :
   
                   <CardContent>
-                    <Typography variant="h4">Buyer Info</Typography>
+                    <Typography variant="h5">Buyer Info</Typography>
                     <Typography variant="body1">Name: {transactionUser.buyerFirstName} {transactionUser.buyerLastName}</Typography>
                     <Typography variant="body1">Email: {transactionUser.buyerEmail}</Typography>
                     <Typography variant="body1">Phone: {transactionUser.buyerPhoneNumber}</Typography>

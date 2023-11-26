@@ -35,6 +35,9 @@ function Home() {
     const [keyword, setKeyword] = useState('');
     const [vin,setVin]=useState('');
     const [isManagerOrOwner, setIsManagerorOwner] = React.useState(false);
+    const [isInventoryClerk, setIsInventoryClerk] = React.useState(false);
+    const [publicCount,setPublicCount]=useState(0);
+    const[pendingCount,setPendingCount]=useState(0);
     const storedUser = sessionStorage.getItem('user');
     const onSubmit = (event) => {
         event.preventDefault();
@@ -70,11 +73,32 @@ function Home() {
 
 
     useEffect(() => {
+        axios.get("/api/countVehicleForPublic", { params: { 'username': storedUser } }).then((response) => {
+          setPublicCount(response.data[0].countVehicleForPublic);
+        }).catch((error) => {
+            console.log(error);
+        });
+        axios.get("/api/countVehicleWithPartsPending", { params: { 'username': storedUser } }).then((response) => {
+          
+            setPendingCount(response.data[0].countVehicleWithPartsPending);
+        }).catch((error) => {
+            console.log(error);
+        });
 
         axios.get("/api/isManagerOrOwner", { params: { 'username': storedUser } }).then((response) => {
           
             if (response.data == true) {
                 setIsManagerorOwner(true);
+            }
+            ;
+        }).catch((error) => {
+            console.log(error);
+        });
+
+        axios.get("/api/isInventoryClerk", { params: { 'username': storedUser } }).then((response) => {
+          
+            if (response.data == true) {
+                setIsInventoryClerk(true);
             }
             ;
         }).catch((error) => {
@@ -101,8 +125,11 @@ function Home() {
             
                 <Navbar styles={{ width: "70%" }}></Navbar>
                 <ToastContainer />
+               
                 <Container maxWidth={false} style={styles.container}>
 
+      
+      
                     <Grid container spacing={3}>
                         {/* Left Grid for Content */}
                         <Grid item md={6}>
@@ -258,6 +285,16 @@ function Home() {
                         </Grid>
                         {/* Right Grid for Image */}
                         <Grid item md={6} style={styles.imgContainer}>
+                        {isInventoryClerk&&isManagerOrOwner &&  <div style={{ width: '100%', textAlign: 'center' }}>
+            <Typography variant="h6" style={{ color: 'blue' }}>
+            Number of Cars available for Sales: {publicCount}
+            </Typography>
+            <br></br>
+            <Typography variant="h6" style={{ color: 'red' }}>
+              Number of Cars with Pending Parts: {pendingCount}
+            </Typography>
+          </div>}
+          <br></br>
                             <img
                                 style={styles.img}
                                 src="https://source.unsplash.com/1600x900/?cars"
@@ -303,8 +340,8 @@ const styles = {
     },
     imgContainer: {
         height: '100%',
-        display: 'flex',
-        alignItems: 'center',
+        // display: 'flex',
+        // alignItems: 'center',
 
     },
     img: {

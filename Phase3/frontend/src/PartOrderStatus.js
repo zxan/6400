@@ -173,7 +173,7 @@ function PartOrderStatus() {
     <div>
       {/* <NavBar /> */}
       <ToastContainer />
-      <div style={{ textAlign: 'center' }}>
+      <div style={{marginBottom:"5%", textAlign: 'center' }}>
         <h1>Part Order Status</h1>
         <Grid container justifyContent="center"  spacing={2}>
           <Grid item xs={12} sm={6}>
