@@ -17,12 +17,13 @@ function CarDetail() {
     const navigate = useNavigate();
     const [transactionUser, setTransactionUser] = useState({});//inventory clerk, customer info
     // check if the user is eligible to sell a vehicle
-    const [isSalesperson, setIsSalesPerson] = React.useState(false);
+    const [isSalespersonOrOwner, setIsSalesPersonOrOwner] = React.useState(false);
     const [isInventoryClerk, setisInventoryClerk] = React.useState(false);
+    const [isInventoryClerkOrOwner, setisInventoryClerkOrOwner] = React.useState(false);
     const storedUser = sessionStorage.getItem('user');
-    axios.get("/api/isSalesperson", { params: { 'username': storedUser } }).then((response) => {
+    axios.get("/api/isSalespersonOrOwner", { params: { 'username': storedUser } }).then((response) => {
       if (response.data == true) {
-          setIsSalesPerson(true);
+          setIsSalesPersonOrOwner(true);
       }
       ;
       }).catch((error) => {
@@ -77,6 +78,15 @@ function CarDetail() {
     async function fetchCarDetail() {
       try {
 
+        axios.get("/api/isInventoryOrOwner", { params: { 'username': storedUser } }).then((response) => {
+          if (response.data == true) {
+            setisInventoryClerkOrOwner(true);
+          } 
+          ;
+          }).catch((error) => {
+              console.log(error);
+          });
+
         const isManagerOrOwner = await isUserManagerOrOwner(storedUser);
         const isIC = await isUserInventoryClerk(storedUser)
         const params = {
@@ -117,6 +127,8 @@ function CarDetail() {
   const handleAddPartOrder = () => {
     navigate('/AddPartsOrder', { state: { vehicleInfo: car } });
   };
+
+  console.log("is inventory clerk or Owner? " +isInventoryClerkOrOwner);
 
 
   
@@ -236,7 +248,7 @@ function CarDetail() {
                 } */}
   
   
-                {isSalesperson && !hasBeenSold && hasNoPendingParts && (
+                {isSalespersonOrOwner && !hasBeenSold && hasNoPendingParts && (
   
                   <div style={{ marginTop: '16px' }}>
                     <Button variant="contained"
@@ -251,14 +263,16 @@ function CarDetail() {
                 )}
   
       
-      {!hasBeenSold && isInventoryClerk && (
+      
+
+      {!hasBeenSold && isInventoryClerkOrOwner && (
               <div style={{ marginTop: '16px' }}>
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={handleAddPartOrder}
                 >
-                  Add Part Order
+                  Add Parts Order
                 </Button>
               </div>
             )}

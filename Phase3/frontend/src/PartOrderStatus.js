@@ -46,7 +46,7 @@ function PartOrderStatus() {
     { Header: 'Vendor Name', accessor: 'vendorName' },
     { Header: 'Part Number', accessor: 'partNumber' },
     { Header: 'Quantity', accessor: 'quantity' },
-    { Header: 'Cost', accessor: 'cost' },
+    { Header: 'Unit Price', accessor: 'cost' },
     { Header: 'Status', accessor: 'status' },
   ];
 
