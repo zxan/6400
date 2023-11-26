@@ -25,6 +25,7 @@ app.get('/api/getCarForInventoryClerk',carController.getCarForInventoryClerk);
 app.get('/api/getCarForManager',carController.getCarForManager);
 app.get('/api/getCustomerAndUserForManager',carController.getCustomerAndUserForManager);
 app.get('/api/hasBeenSold',carController.hasBeenSold);
+app.get('/api/hasNoPendingParts',carController.hasNoPendingParts);
 app.post('/api/sale',carController.sale);
 app.get('/api/countVehicleForPublic',carController.countVehicleForPublic);
 app.post('/api/addCar',carController.addCar);
