@@ -137,7 +137,7 @@ const styles = {
                     <td>{vehicleType}</td>
                     {conditions.map((condition) => (
                       <td key={condition}>
-                        {pivotedData[vehicleType][condition] || '0'}
+                        {'$'+pivotedData[vehicleType][condition] || '$0'}
                       </td>
                     ))}
                   </tr>
