@@ -35,6 +35,7 @@ function PriceReport() {
     axios.get('/api/getPriceReport') // Adjust this endpoint as per your backend
     .then(response => {
       setPriceData(response.data);
+      console.log("PriceReport from backend:" + response.data);
     })
     .catch(error => {
       console.error('Error fetching price report:', error);
