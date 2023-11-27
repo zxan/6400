@@ -105,10 +105,10 @@ const SellerHistory = () => {
                 <thead>
                   <tr>
                     <th style={styles.columnHeader}>Seller Name</th>
-                    <th style={styles.columnHeader}>Total Vehicles Sold</th>
-                    <th style={styles.columnHeader}>Average Sold Price</th>
-                    <th style={styles.columnHeader}>Average Parts per Vehicle</th>
-                    <th style={styles.columnHeader}>Average Cost of Parts</th>
+                    <th style={styles.columnHeader}>Total Number of Vehicles Sold</th>
+                    <th style={styles.columnHeader}>Average Vehicle Price ($)</th>
+                    <th style={styles.columnHeader}>Average Number of Parts per Vehicle</th>
+                    <th style={styles.columnHeader}>Average Cost of Parts per Vehicle ($)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -125,6 +125,7 @@ const SellerHistory = () => {
           </>
         )}
       </div>
+      <br></br>
     </div>
   );
 };

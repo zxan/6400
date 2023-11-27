@@ -16,7 +16,7 @@ import { useLocation } from 'react-router-dom';
 function SearchCustomer() {
   const [searchFormData, setSearchFormData] = useState({
     searchType: 'individual', // 'individual' or 'business'
-    searchValue: '',
+    ID: '',
   });
 
   const navigate = useNavigate();
@@ -34,6 +34,7 @@ function SearchCustomer() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSearchFormData({ ...searchFormData, [name]: value});
+    console.log(searchFormData.ID);
   };
 
   const handleSearch = async (e) => {
@@ -43,8 +44,8 @@ function SearchCustomer() {
       let response;
 
       // Validate search value
-      if (searchFormData.searchValue === '') {
-        toast.error('Please enter a search value', {
+      if (searchFormData.ID === '') {
+        toast.error("Please enter a driver's license number or a Tax ID", {
           position: 'top-center',
           autoClose: true,
           hideProgressBar: false,
@@ -58,12 +59,8 @@ function SearchCustomer() {
       }
 
       // Send a GET request to search for the customer
-      //console.log('Search field value: '+ searchFormData.searchValue);
-      if (searchFormData.searchType === 'individual') {        
-        response = await axios.get(`/api/searchIndividualCustomer?driverLicense=${searchFormData.searchValue}`);
-      } else {
-        response = await axios.get(`/api/searchBusinessCustomer?taxID=${searchFormData.searchValue}`);
-      }
+
+      response = await axios.get(`/api/searchCustomer?ID=${searchFormData.ID}`);
 
       // Handle success, navigate to customer info page
       console.log('Search successful:', response.data);
@@ -73,7 +70,7 @@ function SearchCustomer() {
     } catch (error) {
       // Handle errors, show an error message
       
-      if (error.response && error.response.status === 500) {
+      if (error.response && error.response.status === 404) {
         toast.error('No customer found. Redirecting to add customer page...', {
           position: 'top-center',
           autoClose: true,
@@ -117,21 +114,11 @@ function SearchCustomer() {
                 </Typography>
                 <form onSubmit={handleSearch}>
                   <TextField
-                    select
-                    label="Customer type"
-                    name="searchType"
-                    value={searchFormData.searchType}
+                    label={"Please enter a driver's license number or a Tax ID"}
+                    name="ID"
+                    value={searchFormData.ID}
                     onChange={handleInputChange}
-                    fullWidth
-                  >
-                    <MenuItem value="individual">Individual Customer</MenuItem>
-                    <MenuItem value="business">Business Customer</MenuItem>
-                  </TextField>
-                  <TextField
-                    label={searchFormData.searchType === 'individual' ? "Driver's License" : 'Tax ID'}
-                    name="searchValue"
-                    value={searchFormData.searchValue}
-                    onChange={handleInputChange}
+                    margin='normal'
                     fullWidth
                   />
                   <Button type="submit" variant="contained" color="primary" fullWidth>

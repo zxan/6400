@@ -69,7 +69,7 @@ function PartOrderStatus() {
     })
     .then((response) => {
       const modifiedData = response.data.map(({ vin, orderNumber, ...rest }) => {
-        const combinedOrderNumber = `${vin}-${orderNumber}`;
+        const combinedOrderNumber = `${vin}-${orderNumber.slice(1)}`;
         return {
           ...rest,
           orderNumber: combinedOrderNumber
