@@ -11,7 +11,7 @@ exports.getSellerReports = (req, res) => {
     ROUND(AVG(s.purchasePrice), 2) AS averageSoldPrice,
     ROUND(SUM(COALESCE(PO.partsOrdered, 0)) / NULLIF(COUNT(DISTINCT ST.vin), 0), 2) AS averageNumberOfPartsOrderedPerVehicle,
     CASE
-        WHEN COALESCE(SUM(PT.partsCost), 0) / NULLIF(COUNT(DISTINCT ST.vin), 0) = 0 THEN 'N/A'
+        WHEN COALESCE(SUM(PT.partsCost), 0) / NULLIF(COUNT(DISTINCT ST.vin), 0) = 0 THEN '0'
         ELSE ROUND(COALESCE(SUM(PT.partsCost), 0) / NULLIF(COUNT(DISTINCT ST.vin), 0), 2)
     END AS averageCostOfPartsPerVehicle,
     (SUM(COALESCE(PO.partsOrdered, 0)) / NULLIF(COUNT(DISTINCT ST.vin), 0) >= 5
