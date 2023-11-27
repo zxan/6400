@@ -125,6 +125,7 @@ const SellerHistory = () => {
           </>
         )}
       </div>
+      <br></br>
     </div>
   );
 };
