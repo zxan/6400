@@ -59,6 +59,7 @@ function AddPartsOrder() {
         axios.get(`/api/getPartOrderNumbersByVin?vin=${vehicleInfo.vin}`)
           .then((response) => {
             const numbers = response.data.partOrderNumbers;
+            console.log('numbers: '+numbers);
             setPartOrderNumbers(numbers);
           })
           .catch((error) => {
