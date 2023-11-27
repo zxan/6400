@@ -197,4 +197,56 @@ const searchBusinessCustomer = (req, res) => {
 
 }
 
-module.exports = { addIndividualCustomer, addBusinessCustomer, searchIndividualCustomer, searchBusinessCustomer };
+const searchCustomer = (req, res) => {
+    const ID = req.query.ID;
+
+    const businessQuery = `SELECT C.CustomerID, C.email, C.phoneNumber, C.street, C.city, C.state, C.postalCode, B.taxID, B.businessName, B.name, B.title 
+        FROM Customer AS C INNER JOIN Business AS B ON C.customerID = B.customerID 
+        WHERE B.taxID = ?;`;
+
+    con.query(businessQuery, [ID], async (err1, businessResult) => {
+        if (err1) {
+            console.error('Error selecting business customer:', err1);
+            return res.status(500).send('Error selecting business customer');
+        }
+
+        if (businessResult.length === 1) {
+            console.log('Business customer selected successfully');
+            return res.status(200).json(businessResult);
+        }
+
+        try {
+            const individualQuery = `SELECT C.CustomerID, C.email, C.phoneNumber, C.street, C.city, C.state, C.postalCode, I.driverLicense, I.firstName, I.lastName 
+                FROM Customer AS C JOIN Individual AS I ON C.customerID = I.customerID 
+                WHERE I.driverLicense = ?;`;
+
+            const individualResult = await queryAsync(con, individualQuery, [ID]);
+
+            if (individualResult.length === 1) {
+                console.log('Individual customer selected successfully');
+                return res.status(200).json(individualResult);
+            } else {
+                console.error('No customer found');
+                return res.status(404).send('No customer found');
+            }
+        } catch (err2) {
+            console.error('Error selecting individual customer:', err2);
+            return res.status(500).send('Error selecting individual customer');
+        }
+    });
+};
+
+// Helper function to promisify MySQL queries
+const queryAsync = (con, query, values) => {
+    return new Promise((resolve, reject) => {
+        con.query(query, values, (error, results) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+};
+
+module.exports = { addIndividualCustomer, addBusinessCustomer, searchIndividualCustomer, searchBusinessCustomer, searchCustomer };

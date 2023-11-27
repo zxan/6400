@@ -43,6 +43,26 @@ function PriceReport() {
     });
 }, []);
 
+
+// Pivot the data to make VehicleType the row name and Condition the column name
+const pivotedData = {};
+
+priceData.forEach((entry) => {
+  const vehicleType = entry.VehicleType;
+  const condition = entry.CarCondition; 
+
+  if (!pivotedData[vehicleType]) {
+    pivotedData[vehicleType] = {};
+  }
+
+  pivotedData[vehicleType][condition] = entry.AveragePrice;
+});
+
+// Extract unique conditions to build table headers
+const conditions = Array.from(
+  new Set(priceData.map((entry) => entry.CarCondition))
+);
+
 const styles = {
   table: {
     width: '60%',
@@ -73,7 +93,7 @@ const styles = {
   return (
     <div>
       <NavBar />
-      <h1 style={styles.title}>Price per Condition</h1>
+      <h1 style={styles.title}>Price ($) per Condition</h1>
   
       {loading ? (
         // Show a loading indicator while the data is being fetched
@@ -81,20 +101,44 @@ const styles = {
       ) : (
         <>
           {isManagerOrOwner ? (
+            // <table style={styles.table}>
+            //   <thead>
+            //     <tr>
+            //       <th style={styles.columnHeader}>Vehicle Type</th>
+            //       <th style={styles.columnHeader}>Condition</th>
+            //       <th style={styles.columnHeader}>Average Price</th>
+            //     </tr>
+            //   </thead>
+            //   <tbody>
+            //     {priceData.map((entry) => (
+            //       <tr key={entry.VehicleType + entry.Condition}>
+            //         <td>{entry.VehicleType}</td>
+            //         <td>{entry.CarCondition}</td> {/* Assuming CarCondition is the name of the condition column */}
+            //         <td>${entry.AveragePrice}</td>
+            //       </tr>
+            //     ))}
+            //   </tbody>
+            // </table>
             <table style={styles.table}>
               <thead>
                 <tr>
                   <th style={styles.columnHeader}>Vehicle Type</th>
-                  <th style={styles.columnHeader}>Condition</th>
-                  <th style={styles.columnHeader}>Average Price</th>
+                  {conditions.map((condition) => (
+                    <th key={condition} style={styles.columnHeader}>
+                      {condition}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {priceData.map((entry) => (
-                  <tr key={entry.VehicleType + entry.Condition}>
-                    <td>{entry.VehicleType}</td>
-                    <td>{entry.CarCondition}</td> {/* Assuming CarCondition is the name of the condition column */}
-                    <td>${entry.AveragePrice}</td>
+                {Object.keys(pivotedData).map((vehicleType) => (
+                  <tr key={vehicleType}>
+                    <td>{vehicleType}</td>
+                    {conditions.map((condition) => (
+                      <td key={condition}>
+                        {'$'+pivotedData[vehicleType][condition] || '$0'}
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>

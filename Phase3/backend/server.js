@@ -38,6 +38,7 @@ app.post('/api/addIndividualCustomer', customerController.addIndividualCustomer)
 app.post('/api/addBusinessCustomer', customerController.addBusinessCustomer);
 app.get('/api/searchIndividualCustomer', customerController.searchIndividualCustomer);
 app.get('/api/searchBusinessCustomer', customerController.searchBusinessCustomer);
+app.get('/api/searchCustomer', customerController.searchCustomer);
 
 // part API
 app.get('/api/getSearchVendors', vendorController.getSearchVendors);

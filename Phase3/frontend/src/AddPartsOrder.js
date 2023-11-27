@@ -110,19 +110,19 @@ function AddPartsOrder() {
       }
     
       let orderNumber = '';
-      for (let i = vehicleInfo.vin.length - 1; i >= 0; i--) {
-        const char = vehicleInfo.vin[i];
-        if (!Number.isNaN(Number(char))) {
-          // Continue prepending to orderNumber if the character is a number
-          orderNumber = char + orderNumber;
-        } else {
-          // Stop when a non-number character is encountered
-          break;
-        }
-      }
+      // for (let i = vehicleInfo.vin.length - 1; i >= 0; i--) {
+      //   const char = vehicleInfo.vin[i];
+      //   if (!Number.isNaN(Number(char))) {
+      //     // Continue prepending to orderNumber if the character is a number
+      //     orderNumber = char + orderNumber;
+      //   } else {
+      //     // Stop when a non-number character is encountered
+      //     break;
+      //   }
+      // }
     
       // Append "-" followed by the count of partOrderNumbers.length
-      orderNumber += `-${String(partOrderNumbers.length + 1).padStart(3, '0')}`;
+      orderNumber += `${String(partOrderNumbers.length + 1).padStart(3, '0')}`;
     
       const headers = {
         'Content-Type': 'application/json',
@@ -185,6 +185,22 @@ function AddPartsOrder() {
      } else {
       // Handle the case where isAddingToExistingOrder is true
       // Logic for updating an existing part order
+
+      for (const key in newPartsOrder) {
+        if (newPartsOrder[key].trim() === '') {
+          toast.error(`Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`, {
+            position: "top-center",
+            autoClose: true,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          return; // Don't proceed with adding the parts order
+        }
+      }
   
       // Construct the updated part information object
       const updatedPartInfo = {
@@ -254,7 +270,7 @@ function AddPartsOrder() {
       setIsAddingToExistingOrder(true);
       console.log(isAddingToExistingOrder);
       setSelectedOrderNumber(clickedOrderNumber);
-  
+      console.log(`Selected part order: ${clickedOrderNumber}`);
       // Fetch vendor information based on the selected part order number
       axios.get(`/api/getVendorInfoByPartOrder?orderNumber=${clickedOrderNumber}`)
         .then((response) => {
@@ -393,7 +409,7 @@ function AddPartsOrder() {
                           cursor: 'pointer',
                         }}
                       >
-                        <TableCell>{orderNumber}</TableCell>
+                        <TableCell>{vehicleInfo.vin + '-' + orderNumber.slice(1)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
