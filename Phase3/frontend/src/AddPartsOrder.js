@@ -175,6 +175,22 @@ function AddPartsOrder() {
      } else {
       // Handle the case where isAddingToExistingOrder is true
       // Logic for updating an existing part order
+
+      for (const key in newPartsOrder) {
+        if (newPartsOrder[key].trim() === '') {
+          toast.error(`Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`, {
+            position: "top-center",
+            autoClose: true,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          return; // Don't proceed with adding the parts order
+        }
+      }
   
       // Construct the updated part information object
       const updatedPartInfo = {
