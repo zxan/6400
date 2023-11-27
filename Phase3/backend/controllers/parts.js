@@ -78,7 +78,6 @@ exports.getPartOrder = (req, res) => {
 exports.updatePartOrderStatus = (req, res) => {
   const { orderNumber, partNumber, vin } = req.params;
   const { status } = req.body;
-
   // Check the current status
   const checkStatusQuery = `
     SELECT p.status FROM Part p

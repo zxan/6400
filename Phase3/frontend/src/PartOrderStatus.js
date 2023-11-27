@@ -42,7 +42,7 @@ function PartOrderStatus() {
   const [isInventoryOrOwner,setisInventoryClerkorOwner]=useState(false);
   const storedUser = sessionStorage.getItem('user');
   const columns = [
-    { Header: 'Order Number', accessor: 'orderNumber' },
+    { Header: 'Order Number', accessor: 'combineOrderNumber' },
     { Header: 'Vendor Name', accessor: 'vendorName' },
     { Header: 'Part Number', accessor: 'partNumber' },
     { Header: 'Quantity', accessor: 'quantity' },
@@ -71,8 +71,10 @@ function PartOrderStatus() {
       const modifiedData = response.data.map(({ vin, orderNumber, ...rest }) => {
         const combinedOrderNumber = `${vin}-${orderNumber.slice(1)}`;
         return {
+          vin,
           ...rest,
-          orderNumber: combinedOrderNumber
+          orderNumber,
+          combineOrderNumber: combinedOrderNumber
         };
       });
       console.log(modifiedData)
@@ -85,20 +87,20 @@ function PartOrderStatus() {
 
   const handleSearch = () => {
     // Check if at least one status is selected
-    if (searchStatus.length === 0) {
-      // Show a toast message and return from the function
-      toast.error('A Status must be selected', {
-        position: "top-center",
-        autoClose: true,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      return;
-    }
+    // if (searchStatus.length === 0) {
+    //   // Show a toast message and return from the function
+    //   toast.error('A Status must be selected', {
+    //     position: "top-center",
+    //     autoClose: true,
+    //     hideProgressBar: false,
+    //     closeOnClick: true,
+    //     pauseOnHover: true,
+    //     draggable: true,
+    //     progress: undefined,
+    //     theme: "light",
+    //   });
+    //   return;
+    // }
   
     // Make an HTTP request to search for part orders based on the search criteria
     axios.get(`/api/getPartOrder`, {
@@ -108,8 +110,17 @@ function PartOrderStatus() {
       },
     })
     .then((response) => {
-      console.log('Search results:', response.data);
-      setSearchResults(response.data);
+      const modifiedData = response.data.map(({ vin, orderNumber, ...rest }) => {
+        const combinedOrderNumber = `${vin}-${orderNumber.slice(1)}`;
+        return {
+          vin,
+          ...rest,
+          orderNumber,
+          combineOrderNumber: combinedOrderNumber
+        };
+      });
+      console.log(modifiedData)
+      setSearchResults(modifiedData);
     })
     .catch((error) => {
       console.error('Error searching for part orders:', error);
@@ -156,6 +167,7 @@ function PartOrderStatus() {
 
   const handleStatusUpdate = () => {
     // Make an HTTP request to update the order status
+    console.log(selectedOrder);
     axios
       .put(`/api/updatePartOrderStatus/${selectedOrder?.orderNumber}/${selectedOrder?.partNumber}/${selectedOrder?.vin}`, { status: newStatus })
       .then((response) => {
