@@ -73,8 +73,18 @@ exports.getSellerReports = (req, res) => {
 exports.getAverageTime = (req, res) => {
     const AverageTimeQuery = `
     SELECT
-        VehicleType.type,
-        IFNULL(CAST(ROUND(AVG(DATEDIFF(Buys_From.transactionDate, Sells_To.purchaseDate)), 2) AS CHAR), 'N/A') AS averageTime
+    VehicleType.type,
+    IFNULL(CAST(
+        ROUND(
+            AVG(
+                CASE
+                    WHEN Sells_To.purchaseDate = Buys_From.transactionDate THEN 1
+                    ELSE DATEDIFF(Buys_From.transactionDate, Sells_To.purchaseDate)
+                END
+            ),
+            2
+        ) AS CHAR
+    ), 'N/A') AS averageTime
     FROM VehicleType
     LEFT JOIN Of_Type ON VehicleType.type = Of_Type.type
     LEFT JOIN Vehicle ON Vehicle.vin = Of_Type.vin
@@ -94,50 +104,40 @@ exports.getAverageTime = (req, res) => {
   };
 
 
-  exports.getPriceReport = (req, res) => {
-    const priceReportQuery = `
-    SELECT
-        VT.type AS VehicleType,
-        Conditions.CarCondition,
-        ROUND(AVG(
-            CASE
-                WHEN V.carCondition = Conditions.CarCondition
-                THEN 1.1 * COALESCE(IndividualPartsCost, 0) + 1.25 * COALESCE(ST.purchasePrice, 0)
-                ELSE 0
-            END
-        ), 2) AS AveragePrice
-    FROM VehicleType VT
-    CROSS JOIN (
-        SELECT 'Excellent' AS CarCondition
-        UNION ALL
-        SELECT 'Very Good'
-        UNION ALL
-        SELECT 'Good'
-        UNION ALL
-        SELECT 'Fair'
-    ) Conditions
-    LEFT JOIN Of_Type OT ON VT.type = OT.type
-    LEFT JOIN Vehicle V ON OT.vin = V.vin
-    LEFT JOIN (
-        SELECT 
-            P.vin,
-            COALESCE(SUM(P.cost * COALESCE(P.quantity, 0)), 0) AS IndividualPartsCost
-        FROM Part P
-        GROUP BY P.vin
-    ) Parts ON V.vin = Parts.vin
-    LEFT JOIN Sells_To ST ON V.vin = ST.vin
-    GROUP BY VT.type, Conditions.CarCondition
-    ORDER BY VT.type, FIELD(Conditions.CarCondition, 'Excellent', 'Very Good', 'Good', 'Fair');
-    `;
+exports.getPriceReport = (req, res) => {
+const priceReportQuery = `
+SELECT 
+VehicleType,
+carCondition as CarCondition, 
+SUM(AveragePrice) AS AveragePrice
+FROM
+((SELECT 
+type AS VehicleType,
+v.carCondition AS carCondition, 
+ROUND(AVG(purchasePrice),2) AS AveragePrice
+FROM Vehicle v
+JOIN Of_Type ot ON v.vin = ot.vin
+JOIN Sells_To st on v.vin = st.vin
+GROUP BY type, carCondition
+ORDER BY type)
+UNION
+(SELECT type AS VehicleType, carCondition, 0 
+FROM
+    (SELECT DISTINCT type FROM VehicleType) vt
+CROSS JOIN
+    (SELECT DISTINCT carCondition AS carCondition FROM Vehicle) cc)) AS SummaryTable
+GROUP BY VehicleType, CarCondition
+ORDER BY VehicleType, FIELD(CarCondition, 'Excellent', 'Very Good', 'Good', 'Fair')
+`;
 
-    con.query(priceReportQuery, (err, results) => {
-        if (err) {
-            console.error('Error executing query:', err);
-            res.status(500).send('Error with the database');
-            return;
-        }
-        res.json(results);
-    });
+con.query(priceReportQuery, (err, results) => {
+    if (err) {
+        console.error('Error executing query:', err);
+        res.status(500).send('Error with the database');
+        return;
+    }
+    res.json(results);
+});
 };
 
 exports.getPartsStatistics = (req, res) => {
