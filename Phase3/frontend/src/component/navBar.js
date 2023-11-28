@@ -131,6 +131,7 @@ export default function NavBar() {
                         </Typography>
 
                         {/* Other buttons can be added similarly to this one */}
+
                         <Button style={styles.menuIconBox}>
                             <Link style={{ textDecoration: 'none', color: '#fff' }} to="/">HOME</Link>
                         </Button>
@@ -178,6 +179,13 @@ export default function NavBar() {
                             </div>
                         }
                         <Box style={{ flexGrow: 1 }}></Box>
+
+                        {loggedInUser && (
+                            <Typography style={{ color: '#fff', marginRight: '1rem' }}>
+                                {loggedInUser}
+                            </Typography>
+                        )}
+
                         {loggedInUser === null ?
                             <Button onClick={() => navigate('/Login')} style={styles.loginButton}>Login</Button> :
                             <Button onClick={LogOut} style={styles.loginButton}>Log Out</Button>
