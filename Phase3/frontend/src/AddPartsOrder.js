@@ -287,6 +287,13 @@ function AddPartsOrder() {
         });
     }
   };
+
+  const handleNavigateBack = () => {
+    const vin = vehicleInfo.vin;
+
+    // Navigate back to CarDetail with the VIN as a parameter
+    navigate(`/carDetail?vin=${vin}`);
+  };
   
 
   return (
@@ -422,6 +429,10 @@ function AddPartsOrder() {
         </Grid>
       </div>
       <ToastContainer />
+
+      <Button variant="contained" color="primary" onClick={handleNavigateBack}>
+        Back to Car Detail
+      </Button>
     </div>
   );
   
