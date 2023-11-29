@@ -423,13 +423,23 @@ function AddPartsOrder() {
               </div>
             )}
           </Grid>
+          <Grid>
+            
+          </Grid>
         </Grid>
       </div>
       <ToastContainer />
 
-      <Button variant="contained" color="primary" onClick={handleNavigateBack}>
-        Back to Car Detail
-      </Button>
+      <Grid container justifyContent="center">
+        
+
+        <br></br><br></br>
+        <Button variant="contained" color="primary" onClick={handleNavigateBack} style={{ marginTop: '50px' }}>
+          Back to Car Detail
+        </Button>
+
+      </Grid>
+
     </div>
   );
   
