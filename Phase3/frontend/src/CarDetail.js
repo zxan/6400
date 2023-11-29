@@ -199,7 +199,7 @@ function CarDetail() {
                 <Typography variant="h6" color="text.secondary">
                   Fuel Type: {car.fuelType}
                 </Typography>
-                {transactionUser.inventoryClerkFirstName&&
+                {(transactionUser.inventoryClerkFirstName || isInventoryClerk) &&
                 <>
                   <Typography variant="h6" color="text.secondary">
                   Purchase Price: ${car.purchasePrice}

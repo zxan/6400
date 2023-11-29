@@ -79,7 +79,7 @@ function PartsStatistics() {
               <thead>
                 <tr>
                   <th style={styles.columnHeader}>Vendor Name</th>
-                  <th style={styles.columnHeader}>Types of Parts Supplied</th>
+                  <th style={styles.columnHeader}>Number of Part Types Supplied</th>
                   <th style={styles.columnHeader}>Total Parts Quantity</th>
                   <th style={styles.columnHeader}>Total Dollar Amount</th>
                 </tr>

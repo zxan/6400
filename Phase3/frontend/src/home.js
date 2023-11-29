@@ -285,7 +285,7 @@ function Home() {
                         </Grid>
                         {/* Right Grid for Image */}
                         <Grid item md={6} style={styles.imgContainer}>
-                        {isInventoryClerk&&isManagerOrOwner &&  <div style={{ width: '100%', textAlign: 'center' }}>
+                        {(isInventoryClerk||isManagerOrOwner) &&  <div style={{ width: '100%', textAlign: 'center' }}>
             <Typography variant="h6" style={{ color: 'blue' }}>
             Number of Cars available for Sales: {publicCount}
             </Typography>
