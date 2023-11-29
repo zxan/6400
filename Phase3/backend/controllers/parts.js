@@ -179,7 +179,7 @@ exports.getPartOrderNumbersByVin = (req, res) => {
       return;
     }
 
-    const partOrderNumbers = results.map((result) => vin + '-' + result.orderNumber);
+    const partOrderNumbers = results.map((result) =>  result.orderNumber);
     res.json({ partOrderNumbers });
   });
 };
