@@ -242,7 +242,6 @@ exports.updatePartsOrderwithParts = (req, res) => {
     description,
     cost,
     orderNumber,
-    vendorInfo: { name: vendorName },
   } = req.body;
   orderNumber = orderNumber.slice(-3);
   console.log('Received data for update:', req.body);

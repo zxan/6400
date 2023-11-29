@@ -77,7 +77,7 @@ function AddPartsOrder() {
   
   const handleAddPartsOrder = () => {
 
-    if (!selectedVendor) {
+    if (!selectedVendor&&!isAddingToExistingOrder) {
       toast.error('Please select a vendor before adding or updating a part order', {
         position: "top-center",
         autoClose: true,
@@ -211,10 +211,6 @@ function AddPartsOrder() {
         description: newPartsOrder.description,
         cost: newPartsOrder.cost,
         orderNumber: selectedOrderNumber, // Pass the selected order number for the update
-        vendorInfo: {
-          name: selectedVendor.name,
-          // Add other vendor information if needed
-        },
       };
   
       // Make a request to update the existing part order
@@ -302,14 +298,15 @@ function AddPartsOrder() {
       <div style={{ textAlign: 'center' }}>
 
         <h2>VIN: {vehicleInfo.vin}</h2>
-
-        <Grid container justifyContent="center">
+{!isAddingToExistingOrder&&
+  <Grid container justifyContent="center">
           <Grid item xs={12} sm={6}>
             <Button variant="contained" color="primary" onClick={handleSearchVendor}>
               Search Vendor
             </Button>
           </Grid>
-        </Grid>
+        </Grid>}
+
         {vendorInfo ? (
   // Render details of the selected vendor using selectedVendorInfo
   <div>
@@ -332,9 +329,9 @@ function AddPartsOrder() {
     <p>State: {selectedVendor.state}</p>
     <p>Postal Code: {selectedVendor.postalCode}</p>
   </div>
-) : (
+) : !isAddingToExistingOrder&&(
   // Render this if no vendor is selected
-  <p>No selected vendor.</p>
+   <p>No selected vendor.</p>
 )}
         {showTable && (
           <TableContainer component={Paper}>
