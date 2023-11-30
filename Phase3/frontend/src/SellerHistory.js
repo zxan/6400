@@ -71,7 +71,7 @@ const SellerHistory = () => {
     container: {
       display: 'flex',
       justifyContent: 'center',
-      marginTop: '5%',
+      marginTop: '1%',
     },
     table: {
       width: '60%',
@@ -89,11 +89,18 @@ const SellerHistory = () => {
       color: 'red',
       marginTop: '20px',
     },
+    title: {
+      textAlign: 'center',
+      marginTop: '5%',
+      marginBottom: '20px',
+    },
   };
+
 
   return (
     <div>
       <NavBar />
+      <h1 style={styles.title}>Seller History</h1>
       <div style={styles.container}>
         {loading ? (
           // Show a loading indicator while the data is being fetched
@@ -105,7 +112,7 @@ const SellerHistory = () => {
                 <thead>
                   <tr>
                     <th style={styles.columnHeader}>Seller Name</th>
-                    <th style={styles.columnHeader}>Total Number of Vehicles Sold</th>
+                    <th style={styles.columnHeader}>Total Number of Vehicles Sold to BuzzCars</th>
                     <th style={styles.columnHeader}>Average Vehicle Price ($)</th>
                     <th style={styles.columnHeader}>Average Number of Parts per Vehicle</th>
                     <th style={styles.columnHeader}>Average Cost of Parts per Vehicle ($)</th>

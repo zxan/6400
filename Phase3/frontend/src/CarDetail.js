@@ -211,7 +211,7 @@ function CarDetail() {
                 }
              
                 <Typography variant="h6" color="text.secondary">
-                  Sale Price: ${car.price?car.price:0}
+                  Sale Price: ${car.price?(Math.round(car.price * 100) / 100).toFixed(2):0}                  
                 </Typography>
                 
   

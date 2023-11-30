@@ -318,7 +318,7 @@ function AddPartsOrder() {
     <p>State: {vendorInfo.state}</p>
     <p>Postal Code: {vendorInfo.postalCode}</p>
   </div>
-) : selectedVendor ? (
+) : !isAddingToExistingOrder&&selectedVendor ? (
   // Render details of the selected vendor using selectedVendor
   <div>
     <h2>Selected Vendor:</h2>

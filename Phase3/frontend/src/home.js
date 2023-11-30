@@ -73,6 +73,7 @@ function Home() {
 
 
     useEffect(() => {
+        document.title = 'BuzzCars';
         axios.get("/api/countVehicleForPublic", { params: { 'username': storedUser } }).then((response) => {
           setPublicCount(response.data[0].countVehicleForPublic);
         }).catch((error) => {
@@ -134,14 +135,14 @@ function Home() {
                         {/* Left Grid for Content */}
                         <Grid item md={6}>
                             <Typography variant="h1" component="h1" style={styles.header}>
-                                BuzzCar
+                                BuzzCars
                             </Typography>
                             {storedUser&&
                                 <Paper style={styles.search}>
                                 <InputBase
                                     style={styles.input}
                                     value={vin}
-                                    placeholder="Search By VIN"
+                                    placeholder="VIN"
                                     inputProps={{ 'aria-label': 'search' }}
                                     onChange={(event) => setVin(event.target.value)}
                                 />
@@ -273,7 +274,7 @@ function Home() {
                                 <InputBase
                                     style={styles.input}
                                     value={keyword}
-                                    placeholder="Search By keyword"
+                                    placeholder="Search by keyword"
                                     inputProps={{ 'aria-label': 'search' }}
                                     onChange={(event) => setKeyword(event.target.value)}
                                 />
@@ -285,11 +286,16 @@ function Home() {
                         </Grid>
                         {/* Right Grid for Image */}
                         <Grid item md={6} style={styles.imgContainer}>
-                        {(isInventoryClerk||isManagerOrOwner) &&  <div style={{ width: '100%', textAlign: 'center' }}>
+
+                        {<div style={{ width: '100%', textAlign: 'center' }}>
             <Typography variant="h6" style={{ color: 'blue' }}>
-            Number of Cars available for Sales: {publicCount}
+            Number of Cars Available for Sales: {publicCount}
             </Typography>
             <br></br>
+            
+          </div>}
+                        {(isInventoryClerk||isManagerOrOwner) &&  <div style={{ width: '100%', textAlign: 'center' }}>
+
             <Typography variant="h6" style={{ color: 'red' }}>
               Number of Cars with Pending Parts: {pendingCount}
             </Typography>
