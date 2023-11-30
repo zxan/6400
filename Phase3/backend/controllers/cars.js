@@ -878,5 +878,23 @@ exports.addCar = (req, res) => {
             }
             });
 
-    });};
+    });
+};
+
+exports.getPurchaseDate = (req, res) => {
+    const vin = req.query.vin; 
+    const query = `
+      SELECT purchaseDate  
+      FROM Sells_To ST 
+      WHERE vin = ?
+    `;
   
+    con.query(query, vin, (err, results) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).send('Error with the database');
+        }
+        return res.json(results[0]);
+    });
+};
+

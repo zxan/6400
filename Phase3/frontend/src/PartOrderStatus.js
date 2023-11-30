@@ -143,7 +143,7 @@ function PartOrderStatus() {
   
   const handleOrderClick = (order) => {
     setSelectedOrder(order);
-    if (order.status === 'installed') {
+    if (order.status === 'installed' && isInventoryOrOwner) {
       // Show a toast message indicating that the status cannot be changed
       toast.error('Order status cannot be changed because it is already installed', {
         position: "top-center",

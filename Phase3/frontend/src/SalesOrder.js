@@ -59,14 +59,47 @@ function SalesOrder() {
   };
 
   let response;
+  let purchaseDate;
 
   const handleSellVehicle = async (e) => {
     e.preventDefault();
     transactionDate = salesDate.year + '-' + salesDate.month + '-' + salesDate.day;
-    //console.log(transactionDate);
-    //console.log(dateRegex.test(transactionDate));
+    
+    try {
+      purchaseDate = await axios.get('/api/getPurchaseDate',{params: { 'vin': vehicleInfo.vin } });
+      console.log('Purchase date: '+ purchaseDate.data.purchaseDate);
+    }
+    catch(error){
+      //console.error('Error inserting the sale:', error);
+      if (error.response && error.response.status === 500) {
+        toast.error('Error purchase data. Please check again.', {
+          position: 'top-center',
+          autoClose: true,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        });
+      }
+      else {
+        toast.error('Error reading the purchase date.');
+      }
+    }
+
     if(!dateRegex.test(transactionDate)){
       displayErrorToast('Please enter a correct date using a two-digit number for month, a two-digit number for day, and a four-digit number for year');
+    }
+    else if (Date.parse(transactionDate).toString() === 'NaN'){
+      displayErrorToast('Please enter a legit date');
+    }
+    else if (Date.parse(transactionDate) > Date.now()){
+      displayErrorToast('Please enter a date not in the future');
+    }
+    else if (Date.parse(purchaseDate.data.purchaseDate) > Date.parse(transactionDate)){
+
+      displayErrorToast('Please enter a date later than the original purchase date');
     }
     else {
       try{
@@ -97,7 +130,7 @@ function SalesOrder() {
         else {
           toast.error('Error inserting the sale transaction. Please check again.');
         }
-        }
+      }
         
 
     }
@@ -142,7 +175,7 @@ function SalesOrder() {
               <br />
               Fuel type: {vehicleInfo.fueltype}
               <br />
-              Price: {vehicleInfo.price}
+              Price: {(Math.round(vehicleInfo.price * 100) / 100).toFixed(2)}
               <br />
               Color(s): {vehicleInfo.colors}
               <br />
@@ -245,7 +278,7 @@ function SalesOrder() {
             <br />
             Fuel type: {vehicleInfo.fueltype}
             <br />
-            Price: {vehicleInfo.price}
+            Price: {(Math.round(vehicleInfo.price * 100) / 100).toFixed(2)}
             <br />
             Color(s): {vehicleInfo.colors}
             <br />

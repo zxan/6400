@@ -127,7 +127,7 @@ export default function NavBar() {
                             component="a"
                             style={styles.logoText}
                         >
-                            BuzzCar
+                            BuzzCars
                         </Typography>
 
                         {/* Other buttons can be added similarly to this one */}

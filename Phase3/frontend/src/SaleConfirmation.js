@@ -45,7 +45,7 @@ function SaleConfirmation() {
             <br />
             Fuel type: {vehicleInfo.fueltype}
             <br />
-            Price: {vehicleInfo.price}
+            Price: {(Math.round(vehicleInfo.price * 100) / 100).toFixed(2)}
             <br />
             Color(s): {vehicleInfo.colors}
             <br />
