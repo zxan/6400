@@ -78,7 +78,7 @@ function AverageTime() {
               <thead>
                 <tr>
                   <th style={styles.columnHeader}>Vehicle Type</th>
-                  <th style={styles.columnHeader}>Average Time</th>
+                  <th style={styles.columnHeader}>Average Time (Days)</th>
                 </tr>
               </thead>
               <tbody>

@@ -46,7 +46,7 @@ function CarComponent(props) {
             Fuel Type: {props.fuelType}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Price: ${props.price?props.price:0}
+            Price: ${props.price?(Math.round(props.price * 100) / 100).toFixed(2):0}
           </Typography>
 
           <Typography variant="body2" color="text.secondary">
