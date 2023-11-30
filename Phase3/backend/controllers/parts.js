@@ -2,12 +2,7 @@ const con = require('../connect');
 
 exports.getPartOrder = (req, res) => {
   const {
-    orderNumber,
-    vendorName,
     vin,
-    partNumber,
-    quantity,
-    cost,
     status,
   } = req.query;
 
@@ -24,39 +19,15 @@ exports.getPartOrder = (req, res) => {
     params.push(status);
   }
 
-  // if (orderNumber) {
-  //   conditions.push('po.orderNumber LIKE ?');
-  //   params.push(`%${orderNumber}%`);
-  // }
-
-  // if (vendorName) {
-  //   conditions.push('po.vendorName LIKE ?');
-  //   params.push(`%${vendorName}%`);
-  // }
 
   if (vin) {
     conditions.push('po.vin =?');
     params.push(vin);
   }
 
-  // if (partNumber) {
-  //   conditions.push('p.partNumber LIKE ?');
-  //   params.push(`%${partNumber}%`);
-  // }
-
-  // if (quantity) {
-  //   conditions.push('p.quantity = ?');
-  //   params.push(quantity);
-  // }
-
-  // if (cost) {
-  //   conditions.push('p.cost = ?');
-  //   params.push(cost);
-  // }
-
   const searchQuery = `
     SELECT
-      po.orderNumber, po.vendorName, po.vin, p.partNumber, p.quantity, p.cost, p.status
+      po.orderNumber, po.vendorName, po.vin, p.partNumber, p.quantity, p.cost, p.status,p.description
     FROM PartOrder po
     JOIN Part p ON po.orderNumber = p.orderNumber AND p.vin=po.vin
     WHERE ${conditions.join(' AND ')};

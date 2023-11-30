@@ -39,7 +39,7 @@ exports.getCriterias = (req, res) => {
 
                 let modelYears = [];
                 const currentYear = new Date().getFullYear();
-                for (let i = 2000; i <= currentYear + 1; i++) {
+                for (let i = 1950; i <= currentYear + 1; i++) {
                     modelYears.push(i);
                 }
                 criterias["Model Year"] = modelYears;
