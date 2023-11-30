@@ -47,6 +47,7 @@ function PartOrderStatus() {
     { Header: 'Part Number', accessor: 'partNumber' },
     { Header: 'Quantity', accessor: 'quantity' },
     { Header: 'Unit Price', accessor: 'cost' },
+    { Header: 'Description', accessor: 'description' },
     { Header: 'Status', accessor: 'status' },
   ];
 
@@ -189,50 +190,6 @@ function PartOrderStatus() {
         <h1>Part Order Status</h1>
         <Grid container justifyContent="center"  spacing={2}>
           <Grid item xs={12} sm={6}>
-            {/* <TextField
-              label="Order Number"
-              variant="outlined"
-              value={searchOrderNumber}
-              onChange={(e) => setSearchOrderNumber(e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="Vendor Name"
-              variant="outlined"
-              value={searchVendorName}
-              onChange={(e) => setSearchVendorName(e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="VIN"
-              variant="outlined"
-              value={searchVin}
-              onChange={(e) => setSearchVin(e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="Part Number"
-              variant="outlined"
-              value={searchPartNumber}
-              onChange={(e) => setSearchPartNumber(e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="Quantity"
-              variant="outlined"
-              type="number"
-              value={searchQuantity}
-              onChange={(e) => setSearchQuantity(e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="Cost"
-              variant="outlined"
-              type="number"
-              value={searchCost}
-              onChange={(e) => setSearchCost(e.target.value)}
-              fullWidth
-            /> */}
             <div>
               <label>Order Status:</label>
               <Checkbox
