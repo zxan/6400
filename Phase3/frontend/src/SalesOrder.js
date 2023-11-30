@@ -97,7 +97,7 @@ function SalesOrder() {
     else if (Date.parse(transactionDate) > Date.now()){
       displayErrorToast('Please enter a date not in the future');
     }
-    else if (Date.parse(purchaseDate.data.purchaseDate) > Date.parse(transactionDate)){
+    else if (Date.parse(purchaseDate.data.purchaseDate.split('T')[0]) > Date.parse(transactionDate)){
 
       displayErrorToast('Please enter a date later than the original purchase date');
     }

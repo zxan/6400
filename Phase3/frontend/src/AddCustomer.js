@@ -92,11 +92,7 @@ function AddCustomer() {
       displayErrorToast('Please enter the driver license number');
       return false;
     }
-    if (email === '') {
-      displayErrorToast('Please enter the email');
-      return false;
-    }
-    if (!emailRegex.test(email)){
+    if (email !== '' && !emailRegex.test(email)){
       displayErrorToast('Please enter a valid email');
       return false;
     }
@@ -143,11 +139,7 @@ function AddCustomer() {
       displayErrorToast('Please enter the title of the contact person');
       return false;
     }
-    if (email === '') {
-      displayErrorToast('Please enter the email');
-      return false;
-    }
-    if (!emailRegex.test(email)){
+    if (email !== '' && !emailRegex.test(email)){
       displayErrorToast('Please enter a valid email');
       return false;
     }
